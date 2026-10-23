@@ -255,6 +255,15 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
   result.exportDiagnostics = tally(exported.diagnostics as Diagnostic[]);
   if (exported.status !== "ready") {
     result.failure = "export-blocked";
+    // A netlist the design itself cannot write blocks RNL too; say why.
+    result.netlistDiagnostics = tally(
+      ((exported as { netlistDiagnostics?: Diagnostic[] }).netlistDiagnostics ?? []).filter(
+        (item) => item.severity === "error",
+      ),
+    );
+    result.errors = ((exported as { netlistDiagnostics?: Diagnostic[] }).netlistDiagnostics ?? [])
+      .filter((item) => item.severity === "error")
+      .map((item) => `${item.code}: ${item.message}`);
     return result;
   }
   let text: string;

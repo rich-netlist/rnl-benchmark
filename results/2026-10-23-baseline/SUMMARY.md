@@ -38,7 +38,7 @@ Counts are circuits reaching at least that level.
 | spectre | import-failed | SPICE_IMPORT_UNSUPPORTED_SYMBOL | 11: 7jb4jzcmah bvy25zrhzz ckxxp76d57 d3tfb8q693 d9a2snyhxz gw6naca4r6 … |
 | spice | import-errors | RNL_IMPORT_CHANGES_NETLIST | 10: 3575r7k3gg 435zm6qgpa 58t3fmnnmj 66yyhzeg2b 8aswrx2vta cs5yz8ppc5 … |
 | spectre | import-errors | RNL_IMPORT_CHANGES_NETLIST | 7: 3575r7k3gg 435zm6qgpa 66yyhzeg2b 8aswrx2vta cs5yz8ppc5 j9cfz6mfs7 … |
-| spectre | export-blocked | blocked without an error diagnostic | 5: 3h96hmvpyv 3yb6zz6j2y jkazvdj5zv secn3fpsvj zj2kxb229f |
+| spectre | export-blocked | MODEL_SOURCE_DIALECT: Netlist exceeds the 512 KiB conversion limit. | 5: 3h96hmvpyv 3yb6zz6j2y jkazvdj5zv secn3fpsvj zj2kxb229f |
 | spice | import-threw | Route electrical endpoint must belong to its member Net / Route terminal endpoint must be a member of the route net | 5: 6arzwp68jh c8y9j9djzt dz689bvy2n gwer4fr5c3 pbp5aw5waq |
 | spectre | import-threw | Route electrical endpoint must belong to its member Net / Route terminal endpoint must be a member of the route net | 3: dhfnzqqagg gwer4fr5c3 qmcsgaepwd |
 | spectre | import-threw | TypeError: Cannot read properties of undefined (reading 'id') | 1: ggzkc58xpq |

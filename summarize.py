@@ -85,7 +85,10 @@ for path in sorted(glob.glob(os.path.join(reports_dir, "*.json"))):
             message = " / ".join(sorted({e.split(":")[0] for e in f.get("errors", [])})) or " / ".join(
                 sorted(k.split(" ", 1)[1] for k in f.get("importDiagnostics", {}) if k.startswith("error")))
         elif kind == "export-blocked":
-            message = " / ".join(k for k in f.get("exportDiagnostics", {}) if k.startswith("error")) or "blocked without an error diagnostic"
+            message = " / ".join(
+                [k for k in f.get("exportDiagnostics", {}) if k.startswith("error")]
+                + sorted({e.split(":")[0] + ": " + e.split(": ", 2)[-1][:60] for e in f.get("errors", [])})
+            ) or "blocked without an error diagnostic"
         else:
             message = f.get("error", "")[:120]
         failures[(fmt, kind, message)].append(r["id"])
