@@ -4,8 +4,6 @@
 
 It answers one question per change to RNL or to Canvas's RNL adapter: do more circuits survive the round trip than before, and did any get worse?
 
-> **Private.** The circuits belong to their Gallery authors (55 people). They are here to test RNL and nothing else. Do not publish, redistribute, or train on them, and do not copy them into a public repository.
-
 ## Layout
 
 | Path | What |

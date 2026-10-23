@@ -1,4 +1,4 @@
-# How manifest.json was chosen. Needs a private Gallery snapshot (gallery.sqlite)
+# How manifest.json was chosen. Needs a Gallery snapshot (gallery.sqlite)
 # and, for dhfnzqqagg, its live project file:
 #   python3 select.py <gallery.sqlite> <dhfnzqqagg.icproj.json>
 
