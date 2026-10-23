@@ -1,4 +1,4 @@
-# RNL conformance set
+# RNL benchmark
 
 100 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen, and a harness that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
 
@@ -12,7 +12,7 @@ It answers one question per change to RNL or to Canvas's RNL adapter: do more ci
 |---|---|
 | `circuits/<id>.icproj.json` | The 100 Analog Canvas project files, byte for byte as stored. Never edited. |
 | `manifest.json` | Per circuit: name, author, part count, source snapshot, Gallery URL, SHA-256 of the file, feature tags. |
-| `harness/rnl-conformance.test.ts` | The round-trip harness (runs inside an analog-canvas checkout). |
+| `harness/rnl-benchmark.test.ts` | The round-trip harness (runs inside an analog-canvas checkout). |
 | `summarize.py` | Turns a run's reports into `summary.json` and `SUMMARY.md`. |
 | `results/<date>-<label>/` | One run: `reports/<id>.json`, `summary.json`, `SUMMARY.md`, and `rnl/<id>.{spice,spectre}.rnl`, the files Canvas wrote. |
 
@@ -56,13 +56,13 @@ Gaps: no circuit uses native buses (shipped after the snapshot), and few use no-
 From an [analog-canvas](https://github.com/cascode-ai/analog-canvas) checkout with dependencies installed:
 
 ```bash
-cp <this repo>/harness/rnl-conformance.test.ts apps/editor/src/features/netlist-export/
-CONF_CORPUS=<this repo>/circuits CONF_OUT=<out dir> \
-  npx vitest run apps/editor/src/features/netlist-export/rnl-conformance.test.ts
+cp <this repo>/harness/rnl-benchmark.test.ts apps/editor/src/features/netlist-export/
+RNL_BENCH_CORPUS=<this repo>/circuits RNL_BENCH_OUT=<out dir> \
+  npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <out dir> "<label>"
 ```
 
-`CONF_IDS=id1,id2` runs only those circuits. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
+`RNL_BENCH_IDS=id1,id2` runs only those circuits. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 

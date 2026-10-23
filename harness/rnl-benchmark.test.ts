@@ -1,9 +1,9 @@
-// RNL conformance harness: every corpus circuit through SPICE+RNL and
+// RNL benchmark harness: every benchmark circuit through SPICE+RNL and
 // Spectre+RNL and back into Analog Canvas, graded L0–L3 against the original.
 //
 // Run from an analog-canvas checkout (see README.md):
-//   CONF_CORPUS=<repo>/circuits CONF_OUT=<dir> [CONF_IDS=a,b] \
-//     npx vitest run apps/editor/src/features/netlist-export/rnl-conformance.test.ts
+//   RNL_BENCH_CORPUS=<repo>/circuits RNL_BENCH_OUT=<dir> [RNL_BENCH_IDS=a,b] \
+//     npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, it } from "vitest";
@@ -22,10 +22,10 @@ import { createRnlTestCore } from "./rnl-core.test-support";
 import { planRnlImport } from "./rnl-import";
 import type { RnlRuntime } from "./rnl-runtime";
 
-const CORPUS = process.env.CONF_CORPUS ?? "";
-const OUT = process.env.CONF_OUT ?? "";
-const IDS = process.env.CONF_IDS
-  ? process.env.CONF_IDS.split(",").filter(Boolean)
+const CORPUS = process.env.RNL_BENCH_CORPUS ?? "";
+const OUT = process.env.RNL_BENCH_OUT ?? "";
+const IDS = process.env.RNL_BENCH_IDS
+  ? process.env.RNL_BENCH_IDS.split(",").filter(Boolean)
   : CORPUS
     ? readdirSync(CORPUS)
         .filter((name) => name.endsWith(".icproj.json"))
@@ -311,7 +311,7 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
 }
 
 it.each(IDS)(
-  "RNL conformance %s",
+  "RNL benchmark %s",
   async (id) => {
     mkdirSync(join(OUT, "rnl"), { recursive: true });
     mkdirSync(join(OUT, "reports"), { recursive: true });
