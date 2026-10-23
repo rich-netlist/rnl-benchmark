@@ -1,0 +1,158 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3")
+* }
+.subckt astra_001_rc_coupled_bjt_amplifier vcc VSS in out
+C1 b1 in 1u
+C2 e1 VSS 100u
+C3 b2 c1 1u
+C4 out c2 10u
+C5 out VSS 100p
+Q1 c1 b1 e1 ANPN
+Q2 c2 b2 e2 ANPN
+R1 vcc b1 100k
+R2 b1 VSS 22k
+R3 vcc c1 4.7k
+R4 e1 VSS 1k
+R5 vcc b2 100k
+R6 b2 VSS 22k
+R7 vcc c2 4.7k
+R8 e2 VSS 1k
+R9 out VSS 10k
+* @RNL(author="analog-canvas") {
+*   $IO_PORT @ATTACH &in(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-2, -8) => %port1;
+*   $IO_PORT @ATTACH &out(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(49, -6) => @ORIENT("MY") => %port2;
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(2, -8) => @ORIENT("R270");
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(6, -3);
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(6, -14);
+*   #Q1 @SET-SYMBOL $NPN => @PLACE(14, -8);
+*   #R3 @SET-SYMBOL $RESISTOR => @PLACE(14, -3);
+*   #R4 @SET-SYMBOL $RESISTOR => @PLACE(14, -15);
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(20, -15);
+*   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(21, -6) => @ORIENT("R270");
+*   #R5 @SET-SYMBOL $RESISTOR => @PLACE(26, -3);
+*   #R6 @SET-SYMBOL $RESISTOR => @PLACE(26, -15);
+*   #Q2 @SET-SYMBOL $NPN => @PLACE(34, -8);
+*   #R7 @SET-SYMBOL $RESISTOR => @PLACE(34, -3);
+*   #R8 @SET-SYMBOL $RESISTOR => @PLACE(34, -15);
+*   #C4 @SET-SYMBOL $CAPACITOR => @PLACE(38, -6) => @ORIENT("R270");
+*   #R9 @SET-SYMBOL $RESISTOR => @PLACE(42, -11);
+*   #C5 @SET-SYMBOL $CAPACITOR => @PLACE(47, -11);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(6, -17) => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(14, -18) => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(20, -18) => %gnd3;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(26, -18) => %gnd4;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(34, -18) => %gnd5;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(42, -14) => %gnd6;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(47, -14) => %gnd7;
+*   &vcc @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (4, 0);
+*   %j2 = (35, 0);
+*   %j3 = (6, 0);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (14, 0);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (26, 0);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (34, 0);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (6, -8);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (14, -11);
+*   $JUNCTION @ATTACH %j8;
+*   %j9 = (20, -11);
+*   %j10 = (24, -6);
+*   %j11 = (24, -8);
+*   %j12 = (26, -8);
+*   $JUNCTION @ATTACH %j12;
+*   %j13 = (42, -6);
+*   $JUNCTION @ATTACH %j13;
+*   %j14 = (47, -6);
+*   $JUNCTION @ATTACH %j14;
+*   &vcc @WIRE(mode="straight", linestyle="bold") {%j1 %j3};
+*   &vcc @WIRE(mode="straight", linestyle="bold") {%j3 %j4};
+*   &vcc @WIRE(mode="straight", linestyle="bold") {%j4 %j5};
+*   &vcc @WIRE(mode="straight", linestyle="bold") {%j5 %j6};
+*   &vcc @WIRE(mode="straight", linestyle="bold") {%j6 %j2};
+*   &vcc @WIRE(mode="straight") {%j3 #R1:1};
+*   &vcc @WIRE(mode="straight") {%j4 #R3:1};
+*   &vcc @WIRE(mode="straight") {%j5 #R5:1};
+*   &vcc @WIRE(mode="straight") {%j6 #R7:1};
+*   &in @WIRE(mode="straight") {%port1:p #C1:2};
+*   &b1 @WIRE(mode="straight") {#C1:1 %j7};
+*   &b1 @WIRE(mode="straight") {%j7 #Q1:2};
+*   &b1 @WIRE(mode="straight") {#R1:2 %j7};
+*   &b1 @WIRE(mode="straight") {%j7 #R2:1};
+*   &c1 @WIRE(mode="straight") {#R3:2 #Q1:1};
+*   &c1 @WIRE(mode="straight") {#Q1:1 #C3:2};
+*   &e1 @WIRE(mode="straight") {#Q1:3 %j8};
+*   &e1 @WIRE(mode="straight") {%j8 #R4:1};
+*   &e1 @WIRE(mode="straight") {%j8 %j9};
+*   &e1 @WIRE(mode="straight") {%j9 #C2:1};
+*   &b2 @WIRE(mode="straight") {#C3:1 %j10};
+*   &b2 @WIRE(mode="straight") {%j10 %j11};
+*   &b2 @WIRE(mode="straight") {%j11 %j12};
+*   &b2 @WIRE(mode="straight") {%j12 #Q2:2};
+*   &b2 @WIRE(mode="straight") {#R5:2 %j12};
+*   &b2 @WIRE(mode="straight") {%j12 #R6:1};
+*   &c2 @WIRE(mode="straight") {#R7:2 #Q2:1};
+*   &c2 @WIRE(mode="straight") {#Q2:1 #C4:2};
+*   &e2 @WIRE(mode="straight") {#Q2:3 #R8:1};
+*   &out @WIRE(mode="straight") {#C4:1 %j13};
+*   &out @WIRE(mode="straight") {%j13 %j14};
+*   &out @WIRE(mode="straight") {%j14 %port2:p};
+*   &out @WIRE(mode="straight") {%j13 #R9:1};
+*   &out @WIRE(mode="straight") {%j14 #C5:1};
+*   &VSS @WIRE(mode="straight") {#R2:2 %gnd1:p};
+*   &VSS @WIRE(mode="straight") {#R4:2 %gnd2:p};
+*   &VSS @WIRE(mode="straight") {#C2:2 %gnd3:p};
+*   &VSS @WIRE(mode="straight") {#R6:2 %gnd4:p};
+*   &VSS @WIRE(mode="straight") {#R8:2 %gnd5:p};
+*   &VSS @WIRE(mode="straight") {#R9:2 %gnd6:p};
+*   &VSS @WIRE(mode="straight") {#C5:2 %gnd7:p};
+*   $JUNCTION @ATTACH (14, -6)(p) => %dot1;
+*   $JUNCTION @ATTACH (34, -6)(p) => %dot2;
+*   &vcc @TEXT("\textbf{\textit{v}}_{\textbf{cc}}", size=1.5116) => @PLACE(36, -1) => %power1;
+*   &in @TEXT("\textbf{\textit{in}}", halign="end", size=1.5116) => @PLACE(-3, -7);
+*   &out @TEXT("\textbf{\textit{out}}", size=1.5116) => @PLACE(50, -5);
+*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=0, dy=-2.3, halign="middle", valign="baseline", size=1.5116);
+*   #C1 @TEXT("\textbf{1u}", key="value", dx=0, dy=-4.3, halign="middle", valign="baseline", size=1.5116);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R1 @TEXT("\textbf{100k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R2 @TEXT("\textbf{22k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #Q1 @TEXT("\textbf{\textit{Q}}_{\textbf{1}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R3 @TEXT("\textbf{\textit{R}}_{\textbf{3}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R3 @TEXT("\textbf{4.7k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #R4 @TEXT("\textbf{\textit{R}}_{\textbf{4}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R4 @TEXT("\textbf{1k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C2 @TEXT("\textbf{100u}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{3}}", key="name", dx=0, dy=-2.3, halign="middle", valign="baseline", size=1.5116);
+*   #C3 @TEXT("\textbf{1u}", key="value", dx=0, dy=-4.3, halign="middle", valign="baseline", size=1.5116);
+*   #R5 @TEXT("\textbf{\textit{R}}_{\textbf{5}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R5 @TEXT("\textbf{100k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #R6 @TEXT("\textbf{\textit{R}}_{\textbf{6}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R6 @TEXT("\textbf{22k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #Q2 @TEXT("\textbf{\textit{Q}}_{\textbf{2}}", key="name", dx=1, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #R7 @TEXT("\textbf{\textit{R}}_{\textbf{7}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R7 @TEXT("\textbf{4.7k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #R8 @TEXT("\textbf{\textit{R}}_{\textbf{8}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R8 @TEXT("\textbf{1k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #C4 @TEXT("\textbf{\textit{C}}_{\textbf{4}}", key="name", dx=3, dy=4, halign="middle", valign="baseline", size=1.5116);
+*   #C4 @TEXT("\textbf{10u}", key="value", dx=3, dy=1.8, halign="middle", valign="baseline", size=1.5116);
+*   #R9 @TEXT("\textbf{\textit{R}}_{\textbf{9}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #R9 @TEXT("\textbf{10k}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   #C5 @TEXT("\textbf{\textit{C}}_{\textbf{5}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C5 @TEXT("\textbf{100p}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   &c1 @TEXT("\textbf{\textit{c1}}", size=1.5116) => @PLACE(17.5, -7.3);
+*   &c2 @TEXT("\textbf{\textit{c2}}", size=1.5116) => @PLACE(34.7, -7.3);
+*   &b1 @TEXT("\textbf{\textit{b1}}", size=1.5116) => @PLACE(8.2, -7.4);
+*   &b2 @TEXT("\textbf{\textit{b2}}", size=1.5116) => @PLACE(28.2, -7.4);
+*   &e1 @TEXT("\textbf{\textit{e1}}", size=1.5116) => @PLACE(16, -10.5);
+*   &e2 @TEXT("\textbf{\textit{e2}}", size=1.5116) => @PLACE(35.1, -12.9)
+* }
+.ends astra_001_rc_coupled_bjt_amplifier

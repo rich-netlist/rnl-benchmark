@@ -1,0 +1,120 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1")
+// }
+
+subckt dut (VDD VSS VBIAS VBGR)
+C1 (net3 VSS) capacitor c=1p
+C2 (VBGR VSS) capacitor c=1p
+M1 (net5 net4 VPREREG VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M2 (net6 net4 VPREREG VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M3 (net2 VBIAS net5 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M4 (net4 VBIAS net6 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M5 (net2 net2 net3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M6 (net4 net2 net3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+Q1 (net3 net3 net1 VSS) sky130_fd_pr__npn_05v5_W1p00L1p00 m=1
+Q2 (net3 net3 net0 VSS) sky130_fd_pr__npn_05v5_W1p00L1p00 m=1
+R1 (net0 net1) resistor r=1k
+R2 (net1 VSS) resistor r=1k
+R3 (VBGR net3) resistor r=1k
+// @RNL(author="analog-canvas") {
+//   #M1 @SET-SYMBOL $PMOS => @PLACE(19, -14) => @ORIENT("MY");
+//   #M2 @SET-SYMBOL $PMOS => @PLACE(30, -14);
+//   #M3 @SET-SYMBOL $PMOS => @PLACE(19, -20);
+//   #M4 @SET-SYMBOL $PMOS => @PLACE(30, -20);
+//   #M5 @SET-SYMBOL $NMOS => @PLACE(19, -27) => @ORIENT("MY");
+//   #M6 @SET-SYMBOL $NMOS => @PLACE(30, -27);
+//   $IO_PORT @ATTACH &VBIAS(p) => @SET-SYMBOL $CANVAS_PORT_FILLED => @PLACE(16, -20) => %port1;
+//   #Q1 @SET-SYMBOL $NPN => @PLACE(19, -33) => @ORIENT("MY");
+//   #Q2 @SET-SYMBOL $NPN => @PLACE(30, -33);
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(30, -37);
+//   #R2 @SET-SYMBOL $RESISTOR => @PLACE(30, -41);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(30, -43) => %gnd1;
+//   #R3 @SET-SYMBOL $RESISTOR => @PLACE(38, -30) => @ORIENT("R270");
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(35, -34);
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(42, -34);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(39, -37) => %gnd2;
+//   $IO_PORT @ATTACH &VBGR(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(47, -30) => @ORIENT("MY") => %port2;
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (26, -14);
+//   $JUNCTION @ATTACH %j1;
+//   %j2 = (30, -24);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (19, -24);
+//   $JUNCTION @ATTACH %j3;
+//   %j4 = (19, -30);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (30, -30);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (24, -30);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (24, -33);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (36, -30);
+//   %j9 = (35, -30);
+//   $JUNCTION @ATTACH %j9;
+//   %j10 = (42, -30);
+//   $JUNCTION @ATTACH %j10;
+//   &VPREREG @WIRE(mode="straight") {#M1:3 (19, -11) (30, -11) #M2:3};
+//   &net4 @WIRE(mode="straight") {#M1:2 %j1};
+//   &net4 @WIRE(mode="straight") {%j1 #M2:2};
+//   &net5 @WIRE(mode="straight") {#M3:3 #M1:1};
+//   &net6 @WIRE(mode="straight") {#M4:3 #M2:1};
+//   &VBIAS @WIRE(mode="straight") {#M4:2 #M3:2};
+//   &net4 @WIRE(mode="straight") {%j1 (26, -24) %j2};
+//   &net4 @WIRE(mode="straight") {%j2 #M4:1};
+//   &net4 @WIRE(mode="straight") {#M6:1 %j2};
+//   &net2 @WIRE(mode="straight") {#M3:1 %j3};
+//   &net2 @WIRE(mode="straight") {%j3 #M5:1};
+//   &net2 @WIRE(mode="straight") {%j3 (22, -24) #M5:2};
+//   &net2 @WIRE(mode="straight") {#M5:2 #M6:2};
+//   &net3 @WIRE(mode="straight") {#Q2:1 %j5};
+//   &net3 @WIRE(mode="straight") {%j5 #M6:3};
+//   &net3 @WIRE(mode="straight") {#Q1:1 %j4};
+//   &net3 @WIRE(mode="straight") {%j4 #M5:3};
+//   &net3 @WIRE(mode="straight") {#Q1:2 %j7};
+//   &net3 @WIRE(mode="straight") {%j7 #Q2:2};
+//   &net3 @WIRE(mode="straight") {%j4 %j6};
+//   &net3 @WIRE(mode="straight") {%j6 %j5};
+//   &net3 @WIRE(mode="straight") {%j6 %j7};
+//   &net1 @WIRE(mode="straight") {#Q1:3 (19, -39) #R1:2};
+//   &net3 @WIRE(mode="straight") {%j5 %j9};
+//   &net3 @WIRE(mode="straight") {%j9 %j8};
+//   &VBGR @WIRE(mode="straight") {#C2:1 %j10};
+//   &VBGR @WIRE(mode="straight") {%j10 #R3:1};
+//   &net3 @WIRE(mode="straight") {#C1:1 %j9};
+//   &VSS @WIRE(mode="straight") {#C1:2 (35, -37) %gnd2:p};
+//   &VSS @WIRE(mode="straight") {%gnd2:p (42, -37) #C2:2};
+//   &VBGR @WIRE(mode="straight") {%port2:p %j10};
+//   &VSS @WIRE(mode="straight") {%gnd1:p #R2:2};
+//   $JUNCTION @ATTACH (39, -37)(p) => %dot1;
+//   &net0 @WIRE(mode="straight") {#Q2:3 #R1:1};
+//   &net1 @WIRE(mode="straight") {#R1:2 #R2:1};
+//   $JUNCTION @ATTACH (30, -39)(p) => %dot2;
+//   $JUNCTION @ATTACH (22, -27)(p) => %dot3;
+//   &net3 @WIRE(mode="straight") {%j8 #R3:2};
+//   &VBIAS @WIRE(mode="straight") {#M3:2 %port1:p};
+//   #M1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   #M2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #M3 @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=0.5, dy=-2, halign="start", valign="baseline", size=1.5116);
+//   #M4 @TEXT("\textbf{\textit{M}}_{\textbf{4}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #M5 @TEXT("\textbf{\textit{M}}_{\textbf{5}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   #M6 @TEXT("\textbf{\textit{M}}_{\textbf{6}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{BIAS}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   #Q1 @TEXT("\textbf{\textit{Q}}_{\textbf{1}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   #Q2 @TEXT("\textbf{\textit{Q}}_{\textbf{2}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #R3 @TEXT("\textbf{\textit{R}}_{\textbf{3}}", key="name", dx=0.5, dy=-2, halign="middle", valign="baseline", size=1.5116);
+//   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=-3.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{BGR}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   &VPREREG @TEXT("\textbf{\textit{V}}_{\textbf{PREREG}}", halign="middle", size=1.5116) => @PLACE(25, -10);
+//   (39, -34) @RECTANGLE(width=10, height=12) => @LAYER("top");
+//   (39, -27.5) @TEXT("\textbf{Filter}", halign="middle", size=1.5116, bold=true)
+// }
+ends dut

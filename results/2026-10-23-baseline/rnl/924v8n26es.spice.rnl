@@ -1,0 +1,137 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1")
+* }
+.subckt UBVCO VDD VSS gs Vc Vte ibg450u_ic inp inn vs
+C1 inn Vc 1p
+C2 inp Vc 1p
+C3 inn Vte 1p
+C4 inp Vte 1p
+L1 inn net0 1n
+L2 net0 inp 1n
+XM1 inp inn net1 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 inn inp net1 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM3 net1 ibg450u_ic gs VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM4 ibg450u_ic ibg450u_ic gs gs sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 vs net0 1k
+* @RNL(author="analog-canvas") {
+*   #L1 @SET-SYMBOL $INDUCTOR => @PLACE(25, 2) => @ORIENT("R90");
+*   #C1 @SET-SYMBOL $VARIABLE_CAPACITOR => @PLACE(25, -4) => @ORIENT("R90");
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(40, -20);
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(20, -20) => @ORIENT("MY");
+*   #C2 @SET-SYMBOL $VARIABLE_CAPACITOR => @PLACE(35, -4) => @ORIENT("MXR90");
+*   #L2 @SET-SYMBOL $INDUCTOR => @PLACE(35, 2) => @ORIENT("R90");
+*   #R1 @SET-SYMBOL $VARIABLE_RESISTOR => @PLACE(30, 5);
+*   #C3 @SET-SYMBOL $VARIABLE_CAPACITOR => @PLACE(25, -10) => @ORIENT("R90");
+*   #C4 @SET-SYMBOL $VARIABLE_CAPACITOR => @PLACE(35, -10) => @ORIENT("MXR90");
+*   $IO_PORT @ATTACH &Vc(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(9, -1) => %port1;
+*   $IO_PORT @ATTACH &Vte(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(9, -7) => %port2;
+*   #XM3 @SET-SYMBOL $NMOS => @PLACE(30, -27);
+*   #XM4 @SET-SYMBOL $NMOS => @PLACE(5, -27) => @ORIENT("MY");
+*   $IO_PORT @ATTACH &ibg450u_ic(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(5, -16) => @ORIENT("R270") => %port3;
+*   $IO_PORT @ATTACH &gs(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-1, -31) => %port4;
+*   $IO_PORT @ATTACH &inp(p) => @SET-SYMBOL $CANVAS_PORT_FILLED => @PLACE(45, -6) => @ORIENT("R180") => %port5;
+*   $IO_PORT @ATTACH &inn(p) => @SET-SYMBOL $CANVAS_PORT_FILLED => @PLACE(45, -13) => @ORIENT("R180") => %port6;
+*   $IO_PORT @ATTACH &vs(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(9, 8) => %port7;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (20, -17);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (40, -17);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (20, -4);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (30, -24);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (40, -4);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (30, 2);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (20, -10);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (40, -10);
+*   $JUNCTION @ATTACH %j8;
+*   %j9 = (30, -4);
+*   $JUNCTION @ATTACH %j9;
+*   %j10 = (30, -10);
+*   $JUNCTION @ATTACH %j10;
+*   %j11 = (40, -6);
+*   $JUNCTION @ATTACH %j11;
+*   %j12 = (45, -6);
+*   %j13 = (20, -13);
+*   $JUNCTION @ATTACH %j13;
+*   %j14 = (45, -13);
+*   %j15 = (30, -25);
+*   %j16 = (12, -27);
+*   $JUNCTION @ATTACH %j16;
+*   %j17 = (5, -16);
+*   %j18 = (5, -22);
+*   $JUNCTION @ATTACH %j18;
+*   %j19 = (5, -31);
+*   $JUNCTION @ATTACH %j19;
+*   &inn @WIRE(mode="straight") {#XM2:1 %j1};
+*   &inn @WIRE(mode="straight") {%j3 %j7};
+*   &inn @WIRE(mode="straight") {%j7 %j13};
+*   &inn @WIRE(mode="straight") {%j13 %j1};
+*   &inn @WIRE(mode="straight") {%j3 (20, 2) #L1:1};
+*   &inn @WIRE(mode="straight") {%j3 #C1:1};
+*   &inn @WIRE(mode="straight") {%j1 (28, -17) (31, -20) #XM1:2};
+*   &net1 @WIRE(mode="straight") {#XM2:3 (20, -24) %j4};
+*   &net1 @WIRE(mode="straight") {%j4 %j15};
+*   &net1 @WIRE(mode="straight") {%j4 (40, -24) #XM1:3};
+*   &inp @WIRE(mode="straight") {#XM2:2 (29, -20) (32, -17) %j2};
+*   &inp @WIRE(mode="straight") {#C2:1 %j5};
+*   &inp @WIRE(mode="straight") {%j5 %j11};
+*   &inp @WIRE(mode="straight") {%j11 %j8};
+*   &inp @WIRE(mode="straight") {%j8 %j2};
+*   &inp @WIRE(mode="straight") {%j2 #XM1:1};
+*   &net0 @WIRE(mode="straight") {#L1:2 %j6};
+*   &net0 @WIRE(mode="straight") {%j6 #L2:1};
+*   &inp @WIRE(mode="straight") {#L2:2 (40, 2) %j5};
+*   &net0 @WIRE(mode="straight") {#R1:2 %j6};
+*   &inn @WIRE(mode="straight") {%j7 #C3:1};
+*   &inp @WIRE(mode="straight") {#C4:1 %j8};
+*   &inp @WIRE(mode="straight") {%j11 %j12};
+*   &inn @WIRE(mode="straight") {%j13 %j14};
+*   &ibg450u_ic @WIRE(mode="straight") {#XM4:1 %j18};
+*   &ibg450u_ic @WIRE(mode="straight") {%j18 (12, -22) %j16};
+*   &ibg450u_ic @WIRE(mode="straight") {#XM3:2 %j16};
+*   &ibg450u_ic @WIRE(mode="straight") {#XM4:2 %j16};
+*   &ibg450u_ic @WIRE(mode="straight") {%j17 %j18};
+*   &gs @WIRE(mode="straight") {%port4:p %j19};
+*   &gs @WIRE(mode="straight") {#XM4:3 %j19};
+*   &gs @WIRE(mode="straight") {%j19 (30, -31) #XM3:3};
+*   &vs @WIRE(mode="straight") {#R1:1 (30, 8) %port7:p};
+*   &Vc @WIRE(mode="straight") {#C1:2 %j9};
+*   &Vc @WIRE(mode="straight") {%j9 #C2:2};
+*   &Vc @WIRE(mode="straight") {%j9 (30, -1) %port1:p};
+*   &Vte @WIRE(mode="straight") {#C3:2 %j10};
+*   &Vte @WIRE(mode="straight") {%j10 #C4:2};
+*   &Vte @WIRE(mode="straight") {%j10 (30, -7) %port2:p};
+*   &inn @WIRE(mode="straight") {%j14 %port6:p};
+*   &inp @WIRE(mode="straight") {%j12 %port5:p};
+*   &net1 @WIRE(mode="straight") {%j15 #XM3:1};
+*   &ibg450u_ic @WIRE(mode="straight") {%j17 %port3:p};
+*   #L1 @TEXT("\textbf{\textit{L}}_{\textbf{1}}", key="name", dx=-0.5, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.5, dy=1, halign="middle", valign="baseline", size=1.5116);
+*   #XM1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #XM2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=-1.5, dy=1, halign="middle", valign="baseline", size=1.5116);
+*   #L2 @TEXT("\textbf{\textit{L}}_{\textbf{2}}", key="name", dx=0.5, dy=2, halign="middle", valign="baseline", size=1.5116);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{3}}", key="name", dx=1.5, dy=1, halign="middle", valign="baseline", size=1.5116);
+*   #C4 @TEXT("\textbf{\textit{C}}_{\textbf{4}}", key="name", dx=-1.5, dy=1, halign="middle", valign="baseline", size=1.5116);
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{c}}", key="name", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{te}}", key="name", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   #XM3 @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #XM4 @TEXT("\textbf{\textit{M}}_{\textbf{4}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   %port3 @TEXT("\textbf{\textit{ibg450u\_ic}}", key="name", dx=1, dy=1, halign="start", valign="baseline", size=1.5116);
+*   %port4 @TEXT("\textbf{\textit{gs}}", key="name", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   %port5 @TEXT("\textbf{\textit{inp}}", key="name", dx=2, dy=1, halign="start", valign="baseline", size=1.5116);
+*   %port6 @TEXT("\textbf{\textit{inn}}", key="name", dx=2, dy=1, halign="start", valign="baseline", size=1.5116);
+*   %port7 @TEXT("\textbf{\textit{v}}_{\textbf{s}}", key="name", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116)
+* }
+.ends UBVCO

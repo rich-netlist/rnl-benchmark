@@ -1,0 +1,45 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-functional", version="0.3")
+* }
+.subckt opamp VIP VIN VDD VSS VOUT params: gain=1e6 vhigh=5 vlow=-5
+Blin nlin 0 V={gain*(V(VIP)-V(VIN))}
+Bcore VOUT 0 V={0.5*(vhigh+(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12)))-sqrt((vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))*(vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))}
+.ends opamp
+
+.subckt Main VSS Vin Vout
+.model DIODE D(IS=1e-14 N=1)
+D1 net0 Vout DIODE
+R1 VSS Vout 1k
+X1 Vin Vout 0 VSS net0 opamp
+* @RNL(author="analog-canvas") {
+*   #X1 @SET-SYMBOL $OPAMP_5TERM => @PLACE(40, -29);
+*   #D1 @SET-SYMBOL $DIODE => @PLACE(44, -32) => @ORIENT("R270");
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(34, -37) => @ORIENT("R180");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(34, -39) => %gnd1;
+*   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(30, -28) => %port1;
+*   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(30, -30) => %port2;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (34, -30);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (34, -34);
+*   $JUNCTION @ATTACH %j2;
+*   &net0 @WIRE(mode="straight") {#X1:5 (44, -29) #D1:1};
+*   &Vout @WIRE(mode="straight") {%port2:p %j1};
+*   &Vout @WIRE(mode="straight") {%j1 %j2};
+*   &Vout @WIRE(mode="straight") {%j1 #X1:2};
+*   &Vout @WIRE(mode="straight") {%j2 #R1:2};
+*   &Vout @WIRE(mode="straight") {%j2 #D1:2};
+*   &Vin @WIRE(mode="straight") {%port1:p #X1:1};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #R1:1};
+*   #D1 @TEXT("\textbf{\textit{D}}_{\textbf{1}}", key="name", dx=3, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-2, dy=0.5, halign="end", valign="baseline", size=1.5116);
+*   %port2
+*       @TEXT("\textbf{\textit{V}}_{\textbf{\textit{out}}}", key="name", dx=-1.5, dy=-1, halign="end", valign="baseline",
+*       size=1.5116)
+* }
+.ends Main

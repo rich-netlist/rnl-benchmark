@@ -1,0 +1,113 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1");
+*   @USE-PACKAGE(name="rnl-std-logic", version="0.3")
+* }
+* Ideal xor-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt xor_gate A B Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+BhB hB 0 V={0.5*(1+tanh((V(B,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(V(hA)+V(hB)-2*V(hA)*V(hB))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends xor_gate
+
+.subckt Main VDD VSS Vin Voutp Voutn
+.model DIODE D(IS=1e-14 N=1)
+C1 net1 VSS 1p
+D1 net1 Voutn DIODE
+D2 net1 Voutp DIODE
+I1 net2 VSS DC 100u
+L1 VDD Voutn 1n
+L2 VDD Voutp 1n
+XM1 Voutp Voutn net2 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 Voutn Voutp net2 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 net1 net0 1k
+X1 Vin Voutn net0 VDD VSS xor_gate
+* @RNL(author="analog-canvas") {
+*   #X1 @SET-SYMBOL $XOR_2INPUT => @PLACE(-11, -6);
+*   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-16, -5) => %port1;
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(-4, -6) => @ORIENT("R270");
+*   #L1 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(22, 6);
+*   #L2 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(8, 6) => @ORIENT("MY");
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(8, -2) => @ORIENT("MY");
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(22, -2);
+*   #D1 @SET-SYMBOL $DIODE => @PLACE(26, -2) => @ORIENT("R90");
+*   #D2 @SET-SYMBOL $DIODE => @PLACE(4, -2) => @ORIENT("R90");
+*   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(15, -8);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(15, -10) => %gnd1;
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(0, -9);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(0, -10) => %gnd2;
+*   $IO_PORT @ATTACH &Voutp(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(11, 3) => @ORIENT("R270") => %port2;
+*   $IO_PORT @ATTACH &Voutn(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(19, 3) => @ORIENT("R270") => %port3;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (15, -4);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (4, -6);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (8, 1);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (22, 1);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (0, -6);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (8, 10);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (22, 10);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (11, 1);
+*   $JUNCTION @ATTACH %j8;
+*   %j9 = (19, 1);
+*   $JUNCTION @ATTACH %j9;
+*   %j10 = (26, 1);
+*   $JUNCTION @ATTACH %j10;
+*   %j11 = (6, 10);
+*   %j12 = (26, 10);
+*   %j13 = (11, 3);
+*   %j14 = (19, 3);
+*   &net2 @WIRE(mode="straight") {#XM1:3 %j1};
+*   &net2 @WIRE(mode="straight") {%j1 #XM2:3};
+*   &net2 @WIRE(mode="straight") {#I1:1 %j1};
+*   &Vin @WIRE(mode="straight") {%port1:p #X1:1};
+*   &net0 @WIRE(mode="straight") {#R1:2 #X1:3};
+*   &VSS @WIRE(mode="straight") {#C1:2 %gnd2:p};
+*   &net1 @WIRE(mode="straight") {#R1:1 %j5};
+*   &net1 @WIRE(mode="straight") {%j5 #C1:1};
+*   &net1 @WIRE(mode="straight") {%j5 %j2};
+*   &net1 @WIRE(mode="straight") {#D1:1 (26, -6) %j2};
+*   &net1 @WIRE(mode="straight") {#D2:1 %j2};
+*   &VDD @WIRE(mode="straight") {#L2:1 %j6};
+*   &VDD @WIRE(mode="straight") {#L1:1 %j7};
+*   &Voutn @WIRE(mode="straight") {#X1:2 (-16, -7) (-16, -14) (30, -14) (30, 1) %j10};
+*   &Voutn @WIRE(mode="straight") {#XM1:2 (12, -2) (18, 1) %j9};
+*   &Voutn @WIRE(mode="straight") {%j9 %j14};
+*   &Voutn @WIRE(mode="straight") {%j9 %j4};
+*   &Voutn @WIRE(mode="straight") {%j4 #L1:2};
+*   &Voutn @WIRE(mode="straight") {%j4 #XM2:1};
+*   &Voutn @WIRE(mode="straight") {%j4 %j10};
+*   &Voutn @WIRE(mode="straight") {%j10 #D1:2};
+*   &Voutp @WIRE(mode="straight") {%j8 %j13};
+*   &Voutp @WIRE(mode="straight") {%j8 (12, 1) (18, -2) #XM2:2};
+*   &Voutp @WIRE(mode="straight") {%j8 %j3};
+*   &Voutp @WIRE(mode="straight") {#D2:2 (4, 1) %j3};
+*   &Voutp @WIRE(mode="straight") {%j3 #L2:2};
+*   &Voutp @WIRE(mode="straight") {%j3 #XM1:1};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j11 %j6};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j6 %j7};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j7 %j12};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #I1:2};
+*   &Voutp @WIRE(mode="straight") {%j13 %port2:p};
+*   &Voutn @WIRE(mode="straight") {%j14 %port3:p};
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   #D1 @TEXT("\textbf{\textit{D}}_{\textbf{1}}", key="name", dx=1, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #D2 @TEXT("\textbf{\textit{D}}_{\textbf{2}}", key="name", dx=-3, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(27, 9) => %power1;
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{outp}}", key="name", dx=1, dy=2, halign="middle", valign="baseline", size=1.5116);
+*   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{outn}}", key="name", dx=-1, dy=2, halign="middle", valign="baseline", size=1.5116)
+* }
+.ends Main

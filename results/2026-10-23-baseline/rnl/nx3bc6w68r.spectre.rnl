@@ -1,0 +1,170 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-functional", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-logic", version="0.3")
+// }
+
+// Ideal and-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt and_gate (A B Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+BhB (hB 0) bsource v=0.5*(1+tanh((v(B,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(v(hA)*v(hB))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends and_gate
+
+subckt voltage_amplifier (VIN VOUT VDD VSS)
+parameters gain=1
+ECORE (VOUT 0 VIN 0) vcvs gain=gain
+ends voltage_amplifier
+
+subckt pfd_charge_pump (VDD VSS ref fb vctrl)
+subckt ideal_switch (p n cp cn)
+parameters ron=1 roff=1e12 vt=0.5
+core (p n) bsource i=v(p,n)/(v(cp,cn)>vt ? ron : roff)
+ends ideal_switch
+C1 (net3 VSS) capacitor c=100pF
+C2 (vctrl VSS) capacitor c=10pF
+IDN (net0 VSS) isource dc=50uA
+IUP (VDD net1) isource dc=50uA
+R1 (vctrl net3) resistor r=10kΩ
+S1 (net1 vctrl up VSS) ideal_switch
+S2 (vctrl net0 dn VSS) ideal_switch
+S3 (vrep net1 upb VSS) ideal_switch
+S4 (net0 vrep dnb VSS) ideal_switch
+X1 (VDD VSS VDD ref net2 up upb) d_flip_flop_reset td=10p vt=10m
+X2 (VDD VSS VDD fb net2 dn dnb) d_flip_flop_reset td=10p vt=10m
+X3 (up dn net2 VDD VSS) and_gate td=10p vt=10m
+X4 (vctrl vrep VDD VSS) voltage_amplifier gain=1
+// @RNL(author="analog-canvas") {
+//   #X1 @SET-SYMBOL $D_FLIP_FLOP_WITH_RESET => @PLACE(20, 8);
+//   #X2 @SET-SYMBOL $D_FLIP_FLOP_WITH_RESET => @PLACE(20, -8) => @ORIENT("MX");
+//   #X3 @SET-SYMBOL $AND_2INPUT => @PLACE(30, 0) => @ORIENT("MY");
+//   #IUP @SET-SYMBOL $CURRENT_SOURCE => @PLACE(52, 15);
+//   #S1 @SET-SYMBOL $EXTERNALLY_CONTROLLED_SWITCH => @PLACE(52, 9);
+//   #S2 @SET-SYMBOL $EXTERNALLY_CONTROLLED_SWITCH => @PLACE(52, -9);
+//   #IDN @SET-SYMBOL $CURRENT_SOURCE => @PLACE(52, -15);
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(60, -8);
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(60, -15);
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(68, -15);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(52, -19) => %gnd1;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(60, -19) => %gnd2;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(68, -19) => %gnd3;
+//   $IO_PORT @ATTACH &ref(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(14, 7) => %port1;
+//   $IO_PORT @ATTACH &fb(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(14, -7) => %port2;
+//   $IO_PORT @ATTACH &vctrl(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(70, 0) => @ORIENT("MY") => %port3;
+//   #S3 @SET-SYMBOL $EXTERNALLY_CONTROLLED_SWITCH => @PLACE(46, 15);
+//   #S4 @SET-SYMBOL $EXTERNALLY_CONTROLLED_SWITCH => @PLACE(46, -15);
+//   #X4 @SET-SYMBOL $VOLTAGE_AMPLIFIER => @PLACE(62, 6);
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (48, 20);
+//   %j2 = (56, 20);
+//   %j3 = (36, 9);
+//   $JUNCTION @ATTACH %j3;
+//   %j4 = (36, -9);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (20, 0);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (52, 20);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (52, 0);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (60, 0);
+//   $JUNCTION @ATTACH %j8;
+//   %j9 = (68, 0);
+//   $JUNCTION @ATTACH %j9;
+//   %j10 = (13, 9);
+//   %j11 = (13, -9);
+//   %j12 = (52, 12);
+//   $JUNCTION @ATTACH %j12;
+//   %j13 = (52, -12);
+//   $JUNCTION @ATTACH %j13;
+//   %j14 = (56, 0);
+//   $JUNCTION @ATTACH %j14;
+//   %j15 = (46, 19);
+//   %j16 = (46, -19);
+//   %j17 = (67, 6);
+//   %j18 = (26, 7);
+//   %j19 = (26, -7);
+//   %j20 = (42, 15);
+//   %j21 = (42, -15);
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j1 %j6};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j6 %j2};
+//   &ref @WIRE(mode="straight") {%port1:p #X1:2};
+//   &fb @WIRE(mode="straight") {%port2:p #X2:2};
+//   &up @WIRE(mode="straight") {#X1:4 %j3};
+//   &up @WIRE(mode="straight") {%j3 #S1:3};
+//   &dn @WIRE(mode="straight") {#X2:4 %j4};
+//   &dn @WIRE(mode="straight") {%j4 #S2:3};
+//   &up @WIRE(mode="straight") {%j3 (36, 1) #X3:1};
+//   &dn @WIRE(mode="straight") {%j4 (36, -1) #X3:2};
+//   &net2 @WIRE(mode="straight") {#X3:3 %j5};
+//   &net2 @WIRE(mode="straight") {%j5 #X1:3};
+//   &net2 @WIRE(mode="straight") {#X2:3 %j5};
+//   &VDD @WIRE(mode="straight") {#IUP:1 %j6};
+//   &net1 @WIRE(mode="straight") {#IUP:2 %j12};
+//   &net1 @WIRE(mode="straight") {%j12 #S1:1};
+//   &vctrl @WIRE(mode="straight") {#S1:2 %j7};
+//   &vctrl @WIRE(mode="straight") {%j7 #S2:1};
+//   &net0 @WIRE(mode="straight") {#S2:2 %j13};
+//   &net0 @WIRE(mode="straight") {%j13 #IDN:1};
+//   &VSS @WIRE(mode="straight") {#IDN:2 %gnd1:p};
+//   &vctrl @WIRE(mode="straight") {%j7 %j14};
+//   &vctrl @WIRE(mode="straight") {%j14 %j8};
+//   &vctrl @WIRE(mode="straight") {%j8 %j9};
+//   &vctrl @WIRE(mode="straight") {%j9 %port3:p};
+//   &vctrl @WIRE(mode="straight") {%j8 #R1:1};
+//   &net3 @WIRE(mode="straight") {#R1:2 #C1:1};
+//   &VSS @WIRE(mode="straight") {#C1:2 %gnd2:p};
+//   &vctrl @WIRE(mode="straight") {%j9 #C2:1};
+//   &VSS @WIRE(mode="straight") {#C2:2 %gnd3:p};
+//   &VDD @WIRE(mode="straight") {#X1:1 %j10};
+//   &VDD @WIRE(mode="straight") {#X2:1 %j11};
+//   &net1 @WIRE(mode="straight") {#S3:2 (46, 12) %j12};
+//   &net0 @WIRE(mode="straight") {#S4:1 (46, -12) %j13};
+//   &vctrl @WIRE(mode="straight") {%j14 (56, 6) #X4:1};
+//   &vrep @WIRE(mode="straight") {#S3:1 %j15};
+//   &vrep @WIRE(mode="straight") {#S4:2 %j16};
+//   &vrep @WIRE(mode="straight") {#X4:2 %j17};
+//   &upb @WIRE(mode="straight") {#X1:5 %j18};
+//   &dnb @WIRE(mode="straight") {#X2:5 %j19};
+//   &upb @WIRE(mode="straight") {#S3:3 %j20};
+//   &dnb @WIRE(mode="straight") {#S4:3 %j21};
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(57, 19) => %power1;
+//   #IUP @TEXT("\textbf{\textit{I}}_{\textbf{UP}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #IUP @TEXT("\textbf{50uA}", key="value", dx=1.5, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #S1 @TEXT("\textbf{\textit{S}}_{\textbf{1}}", key="name", dx=-0.8, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   #S2 @TEXT("\textbf{\textit{S}}_{\textbf{2}}", key="name", dx=0.7, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #IDN @TEXT("\textbf{\textit{I}}_{\textbf{DN}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #IDN @TEXT("\textbf{50uA}", key="value", dx=1.5, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #R1 @TEXT("\textbf{10kΩ}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #C1 @TEXT("\textbf{100pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #C2 @TEXT("\textbf{10pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   %port1 @TEXT("\textbf{\textit{ref}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   %port2 @TEXT("\textbf{\textit{fb}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   %port3 @TEXT("\textbf{\textit{v}}_{\textbf{ctrl}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", halign="middle", size=1.5116) => @PLACE(13, 10);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", halign="middle", size=1.5116) => @PLACE(13, -11.2);
+//   &up @TEXT("\textbf{\textit{up}}", size=1.5116) => @PLACE(43, 10);
+//   &dn @TEXT("\textbf{\textit{dn}}", size=1.5116) => @PLACE(43, -8);
+//   #S3 @TEXT("\textbf{\textit{S}}_{\textbf{3}}", key="name", dx=0.8, dy=-0.4, halign="start", valign="baseline", size=1.5116);
+//   #S4 @TEXT("\textbf{\textit{S}}_{\textbf{4}}", key="name", dx=0.8, dy=-0.4, halign="start", valign="baseline", size=1.5116);
+//   #X4 @TEXT("\textbf{\textit{A}}_{\textbf{1}}", key="name", dx=-0.5, dy=-4.5, halign="middle", valign="baseline", size=1.5116);
+//   &vrep @TEXT("\textbf{\textit{v}}_{\textbf{rep}}", size=1.5116) => @PLACE(46.8, 18);
+//   &vrep @TEXT("\textbf{\textit{v}}_{\textbf{rep}}", halign="end", size=1.5116) => @PLACE(46, -19);
+//   &vrep @TEXT("\textbf{\textit{v}}_{\textbf{rep}}", halign="middle", size=1.5116) => @PLACE(67, 7);
+//   &upb @TEXT("\textbf{\textit{upb}}", size=1.5116) => @PLACE(26, 7);
+//   &upb @TEXT("\textbf{\textit{upb}}", halign="middle", size=1.5116) => @PLACE(42, 15.8);
+//   &dnb @TEXT("\textbf{\textit{dnb}}", halign="middle", size=1.5116) => @PLACE(26, -6.6);
+//   &dnb @TEXT("\textbf{\textit{dnb}}", halign="end", size=1.5116) => @PLACE(42, -15)
+// }
+ends pfd_charge_pump

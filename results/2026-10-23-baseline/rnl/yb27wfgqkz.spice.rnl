@@ -1,0 +1,80 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1")
+* }
+.subckt dut VSS
+C1 S VSS 1p
+C2 D VSS 1p
+G1 D S VSS S 1m
+Iin VSS S DC 1m
+r0 D S 1k
+RL VSS D 1k
+Rs S VSS 1k
+* @RNL(author="analog-canvas") {
+*   #Iin @SET-SYMBOL $CURRENT_SOURCE => @PLACE(42, -43) => @ORIENT("R180");
+*   #Rs @SET-SYMBOL $RESISTOR => @PLACE(47, -43);
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(55, -43);
+*   #G1 @SET-SYMBOL $CANVAS_VCCS_CIRCLE => @PLACE(55, -34);
+*   #r0 @SET-SYMBOL $RESISTOR => @PLACE(60, -34);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(42, -49) => %gnd1;
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(71, -35) => @ORIENT("MY");
+*   #RL @SET-SYMBOL $RESISTOR => @PLACE(66, -35) => @ORIENT("MX");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(71, -41) => %gnd2;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (47, -47);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (47, -39);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (55, -39);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (42, -47);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (66, -30);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (60, -30);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (71, -39);
+*   $JUNCTION @ATTACH %j7;
+*   &VSS @WIRE(mode="straight") {#Iin:1 %j4};
+*   &VSS @WIRE(mode="straight") {%j4 %j1};
+*   &VSS @WIRE(mode="straight") {#Rs:2 %j1};
+*   &VSS @WIRE(mode="straight") {%j1 (55, -47) #C1:2};
+*   &VSS @WIRE(mode="straight") {%j4 %gnd1:p};
+*   &S @WIRE(mode="straight") {#Iin:2 (42, -39) %j2};
+*   &S @WIRE(mode="straight") {%j2 #Rs:1};
+*   &S @WIRE(mode="straight") {%j2 %j3};
+*   &S @WIRE(mode="straight") {#G1:2 %j3};
+*   &S @WIRE(mode="straight") {%j3 #C1:1};
+*   &S @WIRE(mode="straight") {%j3 (60, -39) #r0:2};
+*   &D @WIRE(mode="straight") {#G1:1 (55, -30) %j6};
+*   &D @WIRE(mode="straight") {%j6 #r0:1};
+*   &D @WIRE(mode="straight") {%j6 %j5};
+*   &D @WIRE(mode="straight") {#RL:2 %j5};
+*   &D @WIRE(mode="straight") {%j5 (71, -30) #C2:1};
+*   &VSS @WIRE(mode="straight") {#RL:1 (66, -39) %j7};
+*   &VSS @WIRE(mode="straight") {%j7 #C2:2};
+*   &VSS @WIRE(mode="straight") {%j7 %gnd2:p};
+*   #Iin @TEXT("\textbf{\textit{I}}_{\textbf{in}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   #Rs @TEXT("\textbf{\textit{R}}_{\textbf{s}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{gs}}\textbf{+C}_{\textbf{sb}}", key="name", dx=1.2, dy=-0.5, halign="start",
+*       valign="baseline", size=1.5116);
+*   #G1
+*       @TEXT("\textbf{\textit{g}}_{\textbf{m}}\textbf{\textit{v}}_{\textbf{gs}}", key="name", dx=-6, dy=-0.5, halign="start",
+*       valign="baseline", size=1.5116);
+*   #r0 @TEXT("\textbf{\textit{r}}_{\textbf{0}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C2
+*       @TEXT("\textbf{\textit{C}}_{\textbf{gd}}\textbf{+C}_{\textbf{db}}", key="name", dx=4, dy=0.5, halign="middle",
+*       valign="baseline", size=1.5116);
+*   #RL @TEXT("\textbf{\textit{R}}_{\textbf{L}}", key="name", dx=1, dy=1, halign="start", valign="baseline", size=1.5116);
+*   &D @TEXT("\textbf{\textit{D}}", size=1.5116) => @PLACE(53.5, -30.5);
+*   &S @TEXT("\textbf{\textit{S}}", size=1.5116) => @PLACE(53.5, -38.5);
+*   @LINE {(52.652332, -41.773284) (53.347668, -41.773284)} => @LAYER("top") => %polarity1_plus1;
+*   @LINE {(53, -41.425616) (53, -42.120952)} => @LAYER("top") => %polarity1_plus2;
+*   @LINE {(52.652332, -44.826716) (53.347668, -44.826716)} => @LAYER("top") => %polarity1_minus;
+*   (53, -43.3) @TEXT("\textbf{\textit{V}}_{\textbf{in}}", halign="middle", valign="middle", size=1.5116) => %polarity1
+* }
+.ends dut

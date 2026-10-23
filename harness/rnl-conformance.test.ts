@@ -1,0 +1,329 @@
+// RNL conformance harness: every corpus circuit through SPICE+RNL and
+// Spectre+RNL and back into Analog Canvas, graded L0–L3 against the original.
+//
+// Run from an analog-canvas checkout (see README.md):
+//   CONF_CORPUS=<repo>/circuits CONF_OUT=<dir> [CONF_IDS=a,b] \
+//     npx vitest run apps/editor/src/features/netlist-export/rnl-conformance.test.ts
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterAll, it } from "vitest";
+
+import type { CircuitProject, SchematicDocument } from "@icm/model";
+import {
+  compareElectricalGraphs,
+  createDesignNetlistExport,
+  projectElectricalGraph,
+} from "@icm/netlist";
+import { parseProject } from "@icm/project-protocol";
+import { createRnlExport, type RnlSnapshot } from "@icm/rnl";
+
+import { labelCensus, labelDifferences } from "../../../e2e/label-census";
+import { createRnlTestCore } from "./rnl-core.test-support";
+import { planRnlImport } from "./rnl-import";
+import type { RnlRuntime } from "./rnl-runtime";
+
+const CORPUS = process.env.CONF_CORPUS ?? "";
+const OUT = process.env.CONF_OUT ?? "";
+const IDS = process.env.CONF_IDS
+  ? process.env.CONF_IDS.split(",").filter(Boolean)
+  : CORPUS
+    ? readdirSync(CORPUS)
+        .filter((name) => name.endsWith(".icproj.json"))
+        .map((name) => name.replace(/\.icproj\.json$/u, ""))
+        .sort()
+    : [];
+const FORMATS = ["spice", "spectre"] as const;
+
+const core = await createRnlTestCore();
+afterAll(() => core.terminate());
+const runtime: RnlRuntime = {
+  write: (request) =>
+    core.write(request as unknown as Parameters<typeof core.write>[0]),
+  snapshot: (request) =>
+    core.snapshot(request) as unknown as Promise<RnlSnapshot>,
+};
+
+type Diagnostic = { severity: string; code: string; message: string };
+const tally = (items: readonly Diagnostic[]) => {
+  const out: Record<string, number> = {};
+  for (const item of items)
+    out[`${item.severity} ${item.code}`] =
+      (out[`${item.severity} ${item.code}`] ?? 0) + 1;
+  return out;
+};
+
+/** Mirror "horizontal" is "vertical" turned 180°, "both" is a 180° turn. */
+function orientation(rotation: number, mirror: string) {
+  if (mirror === "horizontal") return `r${(rotation + 180) % 360} vertical`;
+  if (mirror === "both") return `r${(rotation + 180) % 360} none`;
+  return `r${rotation} ${mirror}`;
+}
+
+const cellKey = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]+/gu, "_");
+
+function documentPairs(a: CircuitProject, b: CircuitProject) {
+  const byKey = new Map(b.documents.map((item) => [cellKey(item.name), item]));
+  const topB = b.documents.find((item) => item.id === b.topDocumentId);
+  return a.documents.map((document) => ({
+    a: document,
+    b:
+      document.id === a.topDocumentId
+        ? topB
+        : byKey.get(cellKey(document.name)),
+  }));
+}
+
+function symbolOf(project: CircuitProject, instance: SchematicDocument["instances"][number]) {
+  const binding = instance.netlist?.binding;
+  if (binding?.kind === "subcircuit") {
+    const child = project.documents.find((item) => item.id === binding.childDocumentId);
+    return `cell:${cellKey(child?.name ?? "?")}`;
+  }
+  return instance.symbolId;
+}
+
+function placed(project: CircuitProject, document: SchematicDocument) {
+  const named = new Map<string, string>();
+  const unnamed: string[] = [];
+  for (const instance of document.instances) {
+    const at = instance.placement
+      ? `${instance.placement.position.x},${instance.placement.position.y} ${orientation(instance.placement.rotation, instance.placement.mirror)}`
+      : "unplaced";
+    const symbol = symbolOf(project, instance);
+    if (instance.reference)
+      named.set(
+        instance.reference,
+        `${symbol} @ ${at} ${JSON.stringify(Object.fromEntries(Object.entries(instance.netlist?.parameters ?? {}).sort()))}`,
+      );
+    else unnamed.push(`${symbol} @ ${at}`);
+  }
+  return { named, unnamed: unnamed.sort() };
+}
+
+function multisetDiff(a: readonly string[], b: readonly string[]) {
+  const left = new Map<string, number>();
+  for (const item of a) left.set(item, (left.get(item) ?? 0) + 1);
+  const added: string[] = [];
+  for (const item of b) {
+    const n = left.get(item) ?? 0;
+    if (n > 0) left.set(item, n - 1);
+    else added.push(item);
+  }
+  const missing = [...left].flatMap(([item, n]) => Array(n).fill(item));
+  return { missing, added };
+}
+
+const byKind = (items: readonly { kind?: string }[]) => {
+  const out: Record<string, number> = {};
+  for (const item of items) out[item.kind ?? "?"] = (out[item.kind ?? "?"] ?? 0) + 1;
+  return JSON.stringify(Object.fromEntries(Object.entries(out).sort()));
+};
+
+const withoutIds = (value: unknown): unknown =>
+  Array.isArray(value)
+    ? value.map(withoutIds)
+    : value && typeof value === "object"
+      ? Object.fromEntries(
+          Object.entries(value)
+            .filter(
+              ([key, item]) =>
+                key !== "id" &&
+                key !== "zIndex" &&
+                item !== undefined &&
+                !(item && typeof item === "object" && !Array.isArray(item) && Object.keys(item).length === 0),
+            )
+            .sort(([x], [y]) => x.localeCompare(y))
+            .map(([key, item]) => [key, withoutIds(item)]),
+        )
+      : value;
+
+/** Where two JSON values differ, as "path: before -> after". */
+function changedPaths(a: unknown, b: unknown, path = ""): string[] {
+  if (JSON.stringify(a) === JSON.stringify(b)) return [];
+  if (a && b && typeof a === "object" && typeof b === "object") {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    return [...keys].flatMap((key) =>
+      changedPaths(
+        (a as Record<string, unknown>)[key],
+        (b as Record<string, unknown>)[key],
+        path ? `${path}.${key}` : key,
+      ),
+    );
+  }
+  return [`${path}: ${JSON.stringify(a)} -> ${JSON.stringify(b)}`];
+}
+
+/** Every drawing difference between two projects, as "category: detail". */
+function drawingDifferences(a: CircuitProject, b: CircuitProject): string[] {
+  const out: string[] = [];
+  if (a.documents.length !== b.documents.length)
+    out.push(`document: ${a.documents.length} Cells -> ${b.documents.length}`);
+  for (const { a: da, b: db } of documentPairs(a, b)) {
+    const cell = da.name;
+    if (!db) {
+      out.push(`document: ${cell} not found after import`);
+      continue;
+    }
+    const pa = placed(a, da);
+    const pb = placed(b, db);
+    for (const [reference, value] of pa.named) {
+      const after = pb.named.get(reference) ?? pb.named.get(`X${reference}`);
+      if (!pb.named.has(reference) && pb.named.has(`X${reference}`))
+        out.push(`reference: ${cell} ${reference} -> X${reference}`);
+      if (!after) out.push(`instance: ${cell} ${reference} missing`);
+      else if (after !== value)
+        out.push(`instance: ${cell} ${reference} ${value} -> ${after}`);
+    }
+    for (const reference of pb.named.keys())
+      if (!pa.named.has(reference) && !pa.named.has(reference.replace(/^X/u, "")))
+        out.push(`instance: ${cell} ${reference} added`);
+    const pins = multisetDiff(pa.unnamed, pb.unnamed);
+    for (const item of pins.missing) out.push(`pin-or-glyph: ${cell} missing ${item}`);
+    for (const item of pins.added) out.push(`pin-or-glyph: ${cell} added ${item}`);
+    if (da.routes.length !== db.routes.length)
+      out.push(`route: ${cell} ${da.routes.length} -> ${db.routes.length}`);
+    const junctions = multisetDiff(
+      da.junctions.map((item) => `${item.position.x},${item.position.y}`),
+      db.junctions.map((item) => `${item.position.x},${item.position.y}`),
+    );
+    if (junctions.missing.length || junctions.added.length)
+      out.push(
+        `junction: ${cell} -${junctions.missing.length} +${junctions.added.length}`,
+      );
+    if (byKind(da.annotations) !== byKind(db.annotations))
+      out.push(`annotation: ${cell} ${byKind(da.annotations)} -> ${byKind(db.annotations)}`);
+    const drafting = multisetDiff(
+      (da.drafting?.objects ?? []).map((item) => JSON.stringify(withoutIds(item))),
+      (db.drafting?.objects ?? []).map((item) => JSON.stringify(withoutIds(item))),
+    );
+    const unmatched = [...drafting.added];
+    for (const item of drafting.missing) {
+      const before = JSON.parse(item) as Record<string, unknown>;
+      const index = unmatched.findIndex(
+        (candidate) => (JSON.parse(candidate) as Record<string, unknown>).kind === before.kind,
+      );
+      if (index < 0) {
+        out.push(`drafting: ${cell} ${String(before.kind)} lost`);
+        continue;
+      }
+      const after = JSON.parse(unmatched.splice(index, 1)[0]!) as unknown;
+      out.push(`drafting: ${cell} ${String(before.kind)} ${changedPaths(before, after).join("; ")}`);
+    }
+    for (const item of unmatched)
+      out.push(`drafting: ${cell} ${String((JSON.parse(item) as Record<string, unknown>).kind)} added`);
+  }
+  for (const line of labelDifferences(labelCensus(a), labelCensus(b)))
+    out.push(`label: ${line}`);
+  return out;
+}
+
+const netlistLines = (text: string) =>
+  text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("*") && !line.startsWith("//"))
+    .sort();
+const definitions = (text: string) =>
+  new Set(
+    [...text.matchAll(/^\s*\.?(?:model|subckt)\s+(\S+)/gimu)].map((match) =>
+      match[1]!.toLowerCase(),
+    ),
+  );
+
+function netlistComparison(a: CircuitProject, b: CircuitProject, format: "spice" | "spectre") {
+  const before = createDesignNetlistExport(a, { format });
+  const after = createDesignNetlistExport(b, { format });
+  if (before.status !== "ready" || after.status !== "ready")
+    return { identical: false, note: `${before.status}/${after.status}`, lostDefinitions: [] as string[] };
+  const ta = before.file.text;
+  const tb = after.file.text;
+  const lines = multisetDiff(netlistLines(ta), netlistLines(tb));
+  const kept = definitions(tb);
+  return {
+    identical: lines.missing.length === 0 && lines.added.length === 0,
+    linesMissing: lines.missing.slice(0, 20),
+    linesAdded: lines.added.slice(0, 20),
+    lostDefinitions: [...definitions(ta)].filter((name) => !kept.has(name)),
+  };
+}
+
+async function roundTrip(id: string, project: CircuitProject, format: "spice" | "spectre") {
+  const result: Record<string, unknown> = { level: 0 };
+  const exported = createRnlExport(project, { format });
+  result.exportStatus = exported.status;
+  result.exportDiagnostics = tally(exported.diagnostics as Diagnostic[]);
+  if (exported.status !== "ready") {
+    result.failure = "export-blocked";
+    return result;
+  }
+  let text: string;
+  try {
+    text = (await runtime.write({ write: exported.request, svg: false })).text;
+  } catch (error) {
+    result.failure = "write-threw";
+    result.error = String(error).slice(0, 2000);
+    return result;
+  }
+  writeFileSync(join(OUT, "rnl", `${id}.${format}.rnl`), text);
+  const path = format === "spice" ? "circuit.sp" : "circuit.scs";
+  let plan: Awaited<ReturnType<typeof planRnlImport>>;
+  try {
+    plan = await planRnlImport({
+      inputs: [{ path, bytes: new TextEncoder().encode(text) }],
+      entryPath: path,
+      runtime,
+    });
+  } catch (error) {
+    result.failure = "import-threw";
+    result.error = String(error).slice(0, 2000);
+    return result;
+  }
+  result.importStatus = plan.status;
+  result.importDiagnostics = tally(plan.diagnostics as Diagnostic[]);
+  if (plan.status !== "ready") {
+    result.failure = "import-failed";
+    return result;
+  }
+  const errors = (plan.diagnostics as Diagnostic[]).filter((item) => item.severity === "error");
+  if (errors.length > 0) {
+    result.failure = "import-errors";
+    result.errors = errors.map((item) => `${item.code}: ${item.message}`);
+    return result;
+  }
+  result.level = 1;
+  const back = plan.project;
+  const a = projectElectricalGraph(project);
+  const b = projectElectricalGraph(back);
+  result.electrical =
+    a.status === "ready" && b.status === "ready"
+      ? compareElectricalGraphs(a.graph, b.graph)
+      : `${a.status}/${b.status}`;
+  const netlist = netlistComparison(project, back, format);
+  result.netlist = netlist;
+  // Listed at every level that imported, so a circuit failing L2 still shows
+  // what its drawing lost.
+  const differences = drawingDifferences(project, back);
+  result.drawingDifferences = differences;
+  if (result.electrical !== "equal" || !netlist.identical) return result;
+  result.level = differences.length === 0 ? 3 : 2;
+  return result;
+}
+
+it.each(IDS)(
+  "RNL conformance %s",
+  async (id) => {
+    mkdirSync(join(OUT, "rnl"), { recursive: true });
+    mkdirSync(join(OUT, "reports"), { recursive: true });
+    const project = parseProject(readFileSync(join(CORPUS, `${id}.icproj.json`), "utf8"));
+    const report: Record<string, unknown> = { id };
+    for (const format of FORMATS) {
+      const started = performance.now();
+      const result = await roundTrip(id, project, format);
+      result.milliseconds = Math.round(performance.now() - started);
+      report[format] = result;
+    }
+    writeFileSync(join(OUT, "reports", `${id}.json`), `${JSON.stringify(report, null, 1)}\n`);
+  },
+  300_000,
+);

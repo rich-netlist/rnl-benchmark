@@ -1,0 +1,57 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3")
+* }
+.subckt Main VSS
+C1 net0 net2 1p
+I1 net1 VSS DC 100u
+L1 net0 net2 1n
+XM1 net2 net0 net1 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 net0 net2 net1 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+* @RNL(author="analog-canvas") {
+*   #L1 @SET-SYMBOL $INDUCTOR => @PLACE(37, -23) => @ORIENT("R90");
+*   #C1 @SET-SYMBOL $VARIABLE_CAPACITOR => @PLACE(37, -27) => @ORIENT("R90");
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(42, -33);
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(32, -33) => @ORIENT("MY");
+*   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(37, -37);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(37, -39) => %gnd1;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (32, -31);
+*   %j2 = (42, -31);
+*   %j3 = (32, -30);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (39, -33);
+*   %j5 = (42, -30);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (42, -27);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (32, -27);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (32, -27);
+*   &net1 @WIRE(mode="straight") {#XM2:3 #I1:1};
+*   &net1 @WIRE(mode="straight") {#I1:1 #XM1:3};
+*   &net2 @WIRE(mode="straight") {#XM2:2 (36, -33) (39, -30) %j5};
+*   &net2 @WIRE(mode="straight") {#C1:2 %j6};
+*   &net2 @WIRE(mode="straight") {%j6 %j5};
+*   &net2 @WIRE(mode="straight") {%j5 %j2};
+*   &net2 @WIRE(mode="straight") {#L1:2 (42, -23) %j6};
+*   &net0 @WIRE(mode="straight") {%j7 %j3};
+*   &net0 @WIRE(mode="straight") {%j7 #C1:1};
+*   &net0 @WIRE(mode="straight") {%j3 %j1};
+*   &net0 @WIRE(mode="straight") {%j3 (35, -30) (38, -33) %j4};
+*   &net0 @WIRE(mode="straight") {#L1:1 (32, -23) %j8};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #I1:2};
+*   &net0 @WIRE(mode="straight") {%j7 %j8};
+*   &net0 @WIRE(mode="straight") {%j1 #XM2:1};
+*   &net0 @WIRE(mode="straight") {%j4 #XM1:2};
+*   $JUNCTION @ATTACH (37, -35)(p) => %dot1;
+*   &net2 @WIRE(mode="straight") {%j2 #XM1:1};
+*   #L1 @TEXT("\textbf{\textit{L}}_{\textbf{1}}", key="name", dx=1.5, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.5, dy=1, halign="middle", valign="baseline", size=1.5116);
+*   #XM1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #XM2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   #I1 @TEXT("\textbf{\textit{I}}_{\textbf{1}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116)
+* }
+.ends Main

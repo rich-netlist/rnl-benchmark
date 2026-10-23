@@ -1,0 +1,125 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3")
+// }
+
+subckt dut (VDD VSS IN LO LO_bar IF\+ IF\-)
+C1 (VSS net0) capacitor c=1p
+C2 (VSS net1) capacitor c=1p
+C3 (net2 IN) capacitor c=1p
+C4 (net3 VSS) capacitor c=1p
+L1 (net2 net3) inductor l=1n
+M1 (net0 LO net3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+MN2 (net1 LO_bar net3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+MN3 (IF\+ net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+MN4 (IF\- net1 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+MP1 (IF\+ net0 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=2 nf=1 m=1
+MP2 (IF\- net1 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=2 nf=1 m=1
+R1 (IF\- net1) resistor r=1k
+R2 (IF\+ net0) resistor r=1k
+// @RNL(author="analog-canvas") {
+//   #M1 @SET-SYMBOL $NMOS => @PLACE(39, -15) => @ORIENT("R270");
+//   #MN2 @SET-SYMBOL $NMOS => @PLACE(39, -23) => @ORIENT("MXR90");
+//   $IO_PORT @ATTACH &IN(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(20, -19) => %port1;
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(45, -13);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(45, -11) => @ORIENT("R180") => %gnd1;
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(45, -25) => @ORIENT("MX");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(45, -27) => @ORIENT("MY") => %gnd2;
+//   $IO_PORT @ATTACH &LO(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(39, -12) => @ORIENT("R270") => %port2;
+//   $IO_PORT @ATTACH &LO_bar(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(39, -26) => @ORIENT("R90") => %port3;
+//   #MP1 @SET-SYMBOL $PMOS => @PLACE(63, -3);
+//   #MN3 @SET-SYMBOL $NMOS => @PLACE(63, -11);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(63, -14) => %gnd3;
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(63, 0) => %vdd1;
+//   #MP2 @SET-SYMBOL $PMOS => @PLACE(63, -35) => @ORIENT("MX");
+//   #MN4 @SET-SYMBOL $NMOS => @PLACE(63, -27) => @ORIENT("MX");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(63, -24) => @ORIENT("MX") => %gnd4;
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(63, -38) => @ORIENT("MX") => %vdd2;
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(59, -31) => @ORIENT("MXR90");
+//   #R2 @SET-SYMBOL $RESISTOR => @PLACE(59, -7) => @ORIENT("R270");
+//   #L1 @SET-SYMBOL $INDUCTOR => @PLACE(28, -19) => @ORIENT("R90");
+//   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(23, -19) => @ORIENT("R270");
+//   #C4 @SET-SYMBOL $CAPACITOR => @PLACE(32, -23);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(32, -27) => @ORIENT("MY") => %gnd5;
+//   $IO_PORT @ATTACH &"IF+"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(69, -7) => @ORIENT("R180") => %port4;
+//   $IO_PORT @ATTACH &"IF-"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(69, -31) => @ORIENT("R180") => %port5;
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (36, -19);
+//   $JUNCTION @ATTACH %j1;
+//   %j2 = (63, 0);
+//   %j3 = (63, -38);
+//   %j4 = (55, -7);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (55, -31);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (63, -31);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (63, -7);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (32, -19);
+//   $JUNCTION @ATTACH %j8;
+//   %j9 = (69, -31);
+//   %j10 = (69, -7);
+//   &VDD @WIRE(mode="straight") {#MP1:3 %j2};
+//   &VSS @WIRE(mode="straight") {#MN3:3 %gnd3:p};
+//   &"IF+" @WIRE(mode="straight") {#MP1:1 %j7};
+//   &"IF+" @WIRE(mode="straight") {%j7 #MN3:1};
+//   &VDD @WIRE(mode="straight") {#MP2:3 %j3};
+//   &VSS @WIRE(mode="straight") {#MN4:3 %gnd4:p};
+//   &"IF-" @WIRE(mode="straight") {#MP2:1 %j6};
+//   &"IF-" @WIRE(mode="straight") {%j6 #MN4:1};
+//   &net0 @WIRE(mode="straight") {#M1:1 #C1:2};
+//   &net0 @WIRE(mode="straight") {#C1:2 (50, -15) (50, -7) %j4};
+//   &net0 @WIRE(mode="straight") {%j4 (55, -11) #MN3:2};
+//   &net0 @WIRE(mode="straight") {%j4 (55, -3) #MP1:2};
+//   &net1 @WIRE(mode="straight") {#MN2:1 #C2:2};
+//   &net1 @WIRE(mode="straight") {#C2:2 (50, -23) (50, -31) %j5};
+//   &net1 @WIRE(mode="straight") {%j5 (55, -35) #MP2:2};
+//   &net1 @WIRE(mode="straight") {%j5 (55, -27) #MN4:2};
+//   &net1 @WIRE(mode="straight") {#R1:2 %j5};
+//   &"IF-" @WIRE(mode="straight") {#R1:1 %j6};
+//   &net0 @WIRE(mode="straight") {#R2:2 %j4};
+//   &"IF+" @WIRE(mode="straight") {#R2:1 %j7};
+//   &net3 @WIRE(mode="straight") {#L1:2 %j8};
+//   &net3 @WIRE(mode="straight") {%j8 #C4:1};
+//   &net3 @WIRE(mode="straight") {%j8 %j1};
+//   &net3 @WIRE(mode="straight") {%j1 (36, -15) #M1:3};
+//   &net3 @WIRE(mode="straight") {%j1 (36, -23) #MN2:3};
+//   &IN @WIRE(mode="straight") {#C3:2 %port1:p};
+//   &VSS @WIRE(mode="straight") {%gnd5:p #C4:2};
+//   &net2 @WIRE(mode="straight") {#C3:1 #L1:1};
+//   &"IF-" @WIRE(mode="straight") {%j6 %j9};
+//   &"IF+" @WIRE(mode="straight") {%j7 %j10};
+//   $JUNCTION @ATTACH (45, -15)(p) => %dot1;
+//   $JUNCTION @ATTACH (45, -23)(p) => %dot2;
+//   &VDD @WIRE(mode="straight") {%j2 %vdd1:p};
+//   &VDD @WIRE(mode="straight") {%j3 %vdd2:p};
+//   &VSS @WIRE(mode="straight") {#C1:1 %gnd1:p};
+//   &VSS @WIRE(mode="straight") {#C2:1 %gnd2:p};
+//   &LO @WIRE(mode="straight") {#M1:2 %port2:p};
+//   &LO_bar @WIRE(mode="straight") {#MN2:2 %port3:p};
+//   &"IF+" @WIRE(mode="straight") {%j10 %port4:p};
+//   &"IF-" @WIRE(mode="straight") {%j9 %port5:p};
+//   #M1 @TEXT("\textbf{\textit{M}}_{\textbf{N1}}", key="name", dx=0, dy=-1.5, halign="middle", valign="baseline", size=1.5116);
+//   #MN2 @TEXT("\textbf{\textit{M}}_{\textbf{N2}}", key="name", dx=0, dy=1, halign="middle", valign="baseline", size=1.5116);
+//   %port1 @TEXT("\textbf{\textit{IN}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   %port2 @TEXT("\textbf{\textit{LO}}", key="name", dx=0, dy=2.4, halign="middle", valign="baseline", size=1.5116);
+//   %port3 @TEXT("\overline{\textbf{\textit{LO}}}", key="name", dx=0, dy=-3, halign="middle", valign="baseline", size=1.5116);
+//   #MP1 @TEXT("\textbf{\textit{M}}_{\textbf{P1}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #MN3 @TEXT("\textbf{\textit{M}}_{\textbf{N3}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(65, 1) => %power1;
+//   #MP2 @TEXT("\textbf{\textit{M}}_{\textbf{P2}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #MN4 @TEXT("\textbf{\textit{M}}_{\textbf{N4}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(65, -39.6) => %power2;
+//   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0, dy=1.4, halign="middle", valign="baseline", size=1.5116);
+//   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0, dy=-2, halign="middle", valign="baseline", size=1.5116);
+//   #L1 @TEXT("\textbf{\textit{L}}_{\textbf{1}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116);
+//   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=0, dy=-2.3, halign="middle", valign="baseline", size=1.5116);
+//   #C4 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   %port4 @TEXT("\textbf{\textit{IF+}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   %port5 @TEXT("\textbf{\textit{IF-}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116)
+// }
+ends dut

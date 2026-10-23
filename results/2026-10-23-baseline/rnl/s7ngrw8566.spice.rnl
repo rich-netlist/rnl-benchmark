@@ -1,0 +1,82 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3")
+* }
+.subckt dut VDD VSS Vinp VRp VRn Bi CKb CKmb CKm CK
+M1 Vc Bi net1 VSS nch l=150n m=1 nf=1 w=1u
+M2 net1 CK VRn VSS nch l=150n m=1 nf=1 w=1u
+M3 net0 CKb VRp VDD pch l=150n m=1 nf=1 w=1u
+M4 Vc Bi net0 VDD pch l=150n m=1 nf=1 w=1u
+M5 Vinp CKmb Vc VSS nch l=150n m=1 nf=1 w=1u
+M6 Vc CKm Vinp VDD pch l=150n m=1 nf=1 w=1u
+* @RNL(author="analog-canvas") {
+*   #M1 @SET-SYMBOL $NMOS => @PLACE(36, -27);
+*   #M2 @SET-SYMBOL $NMOS => @PLACE(36, -33);
+*   #M3 @SET-SYMBOL $PMOS => @PLACE(36, -13);
+*   #M4 @SET-SYMBOL $PMOS => @PLACE(36, -19);
+*   #M5 @SET-SYMBOL $NMOS => @PLACE(48, -18);
+*   #M6 @SET-SYMBOL $PMOS => @PLACE(56, -18) => @ORIENT("MY");
+*   $IO_PORT @ATTACH &Vinp(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(52, -14) => @ORIENT("R270") => %port1;
+*   $IO_PORT @ATTACH &VRp(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(36, -11) => @ORIENT("R270") => %port2;
+*   $IO_PORT @ATTACH &VRn(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(36, -35) => @ORIENT("R90") => %port3;
+*   $IO_PORT @ATTACH &Bi(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(26, -23) => %port4;
+*   $IO_PORT @ATTACH &CKb(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(33, -13) => %port5;
+*   $IO_PORT @ATTACH &CKmb(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(45, -18) => %port6;
+*   $IO_PORT @ATTACH &CKm(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(59, -18) => @ORIENT("R180") => %port7;
+*   $IO_PORT @ATTACH &CK(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(33, -33) => %port8;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (36, -29);
+*   %j2 = (36, -31);
+*   %j3 = (36, -23);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (52, -20);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (52, -16);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (52, -14);
+*   %j7 = (31, -23);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (26, -23);
+*   &net0 @WIRE(mode="straight") {#M3:1 #M4:3};
+*   &net1 @WIRE(mode="straight") {%j1 %j2};
+*   &Vinp @WIRE(mode="straight") {#M5:1 %j5};
+*   &Vinp @WIRE(mode="straight") {%j5 #M6:3};
+*   &Vc @WIRE(mode="straight") {#M4:1 %j3};
+*   &Vc @WIRE(mode="straight") {%j3 #M1:1};
+*   &Vc @WIRE(mode="straight") {%j3 (52, -23) %j4};
+*   &Vc @WIRE(mode="straight") {#M5:3 %j4};
+*   &Vc @WIRE(mode="straight") {%j4 #M6:1};
+*   &Vinp @WIRE(mode="straight") {%j5 %j6};
+*   &Bi @WIRE(mode="straight") {#M4:2 (31, -19) %j7};
+*   &Bi @WIRE(mode="straight") {%j7 (31, -27) #M1:2};
+*   &Bi @WIRE(mode="straight") {%j7 %j8};
+*   &net1 @WIRE(mode="straight") {%j1 #M1:3};
+*   &net1 @WIRE(mode="straight") {%j2 #M2:1};
+*   &VRp @WIRE(mode="straight") {#M3:3 %port2:p};
+*   &VRn @WIRE(mode="straight") {#M2:3 %port3:p};
+*   &CKb @WIRE(mode="straight") {#M3:2 %port5:p};
+*   &CKmb @WIRE(mode="straight") {#M5:2 %port6:p};
+*   &CKm @WIRE(mode="straight") {#M6:2 %port7:p};
+*   &CK @WIRE(mode="straight") {#M2:2 %port8:p};
+*   &Bi @WIRE(mode="straight") {%j8 %port4:p};
+*   &Vinp @WIRE(mode="straight") {%j6 %port1:p};
+*   #M1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #M2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #M3 @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #M4 @TEXT("\textbf{\textit{M}}_{\textbf{4}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #M5 @TEXT("\textbf{\textit{M}}_{\textbf{5}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #M6 @TEXT("\textbf{\textit{M}}_{\textbf{6}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{inp}}", key="name", dx=0, dy=1.9, halign="middle", valign="baseline", size=1.5116);
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{Rp}}", key="name", dx=0, dy=1.9, halign="middle", valign="baseline", size=1.5116);
+*   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{Rn}}", key="name", dx=0, dy=-2.8, halign="middle", valign="baseline", size=1.5116);
+*   %port4 @TEXT("\textbf{\textit{Bi}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   %port5 @TEXT("\textbf{\textit{CK}}\textbf{b}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   %port6 @TEXT("\textbf{\textit{CKmb}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   %port7 @TEXT("\textbf{\textit{CKm}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   &Vc @TEXT("\textbf{\textit{V}}_{\textbf{c}}", size=1.5116) => @PLACE(43.978656, -22);
+*   %port8 @TEXT("\textbf{\textit{CK}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116)
+* }
+.ends dut

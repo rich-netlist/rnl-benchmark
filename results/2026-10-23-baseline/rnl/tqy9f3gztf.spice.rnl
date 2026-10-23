@@ -1,0 +1,87 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1")
+* }
+.subckt Main VDD VSS Vout Vin
+C1 net5 VSS 1p
+C2 net4 Vin 1p
+C3 Vout net7 1p
+L1 net6 net1 1n
+L2 net2 VSS 1n
+L3 VDD net7 1n
+L4 net4 net3 1n
+XM1 net1 net3 net2 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 net7 net5 net6 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 net5 VDD 1k
+R2 net0 net3 1k
+V1 net0 VSS DC 1.8
+* @RNL(author="analog-canvas") {
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(29, -33);
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(29, -20);
+*   #L1 @SET-SYMBOL $INDUCTOR => @PLACE(29, -28);
+*   #L2 @SET-SYMBOL $INDUCTOR => @PLACE(29, -38);
+*   #L3 @SET-SYMBOL $INDUCTOR => @PLACE(29, -14);
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(24, -24);
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(15, -33) => @ORIENT("R270");
+*   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(33, -17) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(29, -43) => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(24, -26) => %gnd2;
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(21, -20) => @ORIENT("R270");
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(24, -36) => @ORIENT("R180");
+*   #L4 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(20, -33) => @ORIENT("R90");
+*   #V1 @SET-SYMBOL $VOLTAGE_SOURCE => @PLACE(24, -40);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(24, -43) => %gnd3;
+*   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(36, -17) => @ORIENT("R180") => %port1;
+*   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(12, -33) => %port2;
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(29, -12) => %vdd1;
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(18, -12) => %vdd2;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (24, -20);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (24, -33);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (29, -17);
+*   $JUNCTION @ATTACH %j3;
+*   &net1 @WIRE(mode="straight") {#XM1:1 #L1:2};
+*   &net6 @WIRE(mode="straight") {#L1:1 #XM2:3};
+*   &net2 @WIRE(mode="straight") {#L2:1 #XM1:3};
+*   &VSS @WIRE(mode="straight") {#L2:2 %gnd1:p};
+*   &VSS @WIRE(mode="straight") {%gnd3:p #V1:2};
+*   &VDD @WIRE(mode="straight") {%vdd2:p (18, -20) #R1:2};
+*   &net3 @WIRE(mode="straight") {#R2:2 %j2};
+*   &net3 @WIRE(mode="straight") {%j2 #XM1:2};
+*   &Vin @WIRE(mode="straight") {#C2:2 %port2:p};
+*   &Vout @WIRE(mode="straight") {#C3:1 %port1:p};
+*   &net7 @WIRE(mode="straight") {#XM2:1 %j3};
+*   &net7 @WIRE(mode="straight") {%j3 #C3:2};
+*   &net5 @WIRE(mode="straight") {#C1:1 %j1};
+*   &net5 @WIRE(mode="straight") {%j1 #XM2:2};
+*   &net5 @WIRE(mode="straight") {#R1:1 %j1};
+*   &net3 @WIRE(mode="straight") {#L4:2 %j2};
+*   &net7 @WIRE(mode="straight") {#L3:2 %j3};
+*   &VSS @WIRE(mode="straight") {#C1:2 %gnd2:p};
+*   &net0 @WIRE(mode="straight") {#R2:1 #V1:1};
+*   &VDD @WIRE(mode="straight") {#L3:1 %vdd1:p};
+*   &net4 @WIRE(mode="straight") {#C2:1 #L4:1};
+*   #XM1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #XM2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #L1 @TEXT("\textbf{\textit{L}}_{\textbf{1}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #L2 @TEXT("\textbf{\textit{L}}_{\textbf{2}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #L3 @TEXT("\textbf{\textit{L}}_{\textbf{3}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116);
+*   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=-1, dy=-3, halign="middle", valign="baseline", size=1.5116);
+*   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{3}}", key="name", dx=0, dy=-2.5, halign="middle", valign="baseline", size=1.5116);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=-1, dy=-4, halign="middle", valign="baseline", size=1.5116);
+*   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=-1, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   #L4 @TEXT("\textbf{\textit{L}}_{\textbf{4}}", key="name", dx=-0.5, dy=2, halign="middle", valign="baseline", size=1.5116);
+*   #V1 @TEXT("\textbf{\textit{V}}_{\textbf{bias}}", key="name", dx=-7.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116);
+*   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(31, -11) => %power1;
+*   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(20, -11) => %power2
+* }
+.ends Main

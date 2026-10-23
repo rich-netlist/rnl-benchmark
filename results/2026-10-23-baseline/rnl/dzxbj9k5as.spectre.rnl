@@ -1,0 +1,137 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3")
+// }
+
+subckt Main (VDD VSS Vinp Vinn Vout)
+C1 (Vout VSS) capacitor c=1p
+C2 (Vout net4) capacitor c=1p
+I2 (VDD net0) isource dc=100u
+M22 (net1 net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M23 (net3 Vinp net1 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M24 (net2 Vinn net1 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M25 (net0 net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M26 (net2 net3 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M27 (net3 net3 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M28 (Vout net2 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M29 (net1 net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M30 (Vout net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R3 (net4 net2) resistor r=1k
+// @RNL(author="analog-canvas") {
+//   #M22 @SET-SYMBOL $NMOS => @PLACE(29, -48);
+//   #M23 @SET-SYMBOL $NMOS => @PLACE(23, -42);
+//   #M24 @SET-SYMBOL $NMOS => @PLACE(34, -42) => @ORIENT("MY");
+//   #M25 @SET-SYMBOL $NMOS => @PLACE(13, -48) => @ORIENT("MY");
+//   #M26 @SET-SYMBOL $PMOS => @PLACE(34, -31);
+//   #M27 @SET-SYMBOL $PMOS => @PLACE(23, -31) => @ORIENT("MY");
+//   #M28 @SET-SYMBOL $PMOS => @PLACE(45, -35);
+//   #M29 @SET-SYMBOL $NMOS => @PLACE(29, -48);
+//   #M30 @SET-SYMBOL $NMOS => @PLACE(45, -48);
+//   #I2 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(13, -37);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(29, -54) => %gnd1;
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(50, -47);
+//   #R3 @SET-SYMBOL $RESISTOR => @PLACE(37, -39) => @ORIENT("R270");
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(41, -39) => @ORIENT("R270");
+//   $IO_PORT @ATTACH &Vinp(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(20, -42) => %port1;
+//   $IO_PORT @ATTACH &Vinn(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(37, -42) => @ORIENT("MY") => %port2;
+//   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(52, -42) => @ORIENT("MY") => %port3;
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (13, -28);
+//   $JUNCTION @ATTACH %j1;
+//   %j2 = (23, -28);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (34, -28);
+//   $JUNCTION @ATTACH %j3;
+//   %j4 = (34, -35);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (13, -45);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (29, -52);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (28, -31);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (23, -34);
+//   $JUNCTION @ATTACH %j8;
+//   %j9 = (45, -28);
+//   $JUNCTION @ATTACH %j9;
+//   %j10 = (45, -52);
+//   $JUNCTION @ATTACH %j10;
+//   %j11 = (45, -42);
+//   $JUNCTION @ATTACH %j11;
+//   %j12 = (34, -39);
+//   $JUNCTION @ATTACH %j12;
+//   %j13 = (11, -28);
+//   %j14 = (47, -28);
+//   %j15 = (45, -39);
+//   $JUNCTION @ATTACH %j15;
+//   %j16 = (50, -42);
+//   $JUNCTION @ATTACH %j16;
+//   &VDD @WIRE(mode="straight") {#I2:1 %j1};
+//   &net0 @WIRE(mode="straight") {#I2:2 %j5};
+//   &net0 @WIRE(mode="straight") {%j5 #M25:1};
+//   &VDD @WIRE(mode="straight") {#M27:3 %j2};
+//   &VDD @WIRE(mode="straight") {#M26:3 %j3};
+//   &net3 @WIRE(mode="straight") {#M27:2 %j7};
+//   &net3 @WIRE(mode="straight") {%j7 #M26:2};
+//   &net3 @WIRE(mode="straight") {#M23:1 %j8};
+//   &net3 @WIRE(mode="straight") {%j8 #M27:1};
+//   &net0 @WIRE(mode="straight") {#M25:2 #M29:2};
+//   &net0 @WIRE(mode="straight") {#M29:2 #M30:2};
+//   &net0 @WIRE(mode="straight") {#M25:2 (16, -45) %j5};
+//   &net1 @WIRE(mode="straight") {#M23:3 (23, -46) #M29:1};
+//   &net1 @WIRE(mode="straight") {#M24:3 (34, -46) #M29:1};
+//   &net3 @WIRE(mode="straight") {%j7 (28, -34) %j8};
+//   &VDD @WIRE(mode="straight") {#M28:3 %j9};
+//   &VSS @WIRE(mode="straight") {#M29:3 %j6};
+//   &VSS @WIRE(mode="straight") {%j6 %gnd1:p};
+//   &VSS @WIRE(mode="straight") {%j6 %j10};
+//   &VSS @WIRE(mode="straight") {%j6 (13, -52) #M25:3};
+//   &VSS @WIRE(mode="straight") {#M30:3 %j10};
+//   &VSS @WIRE(mode="straight") {%j10 (50, -52) #C1:2};
+//   &net2 @WIRE(mode="straight") {#M26:1 %j4};
+//   &net2 @WIRE(mode="straight") {%j4 %j12};
+//   &net2 @WIRE(mode="straight") {%j4 #M28:2};
+//   &net2 @WIRE(mode="straight") {%j12 #M24:1};
+//   &net2 @WIRE(mode="straight") {%j12 #R3:2};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j13 %j1};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j1 %j2};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j2 %j3};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j3 %j9};
+//   &VDD @WIRE(mode="straight", linestyle="bold") {%j9 %j14};
+//   &Vout @WIRE(mode="straight") {#C2:1 %j15};
+//   &Vout @WIRE(mode="straight") {#M28:1 %j15};
+//   &Vout @WIRE(mode="straight") {%j15 %j11};
+//   &Vout @WIRE(mode="straight") {%j11 #M30:1};
+//   &Vout @WIRE(mode="straight") {%j11 %j16};
+//   &Vout @WIRE(mode="straight") {%j16 #C1:1};
+//   &Vout @WIRE(mode="straight") {%j16 %port3:p};
+//   &VSS @WIRE(mode="straight") {#M22:3 #M29:3};
+//   &Vinp @WIRE(mode="straight") {#M23:2 %port1:p};
+//   &Vinn @WIRE(mode="straight") {#M24:2 %port2:p};
+//   $JUNCTION @ATTACH (16, -48)(p) => %dot1;
+//   &net0 @WIRE(mode="straight") {#M22:2 #M29:2};
+//   &net1 @WIRE(mode="straight") {#M22:1 #M29:1};
+//   $JUNCTION @ATTACH (29, -46)(p) => %dot2;
+//   &net4 @WIRE(mode="straight") {#C2:2 #R3:1};
+//   #M22 @TEXT("\textbf{\textit{M}}_{\textbf{22}}", key="name", dx=0.5, dy=-2, halign="start", valign="baseline", size=1.5116);
+//   #M23 @TEXT("\textbf{\textit{M}}_{\textbf{23}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #M24 @TEXT("\textbf{\textit{M}}_{\textbf{24}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   #M25 @TEXT("\textbf{\textit{M}}_{\textbf{25}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   #M26 @TEXT("\textbf{\textit{M}}_{\textbf{26}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #M27 @TEXT("\textbf{\textit{M}}_{\textbf{27}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   #M28 @TEXT("\textbf{\textit{M}}_{\textbf{28}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #M30 @TEXT("\textbf{\textit{M}}_{\textbf{30}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #I2 @TEXT("\textbf{\textit{I}}_{\textbf{2}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #R3 @TEXT("\textbf{\textit{R}}_{\textbf{Z}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+//   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{m}}", key="name", dx=-0.5, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(48, -29) => %power1;
+//   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{inp}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   %port2
+//       @TEXT("\textbf{\textit{V}}_{\textbf{inn}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=2, dy=0, halign="start", valign="baseline", size=1.5116)
+// }
+ends Main

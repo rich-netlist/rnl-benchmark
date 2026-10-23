@@ -1,0 +1,352 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.1")
+// }
+
+subckt Main (VDD VSS VOUT Vin\- Vin\+)
+C3 (VOUT VSS) capacitor c=1p
+C5 (VOUT net6) capacitor c=1p
+C7 (VOUT net7) capacitor c=1p
+I3 (Vb1 VSS) isource dc=100u
+M32 (net2 Vin\- net8 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=2 nf=1 m=1
+M33 (net3 Vin\+ net8 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M34 (net8 Vb1 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M35 (net2 Vb3 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M36 (net3 Vb3 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M37 (net4 net12 net5 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M38 (net5 net11 net4 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M39 (net9 Vb2 net2 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M40 (net5 Vb2 net3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M41 (net9 net9 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M42 (net4 net9 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M44 (net11 Vb3 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M45 (net10 net10 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M46 (net11 net11 net10 VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M47 (net1 net1 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M48 (net12 net12 net1 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M49 (net12 Vb1 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M50 (VOUT net4 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M51 (VOUT net5 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M53 (Vb1 Vb1 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M54 (Vb2 Vb1 VDD VDD) sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+M55 (Vb3 Vb3 VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M56 (Vb2 Vb2 Vb3 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R5 (net6 net4) resistor r=1k
+R7 (net7 net5) resistor r=1k
+// @RNL(author="analog-canvas") {
+//   #M32 @SET-SYMBOL $PMOS => @PLACE(-30, -45);
+//   #M33 @SET-SYMBOL $PMOS => @PLACE(-22, -45) => @ORIENT("MY");
+//   #M34 @SET-SYMBOL $PMOS => @PLACE(-26, -32);
+//   #M35 @SET-SYMBOL $NMOS => @PLACE(-13, -64) => @ORIENT("MY");
+//   #M39 @SET-SYMBOL $NMOS => @PLACE(-13, -57) => @ORIENT("MY");
+//   #M40 @SET-SYMBOL $NMOS => @PLACE(-3, -57);
+//   #M37 @SET-SYMBOL $NMOS => @PLACE(1, -49) => @ORIENT("MY");
+//   #M38 @SET-SYMBOL $PMOS => @PLACE(-7, -46) => @ORIENT("MY");
+//   #M41 @SET-SYMBOL $PMOS => @PLACE(-13, -32) => @ORIENT("MY");
+//   #M42 @SET-SYMBOL $PMOS => @PLACE(-3, -32);
+//   #M44 @SET-SYMBOL $NMOS => @PLACE(7, -64);
+//   #M45 @SET-SYMBOL $PMOS => @PLACE(7, -30);
+//   #M46 @SET-SYMBOL $PMOS => @PLACE(7, -36);
+//   #M47 @SET-SYMBOL $NMOS => @PLACE(16, -66) => @ORIENT("MY");
+//   #M48 @SET-SYMBOL $NMOS => @PLACE(16, -60) => @ORIENT("MY");
+//   #M49 @SET-SYMBOL $PMOS => @PLACE(16, -32);
+//   #M50 @SET-SYMBOL $PMOS => @PLACE(29, -41);
+//   #M51 @SET-SYMBOL $NMOS => @PLACE(29, -54);
+//   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(35, -57);
+//   #R5 @SET-SYMBOL $RESISTOR => @PLACE(20, -44) => @ORIENT("R270");
+//   #C5 @SET-SYMBOL $CAPACITOR => @PLACE(24, -44) => @ORIENT("R270");
+//   #R7 @SET-SYMBOL $RESISTOR => @PLACE(20, -51) => @ORIENT("R270");
+//   #C7 @SET-SYMBOL $CAPACITOR => @PLACE(24, -51) => @ORIENT("R270");
+//   #M53 @SET-SYMBOL $PMOS => @PLACE(-47, -32) => @ORIENT("MY");
+//   #M54 @SET-SYMBOL $PMOS => @PLACE(-38, -32);
+//   #I3 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(-47, -64);
+//   #M55 @SET-SYMBOL $NMOS => @PLACE(-38, -64) => @ORIENT("MY");
+//   #M56 @SET-SYMBOL $NMOS => @PLACE(-38, -57) => @ORIENT("MY");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(-24, -71) => %gnd1;
+//   $IO_PORT @ATTACH &VOUT(p) => @SET-SYMBOL $CANVAS_PORT_FILLED => @PLACE(41, -47) => @ORIENT("MY") => %port1;
+//   $IO_PORT @ATTACH &"Vin-"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-33, -45) => %port2;
+//   $IO_PORT @ATTACH &"Vin+"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-19, -45) => @ORIENT("MY") => %port3;
+//   #M36 @SET-SYMBOL $NMOS => @PLACE(-3, -64);
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(-19, -27) => %vdd1;
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (-43, -32);
+//   $JUNCTION @ATTACH %j1;
+//   %j2 = (-47, -35);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (-38, -27);
+//   $JUNCTION @ATTACH %j3;
+//   %j4 = (-38, -69);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (-38, -54);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (-38, -61);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (-26, -27);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (-26, -39);
+//   $JUNCTION @ATTACH %j8;
+//   %j9 = (-13, -27);
+//   $JUNCTION @ATTACH %j9;
+//   %j10 = (-3, -27);
+//   $JUNCTION @ATTACH %j10;
+//   %j11 = (-13, -69);
+//   $JUNCTION @ATTACH %j11;
+//   %j12 = (-3, -43);
+//   $JUNCTION @ATTACH %j12;
+//   %j13 = (-3, -69);
+//   $JUNCTION @ATTACH %j13;
+//   %j14 = (7, -27);
+//   $JUNCTION @ATTACH %j14;
+//   %j15 = (7, -39);
+//   $JUNCTION @ATTACH %j15;
+//   %j16 = (7, -33);
+//   $JUNCTION @ATTACH %j16;
+//   %j17 = (7, -69);
+//   $JUNCTION @ATTACH %j17;
+//   %j18 = (16, -27);
+//   $JUNCTION @ATTACH %j18;
+//   %j19 = (16, -69);
+//   $JUNCTION @ATTACH %j19;
+//   %j20 = (16, -57);
+//   $JUNCTION @ATTACH %j20;
+//   %j21 = (16, -63);
+//   $JUNCTION @ATTACH %j21;
+//   %j22 = (-3, -52);
+//   $JUNCTION @ATTACH %j22;
+//   %j23 = (-3, -41);
+//   $JUNCTION @ATTACH %j23;
+//   %j24 = (-3, -54);
+//   $JUNCTION @ATTACH %j24;
+//   %j25 = (29, -69);
+//   $JUNCTION @ATTACH %j25;
+//   %j26 = (29, -44);
+//   $JUNCTION @ATTACH %j26;
+//   %j27 = (18, -41);
+//   $JUNCTION @ATTACH %j27;
+//   %j28 = (29, -51);
+//   $JUNCTION @ATTACH %j28;
+//   %j29 = (18, -54);
+//   $JUNCTION @ATTACH %j29;
+//   %j30 = (29, -47);
+//   $JUNCTION @ATTACH %j30;
+//   %j31 = (7, -46);
+//   $JUNCTION @ATTACH %j31;
+//   %j32 = (16, -49);
+//   $JUNCTION @ATTACH %j32;
+//   %j33 = (-3, -60);
+//   $JUNCTION @ATTACH %j33;
+//   %j34 = (-13, -61);
+//   $JUNCTION @ATTACH %j34;
+//   %j35 = (-24, -69);
+//   $JUNCTION @ATTACH %j35;
+//   %j36 = (23, -25);
+//   %j37 = (-31, -32);
+//   %j38 = (11, -32);
+//   %j39 = (2, -64);
+//   %j40 = (-13, -35);
+//   $JUNCTION @ATTACH %j40;
+//   %j41 = (-9, -32);
+//   $JUNCTION @ATTACH %j41;
+//   %j42 = (35, -47);
+//   $JUNCTION @ATTACH %j42;
+//   %j43 = (-6, -64);
+//   %j44 = (-3, -66);
+//   %j45 = (-3, -62);
+//   &Vb1 @WIRE(mode="straight") {#M53:1 %j2};
+//   &Vb1 @WIRE(mode="straight") {%j2 #I3:1};
+//   &VSS @WIRE(mode="straight") {#I3:2 (-47, -69) %j4};
+//   &VSS @WIRE(mode="straight") {%j4 %j35};
+//   &VSS @WIRE(mode="straight") {%j35 %j11};
+//   &VSS @WIRE(mode="straight") {%j11 %j13};
+//   &VSS @WIRE(mode="straight") {%j13 %j17};
+//   &VSS @WIRE(mode="straight") {%j17 %j19};
+//   &VSS @WIRE(mode="straight") {%j19 %j25};
+//   &VSS @WIRE(mode="straight") {%j25 (35, -69) #C3:2};
+//   &Vb1 @WIRE(mode="straight") {#M53:2 %j1};
+//   &Vb1 @WIRE(mode="straight") {%j1 #M54:2};
+//   &Vb1 @WIRE(mode="straight") {%j1 (-43, -35) %j2};
+//   &Vb2 @WIRE(mode="straight") {#M54:1 %j5};
+//   &Vb2 @WIRE(mode="straight") {%j5 #M56:1};
+//   &Vb3 @WIRE(mode="straight") {#M56:3 %j6};
+//   &Vb3 @WIRE(mode="straight") {%j6 #M55:1};
+//   &VSS @WIRE(mode="straight") {#M55:3 %j4};
+//   &Vb2 @WIRE(mode="straight") {#M56:2 (-33, -57) (-33, -54) %j5};
+//   &Vb3 @WIRE(mode="straight") {#M55:2 (-33, -64) (-33, -61) %j6};
+//   &net8 @WIRE(mode="straight") {#M34:1 %j8};
+//   &net8 @WIRE(mode="straight") {%j8 (-30, -39) #M32:3};
+//   &net8 @WIRE(mode="straight") {%j8 (-22, -39) #M33:3};
+//   &net9 @WIRE(mode="straight") {#M41:2 %j41};
+//   &net9 @WIRE(mode="straight") {%j41 #M42:2};
+//   &net9 @WIRE(mode="straight") {#M41:1 %j40};
+//   &net9 @WIRE(mode="straight") {%j40 #M39:1};
+//   &net2 @WIRE(mode="straight") {#M39:3 %j34};
+//   &net2 @WIRE(mode="straight") {%j34 #M35:1};
+//   &VSS @WIRE(mode="straight") {#M35:3 %j11};
+//   &net3 @WIRE(mode="straight") {#M40:3 %j33};
+//   &net3 @WIRE(mode="straight") {%j33 %j45};
+//   &VSS @WIRE(mode="straight") {%j44 %j13};
+//   &net10 @WIRE(mode="straight") {#M45:1 %j16};
+//   &net10 @WIRE(mode="straight") {%j16 #M46:3};
+//   &net11 @WIRE(mode="straight") {#M46:1 %j15};
+//   &net11 @WIRE(mode="straight") {%j15 %j31};
+//   &net11 @WIRE(mode="straight") {%j31 #M44:1};
+//   &net11 @WIRE(mode="straight") {#M46:2 (2, -36) (2, -39) %j15};
+//   &net10 @WIRE(mode="straight") {#M45:2 (2, -30) (2, -33) %j16};
+//   &VSS @WIRE(mode="straight") {#M44:3 %j17};
+//   &VSS @WIRE(mode="straight") {#M47:3 %j19};
+//   &net1 @WIRE(mode="straight") {#M48:3 %j21};
+//   &net1 @WIRE(mode="straight") {%j21 #M47:1};
+//   &net1 @WIRE(mode="straight") {#M47:2 (20, -66) (20, -63) %j21};
+//   &net5 @WIRE(mode="straight") {#M38:1 (-7, -52) %j22};
+//   &net5 @WIRE(mode="straight") {#M37:3 (1, -52) %j22};
+//   &net5 @WIRE(mode="straight") {%j22 %j24};
+//   &net5 @WIRE(mode="straight") {%j24 #M40:1};
+//   &net4 @WIRE(mode="straight") {#M38:3 (-7, -43) %j12};
+//   &net4 @WIRE(mode="straight") {#M37:1 (1, -43) %j12};
+//   &net4 @WIRE(mode="straight") {#M42:1 %j23};
+//   &net4 @WIRE(mode="straight") {%j23 %j12};
+//   &net4 @WIRE(mode="straight") {%j23 %j27};
+//   &net4 @WIRE(mode="straight") {%j27 #M50:2};
+//   &net5 @WIRE(mode="straight") {#M51:2 %j29};
+//   &net5 @WIRE(mode="straight") {%j29 %j24};
+//   &VSS @WIRE(mode="straight") {#M51:3 %j25};
+//   &net4 @WIRE(mode="straight") {#R5:2 %j27};
+//   &net5 @WIRE(mode="straight") {#R7:2 %j29};
+//   &Vb2 @WIRE(mode="straight") {#M39:2 #M40:2};
+//   &Vb3 @WIRE(mode="straight") {#M35:2 %j43};
+//   &net11 @WIRE(mode="straight") {#M38:2 %j31};
+//   &net12 @WIRE(mode="straight") {#M49:1 %j32};
+//   &net12 @WIRE(mode="straight") {%j32 %j20};
+//   &net12 @WIRE(mode="straight") {%j32 #M37:2};
+//   &net12 @WIRE(mode="straight") {%j20 #M48:1};
+//   &net12 @WIRE(mode="straight") {%j20 (20, -57) (20, -60) #M48:2};
+//   &net3 @WIRE(mode="straight") {#M33:1 (-22, -60) %j33};
+//   &net2 @WIRE(mode="straight") {#M32:1 (-30, -61) %j34};
+//   &VSS @WIRE(mode="straight") {%gnd1:p %j35};
+//   &Vb1 @WIRE(mode="straight") {#M34:2 %j37};
+//   &Vb1 @WIRE(mode="straight") {#M49:2 %j38};
+//   &Vb3 @WIRE(mode="straight") {#M44:2 %j39};
+//   &net9 @WIRE(mode="straight") {%j40 (-9, -35) %j41};
+//   &VOUT @WIRE(mode="straight") {#C5:1 %j26};
+//   &VOUT @WIRE(mode="straight") {#C7:1 %j28};
+//   &VOUT @WIRE(mode="straight") {#M50:1 %j26};
+//   &VOUT @WIRE(mode="straight") {%j26 %j30};
+//   &VOUT @WIRE(mode="straight") {%j30 %j28};
+//   &VOUT @WIRE(mode="straight", linecolor="#000000") {%j30 %j42};
+//   &VOUT @WIRE(mode="straight") {%j28 #M51:1};
+//   &VOUT @WIRE(mode="straight") {%j42 #C3:1};
+//   &VOUT @WIRE(mode="straight", linecolor="#dc2626") {%j42 %port1:p};
+//   &VDD @WIRE(mode="straight") {%j9 #M41:3};
+//   &VDD @WIRE(mode="straight") {%j9 %vdd1:p %j7};
+//   &VDD @WIRE(mode="straight") {%j9 %j10};
+//   &VDD @WIRE(mode="straight") {%j7 #M34:3};
+//   &VDD @WIRE(mode="straight") {%j7 %j3};
+//   &VDD @WIRE(mode="straight") {%j10 #M42:3};
+//   &VDD @WIRE(mode="straight") {%j10 %j14};
+//   &VDD @WIRE(mode="straight") {%j3 #M54:3};
+//   &VDD @WIRE(mode="straight") {%j3 (-47, -27) #M53:3};
+//   &VDD @WIRE(mode="straight") {%j18 #M49:3};
+//   &VDD @WIRE(mode="straight") {%j18 (29, -27) #M50:3};
+//   &VDD @WIRE(mode="straight") {%j18 %j14};
+//   &VDD @WIRE(mode="straight") {%j14 #M45:3};
+//   &Vb3 @WIRE(mode="straight") {%j43 #M36:2};
+//   &"Vin+" @WIRE(mode="straight") {#M33:2 %port3:p};
+//   &"Vin-" @WIRE(mode="straight") {#M32:2 %port2:p};
+//   &VSS @WIRE(mode="straight") {%j44 #M36:3};
+//   &net3 @WIRE(mode="straight") {%j45 #M36:1};
+//   &net6 @WIRE(mode="straight") {#C5:2 #R5:1};
+//   &net7 @WIRE(mode="straight") {#C7:2 #R7:1};
+//   $JUNCTION @ATTACH (-19, -27)(p) => %dot1;
+//   #M32
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{32}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M33
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{33}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M34
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{34}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M35
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{35}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M39 @TEXT("\textbf{\textit{M}}_{\textbf{39}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   #M40
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{40}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M37
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{37}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M38
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{38}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M41
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{41}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M42
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{42}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M44 @TEXT("\textbf{\textit{M}}_{\textbf{44}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #M45
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{45}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M46
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{46}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M47
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{47}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M48
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{48}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M49
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{49}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M50
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{50}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #M51
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{51}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1.5, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #R5 @TEXT("\textbf{\textit{R}}_{\textbf{Z1}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+//   #C5
+//       @TEXT("\textbf{\textit{C}}_{\textbf{\textit{c1}}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline",
+//       size=1.5116);
+//   #R7 @TEXT("\textbf{\textit{R}}_{\textbf{Z2}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+//   #C7
+//       @TEXT("\textbf{\textit{C}}_{\textbf{\textit{c2}}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline",
+//       size=1.5116);
+//   #M53
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{53}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M54
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{54}}}", key="name", dx=1, dy=-1, halign="start", valign="baseline",
+//       size=1.5116);
+//   #I3 @TEXT("\textbf{\textit{I}}_{\textbf{3}}", key="name", dx=2, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   #M55
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{55}}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline",
+//       size=1.5116);
+//   #M56 @TEXT("\textbf{\textit{M}}_{\textbf{56}}", key="name", dx=-1, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   %port1
+//       @TEXT("\textbf{\textit{V}}_{\textbf{\textit{OUT}}}", key="name", dx=-3, dy=1, halign="start", valign="baseline",
+//       size=1.5116);
+//   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{in-}}", key="name", dx=0, dy=1, halign="end", valign="baseline", size=1.5116);
+//   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{in+}}", key="name", dx=-0.5, dy=1, halign="start", valign="baseline", size=1.5116);
+//   &Vb1 @TEXT("\textbf{\textit{V}}_{\textbf{b1}}", halign="middle", size=1.5116) => @PLACE(-42, -31.2);
+//   &Vb1 @TEXT("\textbf{\textit{V}}_{\textbf{b1}}", halign="middle", size=1.5116) => @PLACE(-30, -31.2);
+//   &Vb1 @TEXT("\textbf{\textit{V}}_{\textbf{b1}}", halign="middle", size=1.5116) => @PLACE(12.5, -31);
+//   &Vb2 @TEXT("\textbf{\textit{V}}_{\textbf{b2}}", halign="middle", size=1.5116) => @PLACE(-35.083333, -53);
+//   &Vb2 @TEXT("\textbf{\textit{V}}_{\textbf{b2}}", halign="middle", size=1.5116) => @PLACE(-8, -56.2);
+//   &Vb3 @TEXT("\textbf{\textit{V}}_{\textbf{b3}}", halign="middle", size=1.5116) => @PLACE(-34, -60.2);
+//   &Vb3 @TEXT("\textbf{\textit{V}}_{\textbf{b3}}", halign="middle", size=1.5116) => @PLACE(-8, -63.2);
+//   &Vb3 @TEXT("\textbf{\textit{V}}_{\textbf{b3}}", halign="middle", size=1.5116) => @PLACE(3, -63);
+//   #M36
+//       @TEXT("\textbf{\textit{M}}_{\textbf{\textit{36}}}", key="name", dx=-3, dy=-3, halign="start", valign="baseline",
+//       size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(-17, -26) => %power1
+// }
+ends Main
