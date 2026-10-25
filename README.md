@@ -29,6 +29,8 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 
 Drawing differences are listed in each report for every circuit that imports, also below L2.
 
+Before comparing, an external definition of a reviewed device (a SKY130 transistor or BJT) that the original declares with no formal parameters is compared as declaring the reviewed interface's, with their defaults. Older Gallery projects lack them, Canvas's placement and import both declare them today, and every call gives the values. Each report lists the definitions brought up this way (`normalizedDefinitions`), and `SUMMARY.md` counts them; `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` compares against the original as stored.
+
 ## How the 100 were chosen
 
 From the 1497 public Gallery circuits whose netlist Canvas can write (snapshot of 2026-10-19; redrawn reference datasets excluded; at most 200 parts):
@@ -60,7 +62,7 @@ RNL_BENCH_CORPUS=<this repo>/circuits RNL_BENCH_OUT=<out dir> \
 python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <out dir> "<label>"
 ```
 
-`RNL_BENCH_IDS=id1,id2` runs only those circuits. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
+`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` turns off the normalization above. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 
@@ -70,7 +72,8 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 |---|---|---|---|---|
 | `results/2026-10-23-baseline/` | `1052ca1be` | `0.1.0-preview.14` | 68 / 34 / 0 | 57 / 3 / 0 |
 | `results/2026-10-26-after-review/` | `acd08e069` | `0.5.1` | 73 / 34 / 6 | 72 / 3 / 0 |
+| `results/2026-10-26-reviewed-formals/` | `acd08e069` | `0.5.1` | 73 / 38 / 6 | 72 / 3 / 0 |
 
-Each count is the circuits at that level or above. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
+Each count is the circuits at that level or above. `2026-10-26-reviewed-formals` is the same commit and runtime as `2026-10-26-after-review`, graded with the external-definition normalization (above): its `.rnl` files are that run's, byte for byte, so it keeps only its reports and summary. Without the normalization it grades as `2026-10-26-after-review`. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 
 Each run's `SUMMARY.md` lists the problems by circuits affected and the issues tracking them (in analog-canvas).

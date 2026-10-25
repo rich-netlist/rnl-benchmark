@@ -3,11 +3,13 @@
 //
 // Run from an analog-canvas checkout (see README.md):
 //   RNL_BENCH_CORPUS=<repo>/circuits RNL_BENCH_OUT=<dir> [RNL_BENCH_IDS=a,b] \
+//     [RNL_BENCH_KEEP_ORIGINAL_FORMALS=1] \
 //     npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, it } from "vitest";
 
+import { reviewedExternalBindingForTerminalCount } from "@icm/devices";
 import type { CircuitProject, SchematicDocument } from "@icm/model";
 import {
   compareElectricalGraphs,
@@ -33,6 +35,9 @@ const IDS = process.env.RNL_BENCH_IDS
         .sort()
     : [];
 const FORMATS = ["spice", "spectre"] as const;
+// Compare against the original as stored, its external definitions left as
+// they are (see withReviewedFormals).
+const KEEP_ORIGINAL_FORMALS = process.env.RNL_BENCH_KEEP_ORIGINAL_FORMALS === "1";
 
 const core = await createRnlTestCore();
 afterAll(() => core.terminate());
@@ -248,6 +253,42 @@ function netlistComparison(a: CircuitProject, b: CircuitProject, format: "spice"
   };
 }
 
+/**
+ * The original as Analog Canvas declares its external definitions now, for
+ * comparing only: a definition of a reviewed device (a SKY130 transistor or
+ * BJT) that declares no formal parameters takes the ones the reviewed
+ * interface gives it, with their defaults. Older Gallery projects lack them,
+ * while Canvas's placement and import both declare them today, so the
+ * definition read back has them and the electrical comparison sets the two
+ * apart. Every call gives the values, so the circuit is the same. The
+ * definitions brought up this way are listed in the report
+ * (`normalizedDefinitions`); RNL_BENCH_KEEP_ORIGINAL_FORMALS=1 turns it off.
+ */
+function withReviewedFormals(project: CircuitProject): {
+  project: CircuitProject;
+  normalized: string[];
+} {
+  const normalized: string[] = [];
+  if (KEEP_ORIGINAL_FORMALS) return { project, normalized };
+  const next = structuredClone(project);
+  for (const definition of next.externalSubcircuitDefinitions ?? []) {
+    if (definition.implementation || definition.formalParameters.length) continue;
+    const reviewed = reviewedExternalBindingForTerminalCount(
+      definition.name,
+      definition.terminals.length,
+    );
+    if (!reviewed?.parameters.length) continue;
+    definition.formalParameters = reviewed.parameters.map((parameter) => ({
+      name: parameter.name,
+      ...(parameter.targetDefaultValue === undefined
+        ? {}
+        : { defaultValue: parameter.targetDefaultValue }),
+    }));
+    normalized.push(definition.name);
+  }
+  return { project: normalized.length ? next : project, normalized };
+}
+
 async function roundTrip(id: string, project: CircuitProject, format: "spice" | "spectre") {
   const result: Record<string, unknown> = { level: 0 };
   const exported = createRnlExport(project, { format });
@@ -310,6 +351,9 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
   }
   result.level = 1;
   const back = plan.project;
+  const compared = withReviewedFormals(project);
+  if (compared.normalized.length) result.normalizedDefinitions = compared.normalized;
+  project = compared.project;
   const a = projectElectricalGraph(project);
   const b = projectElectricalGraph(back);
   result.electrical =
