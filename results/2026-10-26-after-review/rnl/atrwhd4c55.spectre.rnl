@@ -1,0 +1,41 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.2")
+// }
+
+subckt Main (VSS Vin Vo VB)
+M1 (Vo VB net0 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+M2 (net0 Vin VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   #M1 @SET-SYMBOL $NMOS => @PLACE(14, -20) => @ORIENT("R0");
+//   #M2 @SET-SYMBOL $NMOS => @PLACE(14, -29) => @ORIENT("R0");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(14, -32) => @ORIENT("R0") => %gnd1;
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(10, -29) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &Vo(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(14, -14) => @ORIENT("R270") => %port2;
+//   $IO_PORT @ATTACH &VB(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(10, -20) => @ORIENT("R0") => %port3;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   &net0 @WIRE(mode="straight") {#M1:3 #M2:1};
+//   &VSS @WIRE(mode="straight") {#M2:3 %gnd1:p};
+//   &Vin @WIRE(mode="straight") {%port1:p #M2:2};
+//   &Vo @WIRE(mode="straight") {%port2:p #M1:1};
+//   &VB @WIRE(mode="straight") {%port3:p #M1:2};
+//   #M1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M1::name(label);
+//   #M2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M2::name(label);
+//   $CURRENT_ARROW @ATTACH (14, -24.5)(p) => @ORIENT("R90") => %current1;
+//   %current1 @TEXT("\textbf{\textit{I}}_{\textbf{i}}", halign="middle", size=1.5116) => @PLACE(15.4, -24.5);
+//   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-1.5, dy=-1, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+//   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{o}}", key="name", dx=-2.5, dy=1, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
+//   $CURRENT_ARROW @ATTACH (14, -16.5)(p) => @ORIENT("R90") => %current2;
+//   %current2 @TEXT("\textbf{\textit{I}}_{\textbf{o}}", halign="middle", size=1.5116) => @PLACE(15.2, -16.5);
+//   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{B}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::name(label)
+// }
+ends Main

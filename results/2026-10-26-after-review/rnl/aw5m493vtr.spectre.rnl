@@ -1,0 +1,54 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.2");
+//   @USE-PACKAGE(name="rnl-std-functional", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-signal-flow", version="0.3")
+// }
+
+subckt opamp (VIP VIN VDD VSS VOUT)
+parameters gain=1e6 vhigh=5 vlow=-5
+Blin (nlin 0) bsource v=gain*(v(VIP)-v(VIN))
+Bcore (VOUT 0) bsource v=0.5*(vhigh+(0.5*(vlow+v(nlin)+sqrt((v(nlin)-vlow)*(v(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12)))-sqrt((vhigh-(0.5*(vlow+v(nlin)+sqrt((v(nlin)-vlow)*(v(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))*(vhigh-(0.5*(vlow+v(nlin)+sqrt((v(nlin)-vlow)*(v(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))
+ends opamp
+
+subckt adder (A B Y VDD VSS)
+ESUMA (Y nsum A 0) vcvs gain=1
+ESUMB (nsum 0 B 0) vcvs gain=1
+ends adder
+
+subckt Main (Vin Vout VM)
+X1 (Vout Vin 0 0 net0) opamp
+X2 (net0 VM Vout 0 0) adder
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(25, -24) => @ORIENT("R0") => %port1;
+//   #X1 @SET-SYMBOL $OPAMP_5TERM => @PLACE(31, -25) => @ORIENT("MX");
+//   #X2 @SET-SYMBOL $ADDER => @PLACE(38, -25) => @ORIENT("MX");
+//   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(43, -25) => @ORIENT("MY") => %port2;
+//   $IO_PORT @ATTACH &VM(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(38, -21) => @ORIENT("R270") => %port3;
+//   %j1 = (41, -25);
+//   $JUNCTION @ATTACH %j1;
+//   &Vout @WIRE(mode="straight") {#X1:1 (26, -26) (26, -29) (41, -29) %j1};
+//   &Vout @WIRE(mode="straight") {#X2:3 %j1};
+//   &Vout @WIRE(mode="straight") {%j1 %port2:p};
+//   &Vin @WIRE(mode="straight") {#X1:2 %port1:p};
+//   &VM @WIRE(mode="straight") {#X2:2 %port3:p};
+//   &net0 @WIRE(mode="straight") {#X1:5 #X2:1};
+//   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-1, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+//   #X1 @TEXT("\textbf{\textit{A}}", key="name", dx=-0.5, dy=-0.5, halign="middle", valign="baseline", size=1.5116);
+//   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=1, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
+//   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{M}}", key="name", dx=-0.5, dy=1.5, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::name(label);
+//   @LINE(arrow="end", arrowsize=1.656977) {(34.9, -25) (36.9, -25)} => @LAYER("top") => %arrow1;
+//   @LINE(arrow="end", arrowsize=1.656977) {(38, -20.5) (38, -23.6)} => @LAYER("top") => %arrow2;
+//   @LINE {(36.552332, -23.6) (37.247668, -23.6)} => @LAYER("top") => %polarity1_plus1;
+//   @LINE {(36.9, -23.252332) (36.9, -23.947668)} => @LAYER("top") => %polarity1_plus2;
+//   @LINE {(35.052332, -25) (35.747668, -25)} => @LAYER("top") => %polarity2_plus1;
+//   @LINE {(35.4, -24.652332) (35.4, -25.347668)} => @LAYER("top") => %polarity2_plus2
+// }
+ends Main

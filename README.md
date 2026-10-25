@@ -22,8 +22,8 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 
 | Level | Meaning | Checked |
 |---|---|---|
-| L0 | Fails | RNL export blocked, or import throws, fails or reports an error |
-| **L1** | Imports cleanly | Export ready; import returns a project with no error diagnostic |
+| L0 | Fails | RNL export blocked, or import throws, fails, reports an error or returns a project the editor cannot save |
+| **L1** | Imports cleanly | Export ready; import returns a project with no error diagnostic, which the editor can save |
 | **L2** | Same circuit | L1, the electrical graphs compare `equal`, and the design netlist Canvas writes from the imported project is line-for-line the original's (comments and line order ignored) |
 | **L3** | Same drawing | L2 and no drawing difference: same Cells; every instance with the same symbol (a Cell instance by its Cell), position, orientation (equivalent rotation/mirror pairs count as equal) and parameters; same unnamed pins and glyphs; same number of wires; same junction positions; same annotations by kind; same drafting objects (every field but ids); and no label-census difference |
 
@@ -64,13 +64,13 @@ python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <ou
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 
-## Baseline
+## Results
 
-`results/2026-10-23-baseline/`: analog-canvas `1052ca1be`, `@rich-netlist/runtime@0.1.0-preview.14`, `analog-canvas-extensions` 0.1.
+| Run | analog-canvas | runtime | SPICE+RNL L1 / L2 / L3 | Spectre+RNL L1 / L2 / L3 |
+|---|---|---|---|---|
+| `results/2026-10-23-baseline/` | `1052ca1be` | `0.1.0-preview.14` | 68 / 34 / 0 | 57 / 3 / 0 |
+| `results/2026-10-26-after-review/` | `acd08e069` | `0.5.1` | 73 / 34 / 6 | 72 / 3 / 0 |
 
-| | L1 imports cleanly | L2 same circuit | L3 same drawing |
-|---|---|---|---|
-| SPICE+RNL | 68 | 34 | 0 |
-| Spectre+RNL | 57 | 3 | 0 |
+Each count is the circuits at that level or above. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 
-See its `SUMMARY.md` for the problems by circuits affected and the issues tracking them ([#1783](https://github.com/cascode-ai/analog-canvas/issues/1783)–[#1789](https://github.com/cascode-ai/analog-canvas/issues/1789) in analog-canvas).
+Each run's `SUMMARY.md` lists the problems by circuits affected and the issues tracking them (in analog-canvas).

@@ -1,0 +1,84 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.2");
+//   @USE-PACKAGE(name="rnl-std-logic", version="0.3")
+// }
+
+// Ideal inverter: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt inverter (A Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(1-v(hA))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends inverter
+
+// Ideal nand-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt nand_gate (A B Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+BhB (hB 0) bsource v=0.5*(1+tanh((v(B,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(1-v(hA)*v(hB))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends nand_gate
+
+subckt Main (VDD VSS)
+X1 (net4 net0 VDD VSS) inverter
+X2 (net4 net3 net5 VDD VSS) nand_gate
+X3 (net3 net0 net6 VDD VSS) nand_gate
+X4 (net5 net1 net2 VDD VSS) nand_gate
+X5 (net2 net6 net1 VDD VSS) nand_gate
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   #X1 @SET-SYMBOL $INVERTER => @PLACE(10, -37) => @ORIENT("R0");
+//   #X2 @SET-SYMBOL $NAND_2INPUT => @PLACE(22, -19) => @ORIENT("R0");
+//   #X3 @SET-SYMBOL $NAND_2INPUT => @PLACE(22, -36) => @ORIENT("R0");
+//   #X4 @SET-SYMBOL $NAND_2INPUT => @PLACE(39, -22) => @ORIENT("R0");
+//   #X5 @SET-SYMBOL $NAND_2INPUT => @PLACE(39, -33) => @ORIENT("R0");
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (-3, -18);
+//   %j2 = (4, -18);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (47, -31);
+//   %j4 = (15, -28);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (-3, -28);
+//   %j6 = (47, -22);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (50, -22);
+//   &net0 @WIRE(mode="straight") {#X1:2 #X3:2};
+//   &net3 @WIRE(mode="straight") {#X3:1 (15, -35) %j4};
+//   &net3 @WIRE(mode="straight") {%j4 (15, -20) #X2:2};
+//   &net4 @WIRE(mode="straight") {#X2:1 %j2};
+//   &net4 @WIRE(mode="straight") {%j2 %j1};
+//   &net4 @WIRE(mode="straight") {#X1:1 (4, -37) %j2};
+//   &net5 @WIRE(mode="straight") {#X2:3 (29, -19) (29, -21) #X4:1};
+//   &net6 @WIRE(mode="straight") {#X3:3 (29, -36) (29, -34) #X5:2};
+//   &net1 @WIRE(mode="straight") {#X5:3 (47, -33) %j3};
+//   &net3 @WIRE(mode="straight") {%j4 %j5};
+//   &net1 @WIRE(mode="straight") {%j3 (32, -25) (32, -23) #X4:2};
+//   &net2 @WIRE(mode="straight") {#X5:1 (32, -32) (32, -30) (47, -24) %j6};
+//   &net2 @WIRE(mode="straight") {%j6 #X4:3};
+//   &net2 @WIRE(mode="straight") {%j6 %j7};
+//   #X1 @TEXT("\textbf{\textit{X}}_{\textbf{1}}", key="name", dx=-0.5, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X1::name(label);
+//   #X2 @TEXT("\textbf{\textit{X}}_{\textbf{2}}", key="name", dx=-1, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X2::name(label);
+//   #X3 @TEXT("\textbf{\textit{X}}_{\textbf{3}}", key="name", dx=-0.5, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X3::name(label);
+//   #X4 @TEXT("\textbf{\textit{X}}_{\textbf{4}}", key="name", dx=-1, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X4::name(label);
+//   #X5 @TEXT("\textbf{\textit{X}}_{\textbf{5}}", key="name", dx=-1, dy=-3.5, halign="middle", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X5::name(label);
+//   (-4.5, -18.5) @TEXT("\textbf{\textit{D}}", halign="middle", size=1.5116, bold=true);
+//   (-4.5, -28.5) @TEXT("\textbf{\textit{EN}}", halign="middle", size=1.5116, bold=true);
+//   (51, -22.5) @TEXT("\textbf{\textit{Q}}", halign="middle", size=1.5116, bold=true)
+// }
+ends Main

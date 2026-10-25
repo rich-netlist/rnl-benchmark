@@ -14,6 +14,7 @@ CLASSES = [
     ("import throws", "#1788 (route crash only)", lambda f, d: f.get("failure") == "import-threw"),
     ("export blocked", "", lambda f, d: f.get("failure") == "export-blocked"),
     ("import reports errors", "", lambda f, d: f.get("failure") in ("import-errors", "import-failed")),
+    ("import cannot be saved", "", lambda f, d: f.get("failure") == "import-unsaveable"),
     ("model/subcircuit definition lost", "#1789", lambda f, d: bool((f.get("netlist") or {}).get("lostDefinitions"))),
     ("electrically different", "#1783", lambda f, d: f.get("electrical") not in (None, "equal")),
     ("netlist text changed", "#1785", lambda f, d: f.get("netlist") is not None and not f["netlist"].get("identical")),
@@ -89,6 +90,8 @@ for path in sorted(glob.glob(os.path.join(reports_dir, "*.json"))):
                 [k for k in f.get("exportDiagnostics", {}) if k.startswith("error")]
                 + sorted({e.split(":")[0] + ": " + e.split(": ", 2)[-1][:60] for e in f.get("errors", [])})
             ) or "blocked without an error diagnostic"
+        elif kind == "import-unsaveable":
+            message = (f.get("errors") or [""])[0][:120]
         else:
             message = f.get("error", "")[:120]
         failures[(fmt, kind, message)].append(r["id"])

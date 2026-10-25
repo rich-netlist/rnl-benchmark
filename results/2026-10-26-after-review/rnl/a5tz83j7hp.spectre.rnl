@@ -1,0 +1,53 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.2");
+//   @USE-PACKAGE(name="rnl-std-functional", version="0.3")
+// }
+
+subckt icm_opamp_vdd_vss (VIP VIN VDD VSS VOUT)
+parameters gain=1e6
+Blin (nlin 0) bsource v=gain*(v(VIP)-v(VIN))
+Bcore (VOUT 0) bsource v=0.5*(v(VDD)+(0.5*(v(VSS)+v(nlin)+sqrt((v(nlin)-v(VSS))*(v(nlin)-v(VSS))+(1e-4*(v(VDD)-v(VSS)))*(1e-4*(v(VDD)-v(VSS)))+1e-12)))-sqrt((v(VDD)-(0.5*(v(VSS)+v(nlin)+sqrt((v(nlin)-v(VSS))*(v(nlin)-v(VSS))+(1e-4*(v(VDD)-v(VSS)))*(1e-4*(v(VDD)-v(VSS)))+1e-12))))*(v(VDD)-(0.5*(v(VSS)+v(nlin)+sqrt((v(nlin)-v(VSS))*(v(nlin)-v(VSS))+(1e-4*(v(VDD)-v(VSS)))*(1e-4*(v(VDD)-v(VSS)))+1e-12))))+(1e-4*(v(VDD)-v(VSS)))*(1e-4*(v(VDD)-v(VSS)))+1e-12))
+ends icm_opamp_vdd_vss
+
+subckt Main (VDD VSS)
+model DIODE diode is=1e-14 n=1
+D1 (net0 VDD) DIODE
+R1 (net0 net1) resistor r=1k
+X1 (VSS net0 VDD VSS net1) icm_opamp_vdd_vss
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   #D1 @SET-SYMBOL $DIODE => @PLACE(20, -21) => @ORIENT("R90");
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(20, -18) => @ORIENT("R0") => %vdd1;
+//   #X1 @SET-SYMBOL $OPAMP_5TERM => @PLACE(29, -26) => @ORIENT("MX");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(23, -31) => @ORIENT("R0") => %gnd1;
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(30, -21) => @ORIENT("MYR90");
+//   &VDD @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (23, -32);
+//   %j2 = (24, -25);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (34, -26);
+//   $JUNCTION @ATTACH %j3;
+//   %j4 = (36, -26);
+//   &VDD @WIRE(mode="straight") {%vdd1:p #D1:2};
+//   &net0 @WIRE(mode="straight") {#D1:1 (20, -25) %j2};
+//   &net0 @WIRE(mode="straight") {%j2 #X1:2};
+//   &net0 @WIRE(mode="straight") {#R1:1 (24, -21) %j2};
+//   &net1 @WIRE(mode="straight") {#X1:5 %j3};
+//   &net1 @WIRE(mode="straight") {%j3 (34, -21) #R1:2};
+//   &net1 @WIRE(mode="straight") {%j3 %j4};
+//   &VSS @WIRE(mode="straight") {%gnd1:p %j1};
+//   &VSS @WIRE(mode="straight") {%gnd1:p (23, -27) #X1:1};
+//   #D1 @TEXT("\textbf{\textit{PD}}", key="name", dx=1, dy=0, halign="start", valign="baseline", size=1.5116);
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(22, -17) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   #R1
+//       @TEXT("\textbf{\textit{R}}_{\textbf{\textit{f}}}", key="name", dx=1.5, dy=-2.5, halign="middle", valign="baseline",
+//       size=1.5116);
+//   @LINE(arrow="end", arrowsize=1.656977) {(15.5, -22) (17, -21) (16, -23) (19, -21)} => @LAYER("top") => %arrow1
+// }
+ends Main

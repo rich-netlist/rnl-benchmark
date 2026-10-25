@@ -14,7 +14,7 @@ import {
   createDesignNetlistExport,
   projectElectricalGraph,
 } from "@icm/netlist";
-import { parseProject } from "@icm/project-protocol";
+import { parseProject, serializeProject } from "@icm/project-protocol";
 import { createRnlExport, type RnlSnapshot } from "@icm/rnl";
 
 import { labelCensus, labelDifferences } from "../../../e2e/label-census";
@@ -298,6 +298,14 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
   if (errors.length > 0) {
     result.failure = "import-errors";
     result.errors = errors.map((item) => `${item.code}: ${item.message}`);
+    return result;
+  }
+  // A Project the editor could not save is no import.
+  try {
+    serializeProject(plan.project);
+  } catch (error) {
+    result.failure = "import-unsaveable";
+    result.errors = [String(error instanceof Error ? error.message : error).slice(0, 2000)];
     return result;
   }
   result.level = 1;
