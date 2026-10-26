@@ -25,7 +25,7 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 | L0 | Fails | RNL export blocked, or import throws, fails, reports an error or returns a project the editor cannot save |
 | **L1** | Imports cleanly | Export ready; import returns a project with no error diagnostic, which the editor can save |
 | **L2** | Same circuit | L1, the electrical graphs compare `equal`, and the design netlist Canvas writes from the imported project is line-for-line the original's (comments and line order ignored) |
-| **L3** | Same drawing | L2 and no drawing difference: same Cells; every instance with the same symbol (a Cell instance by its Cell), position, orientation (equivalent rotation/mirror pairs count as equal) and parameters; same unnamed pins and glyphs; same number of wires; same junction positions; same annotations by kind; same drafting objects (every field but ids); and no label-census difference |
+| **L3** | Same drawing | L2 and no drawing difference: same Cells; every instance with the same symbol (a Cell instance by its Cell), position, orientation (equivalent rotation/mirror pairs count as equal) and parameters; same unnamed pins and glyphs; same number of wires; same junction positions; same annotations by kind; same drafting objects (every field but ids); and no label-census difference, each Cell's labels compared with those of the Cell it is paired with, whose name the netlist may spell otherwise |
 
 Drawing differences are listed in each report for every circuit that imports, also below L2.
 

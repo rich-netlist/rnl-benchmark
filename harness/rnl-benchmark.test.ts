@@ -288,9 +288,23 @@ function drawingDifferences(
     for (const item of unmatched)
       out.push(`drafting: ${cell} ${String((JSON.parse(item) as Record<string, unknown>).kind)} added`);
   }
+  // The census knows a Cell by its netlist name, which the netlist may have to
+  // spell otherwise ("Bootstrap switch" prints as bootstrap_switch): the
+  // original's labels go by the name of the Cell it is paired with above.
+  const censusName = (document: SchematicDocument) =>
+    (document.netlist?.name ?? document.name).toLowerCase();
+  const renamed = new Map(
+    documentPairs(a, b).flatMap(({ a: da, b: db }) =>
+      db ? [[censusName(da), censusName(db)] as const] : [],
+    ),
+  );
+  const before = labelCensus(a).map((label) => ({
+    ...label,
+    cell: renamed.get(label.cell) ?? label.cell,
+  }));
   const after = labelCensus(b);
   const labelled = new Set(after.map((label) => `${label.cell} ${label.kind} ${label.owner}`));
-  for (const line of labelDifferences(labelCensus(a), after)) {
+  for (const line of labelDifferences(before, after)) {
     const hidden = /^(.*): hidden before, shown$/u.exec(line);
     if (equivalences.has("hidden-absent") && hidden && !labelled.has(hidden[1]!)) continue;
     out.push(`label: ${line}`);
