@@ -45,6 +45,8 @@ for path in sorted(glob.glob(os.path.join(reports_dir, "*.json"))):
             if len(examples[name]) < 3 and fmt == "spice" or (name == "import throws" and len(examples[name]) < 3):
                 examples[name].append(r["id"])
         row[fmt] = {"level": f["level"], "failure": f.get("failure"), "problems": hit, "differences": len(d)}
+        if f.get("equivalentDifferences"):
+            row[fmt]["equivalentDifferences"] = len(f["equivalentDifferences"])
     rows.append(row)
 
 summary = {
@@ -64,7 +66,18 @@ md = [f"# Results: {label}", "", f"{len(rows)} circuits, each round-tripped as S
 for fmt in FORMATS:
     a = summary["atLeast"][fmt]
     md.append(f"| {'SPICE+RNL' if fmt == 'spice' else 'Spectre+RNL'} | {a['L1']} | {a['L2']} | {a['L3']} |")
-md += ["", "Counts are circuits reaching at least that level.", "", "## Problems, by circuits affected", "",
+md += ["", "Counts are circuits reaching at least that level."]
+equivalent = {fmt: [r for r in rows if r[fmt].get("equivalentDifferences")] for fmt in FORMATS}
+if any(equivalent.values()):
+    md += ["", "## Counted as drawing the same", "",
+           "Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends,"
+           " default-false; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as"
+           " `equivalentDifferences`:", "",
+           "| Format | Circuits | Differences |", "|---|---|---|"]
+    for fmt in FORMATS:
+        if equivalent[fmt]:
+            md.append(f"| {fmt} | {len(equivalent[fmt])} | {sum(r[fmt]['equivalentDifferences'] for r in equivalent[fmt])} |")
+md += ["", "## Problems, by circuits affected", "",
        "| Problem | Tracked in | SPICE+RNL | Spectre+RNL | e.g. |", "|---|---|---|---|---|"]
 for name, ref, _ in CLASSES:
     s, p = classes["spice"][name], classes["spectre"][name]

@@ -29,6 +29,8 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 
 Drawing differences are listed in each report for every circuit that imports, also below L2.
 
+Some differences draw the same and are counted as none: a hidden label the import does not bring back (`hidden-absent`); hidden annotations, since annotations are counted as shown (`hidden-extra`); a drawing text's span nesting or splitting, its characters and their styles compared as Analog Canvas compares styled text (`text-styles`); an arrow's legacy or default head fields, its heads compared as Analog Canvas draws them (`arrow-ends`); a style flag set false, the same as one unset (`default-false`). Each report lists the differences they count as none (`equivalentDifferences`), and `SUMMARY.md` counts them; `RNL_BENCH_STRICT=all`, or a comma-separated list of those names, counts them again.
+
 ## How the 100 were chosen
 
 From the 1497 public Gallery circuits whose netlist Canvas can write (snapshot of 2026-10-19; redrawn reference datasets excluded; at most 200 parts):
@@ -60,7 +62,7 @@ RNL_BENCH_CORPUS=<this repo>/circuits RNL_BENCH_OUT=<out dir> \
 python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <out dir> "<label>"
 ```
 
-`RNL_BENCH_IDS=id1,id2` runs only those circuits. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
+`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_STRICT=all` turns off the equivalences above. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 
@@ -70,7 +72,8 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 |---|---|---|---|---|
 | `results/2026-10-23-baseline/` | `1052ca1be` | `0.1.0-preview.14` | 68 / 34 / 0 | 57 / 3 / 0 |
 | `results/2026-10-26-after-review/` | `acd08e069` | `0.5.1` | 73 / 34 / 6 | 72 / 3 / 0 |
+| `results/2026-10-26-equivalences/` | `a7eb32743` | `0.5.2` | 92 / 68 / 20 | 91 / 64 / 20 |
 
-Each count is the circuits at that level or above. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
+Each count is the circuits at that level or above. `2026-10-26-equivalences` is graded with the equivalences above; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 
 Each run's `SUMMARY.md` lists the problems by circuits affected and the issues tracking them (in analog-canvas).

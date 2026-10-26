@@ -3,11 +3,13 @@
 //
 // Run from an analog-canvas checkout (see README.md):
 //   RNL_BENCH_CORPUS=<repo>/circuits RNL_BENCH_OUT=<dir> [RNL_BENCH_IDS=a,b] \
+//     [RNL_BENCH_STRICT=all | hidden-absent,hidden-extra,…] \
 //     npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, it } from "vitest";
 
+import { arrowEndStyles } from "@icm/derived";
 import type { CircuitProject, SchematicDocument } from "@icm/model";
 import {
   compareElectricalGraphs,
@@ -114,6 +116,66 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
   return { missing, added };
 }
 
+/**
+ * Differences that draw the same, each counted as none unless named in
+ * RNL_BENCH_STRICT (or `all`):
+ * - hidden-absent: a hidden label the import does not bring back is still
+ *   hidden; only one that comes back shown counts;
+ * - hidden-extra: annotations are counted as shown, so a hidden one the
+ *   import adds, which draws nothing, does not count;
+ * - text-styles: a drawing object's text is compared by the characters it
+ *   shows and the styles of each, as Analog Canvas compares styled text
+ *   (sameStyledText), not by how its spans are nested or split;
+ * - arrow-ends: an arrow's heads are compared as Analog Canvas draws them
+ *   (arrowEndStyles), so the legacy fields and the defaults they mean match
+ *   the explicit ends;
+ * - default-false: a style flag set false is the same as one left unset.
+ */
+const EQUIVALENCES = [
+  "hidden-absent",
+  "hidden-extra",
+  "text-styles",
+  "arrow-ends",
+  "default-false",
+] as const;
+type Equivalence = (typeof EQUIVALENCES)[number];
+const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
+const ENABLED = new Set<Equivalence>(
+  EQUIVALENCES.filter((name) => !STRICT.includes("all") && !STRICT.includes(name)),
+);
+
+/** A rich text as the characters it shows, each with its sorted styles. */
+function styledCharacters(value: unknown, styles: readonly string[] = []): string[] {
+  if (Array.isArray(value)) return value.flatMap((item) => styledCharacters(item, styles));
+  if (!value || typeof value !== "object") return [];
+  const run = value as Record<string, unknown>;
+  if (run.kind === "text" && typeof run.value === "string")
+    return [...run.value].map((character) => `${character}|${[...new Set(styles)].sort().join(",")}`);
+  if (run.kind === "span")
+    return styledCharacters(run.children, [...styles, String(run.style)]);
+  if (run.kind === "line-break") return ["<br>"];
+  return Object.entries(run)
+    .filter(([key]) => key !== "kind")
+    .flatMap(([key, item]) => styledCharacters(item, [...styles, key]));
+}
+
+/** A drawing object as its drawing compares, the equivalences applied. */
+function comparable(object: Record<string, unknown>, equivalences: ReadonlySet<Equivalence>) {
+  let next: Record<string, unknown> = { ...object };
+  const style = { ...((next.styleOverride as Record<string, unknown> | undefined) ?? {}) };
+  if (equivalences.has("text-styles") && next.content && typeof next.content === "object")
+    next.content = styledCharacters((next.content as { runs?: unknown }).runs);
+  if (equivalences.has("arrow-ends") && next.kind === "arrow") {
+    next.arrowEnds = arrowEndStyles(next as Parameters<typeof arrowEndStyles>[0]);
+    for (const key of ["arrowHead", "arrowHeadAt", "arrowHeadScale", "arrowStart", "arrowEnd"])
+      delete style[key];
+  }
+  if (equivalences.has("default-false"))
+    for (const [key, item] of Object.entries(style)) if (item === false) delete style[key];
+  next.styleOverride = style;
+  return next;
+}
+
 const byKind = (items: readonly { kind?: string }[]) => {
   const out: Record<string, number> = {};
   for (const item of items) out[item.kind ?? "?"] = (out[item.kind ?? "?"] ?? 0) + 1;
@@ -155,8 +217,14 @@ function changedPaths(a: unknown, b: unknown, path = ""): string[] {
 }
 
 /** Every drawing difference between two projects, as "category: detail". */
-function drawingDifferences(a: CircuitProject, b: CircuitProject): string[] {
+function drawingDifferences(
+  a: CircuitProject,
+  b: CircuitProject,
+  equivalences: ReadonlySet<Equivalence> = ENABLED,
+): string[] {
   const out: string[] = [];
+  const counted = (items: readonly { kind?: string; visible?: boolean }[]) =>
+    equivalences.has("hidden-extra") ? items.filter((item) => item.visible !== false) : items;
   if (a.documents.length !== b.documents.length)
     out.push(`document: ${a.documents.length} Cells -> ${b.documents.length}`);
   for (const { a: da, b: db } of documentPairs(a, b)) {
@@ -191,11 +259,16 @@ function drawingDifferences(a: CircuitProject, b: CircuitProject): string[] {
       out.push(
         `junction: ${cell} -${junctions.missing.length} +${junctions.added.length}`,
       );
-    if (byKind(da.annotations) !== byKind(db.annotations))
-      out.push(`annotation: ${cell} ${byKind(da.annotations)} -> ${byKind(db.annotations)}`);
+    const ka = byKind(counted(da.annotations));
+    const kb = byKind(counted(db.annotations));
+    if (ka !== kb) out.push(`annotation: ${cell} ${ka} -> ${kb}`);
+    const drawn = (objects: readonly unknown[]) =>
+      objects.map((item) =>
+        JSON.stringify(withoutIds(comparable(item as Record<string, unknown>, equivalences))),
+      );
     const drafting = multisetDiff(
-      (da.drafting?.objects ?? []).map((item) => JSON.stringify(withoutIds(item))),
-      (db.drafting?.objects ?? []).map((item) => JSON.stringify(withoutIds(item))),
+      drawn(da.drafting?.objects ?? []),
+      drawn(db.drafting?.objects ?? []),
     );
     const unmatched = [...drafting.added];
     for (const item of drafting.missing) {
@@ -213,8 +286,13 @@ function drawingDifferences(a: CircuitProject, b: CircuitProject): string[] {
     for (const item of unmatched)
       out.push(`drafting: ${cell} ${String((JSON.parse(item) as Record<string, unknown>).kind)} added`);
   }
-  for (const line of labelDifferences(labelCensus(a), labelCensus(b)))
+  const after = labelCensus(b);
+  const labelled = new Set(after.map((label) => `${label.cell} ${label.kind} ${label.owner}`));
+  for (const line of labelDifferences(labelCensus(a), after)) {
+    const hidden = /^(.*): hidden before, shown$/u.exec(line);
+    if (equivalences.has("hidden-absent") && hidden && !labelled.has(hidden[1]!)) continue;
     out.push(`label: ${line}`);
+  }
   return out;
 }
 
@@ -322,6 +400,13 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
   // what its drawing lost.
   const differences = drawingDifferences(project, back);
   result.drawingDifferences = differences;
+  // What the equivalences count as none, listed so a reader sees each.
+  if (ENABLED.size) {
+    const strict = drawingDifferences(project, back, new Set());
+    const kept = new Set(differences);
+    const absorbed = strict.filter((line) => !kept.has(line));
+    if (absorbed.length) result.equivalentDifferences = absorbed;
+  }
   if (result.electrical !== "equal" || !netlist.identical) return result;
   result.level = differences.length === 0 ? 3 : 2;
   return result;
