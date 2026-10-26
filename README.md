@@ -29,7 +29,7 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 
 Drawing differences are listed in each report for every circuit that imports, also below L2.
 
-Some differences draw the same and are counted as none: a hidden label the import does not bring back (`hidden-absent`); hidden annotations, since annotations are counted as shown (`hidden-extra`); a drawing text's span nesting or splitting, its characters and their styles compared as Analog Canvas compares styled text (`text-styles`); an arrow's legacy or default head fields, its heads compared as Analog Canvas draws them (`arrow-ends`); a style flag set false, the same as one unset (`default-false`). Each report lists the differences they count as none (`equivalentDifferences`), and `SUMMARY.md` counts them; `RNL_BENCH_STRICT=all`, or a comma-separated list of those names, counts them again.
+Some differences draw the same and are counted as none: a hidden label the import does not bring back (`hidden-absent`); hidden annotations, since annotations are counted as shown (`hidden-extra`); a drawing text's span nesting or splitting, its characters and their styles compared as Analog Canvas compares styled text (`text-styles`); an arrow's legacy or default head fields, its heads compared as Analog Canvas draws them (`arrow-ends`); a style flag set false or a size scale of 1, the same as one unset (`style-defaults`). Each report lists the differences they count as none (`equivalentDifferences`), and `SUMMARY.md` counts them; `RNL_BENCH_STRICT=all`, or a comma-separated list of those names, counts them again.
 
 ## How the 100 were chosen
 

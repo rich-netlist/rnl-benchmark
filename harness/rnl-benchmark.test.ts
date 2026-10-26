@@ -129,14 +129,15 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
  * - arrow-ends: an arrow's heads are compared as Analog Canvas draws them
  *   (arrowEndStyles), so the legacy fields and the defaults they mean match
  *   the explicit ends;
- * - default-false: a style flag set false is the same as one left unset.
+ * - style-defaults: a style flag set false, or a size scale of 1, is the
+ *   same as one left unset.
  */
 const EQUIVALENCES = [
   "hidden-absent",
   "hidden-extra",
   "text-styles",
   "arrow-ends",
-  "default-false",
+  "style-defaults",
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
@@ -170,8 +171,9 @@ function comparable(object: Record<string, unknown>, equivalences: ReadonlySet<E
     for (const key of ["arrowHead", "arrowHeadAt", "arrowHeadScale", "arrowStart", "arrowEnd"])
       delete style[key];
   }
-  if (equivalences.has("default-false"))
-    for (const [key, item] of Object.entries(style)) if (item === false) delete style[key];
+  if (equivalences.has("style-defaults"))
+    for (const [key, item] of Object.entries(style))
+      if (item === false || (key === "sizeScale" && item === 1)) delete style[key];
   next.styleOverride = style;
   return next;
 }
