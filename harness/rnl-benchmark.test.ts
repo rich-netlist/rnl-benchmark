@@ -130,7 +130,10 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
  *   (arrowEndStyles), so the legacy fields and the defaults they mean match
  *   the explicit ends;
  * - style-defaults: a style flag set false, or a size scale of 1, is the
- *   same as one left unset.
+ *   same as one left unset;
+ * - unused-anchor: the anchor of an arrow, construction line, rectangle or
+ *   circle, which Analog Canvas draws from its own points (resolveDraftingGeometry
+ *   reads the anchor only of texts, leaders, callouts and floating symbols).
  */
 const EQUIVALENCES = [
   "hidden-absent",
@@ -138,6 +141,7 @@ const EQUIVALENCES = [
   "text-styles",
   "arrow-ends",
   "style-defaults",
+  "unused-anchor",
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
@@ -174,6 +178,11 @@ function comparable(object: Record<string, unknown>, equivalences: ReadonlySet<E
   if (equivalences.has("style-defaults"))
     for (const [key, item] of Object.entries(style))
       if (item === false || (key === "sizeScale" && item === 1)) delete style[key];
+  if (
+    equivalences.has("unused-anchor") &&
+    ["arrow", "construction-line", "rectangle", "circle"].includes(String(next.kind))
+  )
+    delete next.anchor;
   next.styleOverride = style;
   return next;
 }

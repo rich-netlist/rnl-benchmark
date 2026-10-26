@@ -11,12 +11,12 @@ Counts are circuits reaching at least that level.
 
 ## Counted as drawing the same
 
-Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, style-defaults; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
+Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, style-defaults, unused-anchor; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
 
 | Format | Circuits | Differences |
 |---|---|---|
-| spice | 56 | 203 |
-| spectre | 57 | 208 |
+| spice | 57 | 207 |
+| spectre | 58 | 212 |
 
 ## Problems, by circuits affected
 
@@ -31,7 +31,7 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 | wires lost or added | #1784 | 5 | 5 | 57xa4r682t, c8y9j9djzt, dhfnzqqagg |
 | junctions moved/lost | #1784 | 6 | 6 | 3dryra4xaq, 57xa4r682t, dhfnzqqagg |
 | annotations changed | #1785 | 13 | 13 | 6arzwp68jh, a5tz83j7hp, af6prxthxw |
-| drafting objects changed | #1787 | 30 | 30 | 23v5t7erxh, 35nyqjtrkh, 3dryra4xaq |
+| drafting objects changed | #1787 | 29 | 29 | 23v5t7erxh, 35nyqjtrkh, 3dryra4xaq |
 | labels changed/shown/hidden | #1785 #1787 | 43 | 42 | 23v5t7erxh, 3dryra4xaq, 4vdb4hbfe3 |
 | Cells lost or renamed |  | 5 | 5 | 23v5t7erxh, 4vdb4hbfe3, 924v8n26es |
 
@@ -108,7 +108,7 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 | `crpphvtva6` Two Stage OTA with Flying Cap CMFB (Star | Zengchun Chen | 52 | L2 | L2 | instance symbol/placement/parameters changed, drafting objects changed, labels changed/shown/hidden |
 | `cwmesegne8` Two Stage OTA with Flying Cap CMFB | Zengchun Chen | 48 | L2 | L2 | instance symbol/placement/parameters changed, labels changed/shown/hidden |
 | `d3tfb8q693` CMOS three-bit Fibonacci LFSR | GPT-6.1 Sol | 57 | L2 | L2 | labels changed/shown/hidden |
-| `ez4m9ggesf` Dynamic Switch | He Yuan | 11 | L2 | L2 | drafting objects changed, labels changed/shown/hidden |
+| `ez4m9ggesf` Dynamic Switch | He Yuan | 11 | L2 | L2 | labels changed/shown/hidden |
 | `f64bvmxv5e` Common Gate LNA | Ethan Zhong | 14 | L2 | L2 | drafting objects changed, labels changed/shown/hidden |
 | `fx52v6fzbg` IDAC | zhouzhou | 44 | L2 | L2 | instance symbol/placement/parameters changed, labels changed/shown/hidden |
 | `gebpb6er9t` Fig. 5.17 (b) | Nicolas Herrera | 6 | L2 | L2 | instance symbol/placement/parameters changed |
