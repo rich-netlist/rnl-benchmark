@@ -264,14 +264,30 @@ function drawingDifferences(
     const ka = byKind(counted(da.annotations));
     const kb = byKind(counted(db.annotations));
     if (ka !== kb) out.push(`annotation: ${cell} ${ka} -> ${kb}`);
-    const drawn = (objects: readonly unknown[]) =>
-      objects.map((item) =>
+    // Ids are not compared, and so neither is the id an anchor names: the
+    // part it names is, by its name or its symbol and place.
+    const anchoredTo = (document: SchematicDocument) => (item: unknown) => {
+      const object = item as Record<string, unknown>;
+      const anchor = object.anchor as { kind?: string; objectId?: string } | undefined;
+      const part =
+        anchor?.kind === "object"
+          ? document.instances.find((instance) => instance.id === anchor.objectId)
+          : undefined;
+      if (!part) return object;
+      const at = part.placement?.position;
+      return {
+        ...object,
+        anchor: {
+          ...anchor,
+          objectId: part.reference ?? `${part.symbolId}@${at?.x},${at?.y}`,
+        },
+      };
+    };
+    const drawn = (document: SchematicDocument) =>
+      (document.drafting?.objects ?? []).map(anchoredTo(document)).map((item) =>
         JSON.stringify(withoutIds(comparable(item as Record<string, unknown>, equivalences))),
       );
-    const drafting = multisetDiff(
-      drawn(da.drafting?.objects ?? []),
-      drawn(db.drafting?.objects ?? []),
-    );
+    const drafting = multisetDiff(drawn(da), drawn(db));
     const unmatched = [...drafting.added];
     for (const item of drafting.missing) {
       const before = JSON.parse(item) as Record<string, unknown>;
