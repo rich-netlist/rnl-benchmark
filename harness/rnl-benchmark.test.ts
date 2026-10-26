@@ -85,7 +85,11 @@ function symbolOf(project: CircuitProject, instance: SchematicDocument["instance
   return instance.symbolId;
 }
 
-function placed(project: CircuitProject, document: SchematicDocument) {
+function placed(
+  project: CircuitProject,
+  document: SchematicDocument,
+  equivalences: ReadonlySet<Equivalence> = ENABLED,
+) {
   const named = new Map<string, string>();
   const unnamed: string[] = [];
   for (const instance of document.instances) {
@@ -96,7 +100,20 @@ function placed(project: CircuitProject, document: SchematicDocument) {
     if (instance.reference)
       named.set(
         instance.reference,
-        `${symbol} @ ${at} ${JSON.stringify(Object.fromEntries(Object.entries(instance.netlist?.parameters ?? {}).sort()))}`,
+        `${symbol} @ ${at} ${JSON.stringify(
+          Object.fromEntries(
+            Object.entries(instance.netlist?.parameters ?? {})
+              .filter(
+                ([name, value]) =>
+                  !(
+                    equivalences.has("default-ac-phase") &&
+                    name === "acPhase" &&
+                    Number(value) === 0
+                  ),
+              )
+              .sort(),
+          ),
+        )}`,
       );
     else unnamed.push(`${symbol} @ ${at}`);
   }
@@ -135,7 +152,10 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
  *   circle, which Analog Canvas draws from its own points (resolveDraftingGeometry
  *   reads the anchor only of texts, leaders, callouts and floating symbols);
  * - orphan-junction: a junction no wire touches, which draws nothing (a dot
- *   is drawn only where wires meet).
+ *   is drawn only where wires meet);
+ * - default-ac-phase: a source's AC phase of 0, the default, the same as one
+ *   left unset, as Analog Canvas compares circuits (comparedParameters); the
+ *   netlist prints 0 either way.
  */
 const EQUIVALENCES = [
   "hidden-absent",
@@ -145,6 +165,7 @@ const EQUIVALENCES = [
   "style-defaults",
   "unused-anchor",
   "orphan-junction",
+  "default-ac-phase",
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
@@ -252,8 +273,8 @@ function drawingDifferences(
     const nameOf = (document: SchematicDocument) => document.netlist?.name ?? document.name;
     if (nameOf(da) !== nameOf(db))
       out.push(`cell-name: ${nameOf(da)} rewritten as ${nameOf(db)}`);
-    const pa = placed(a, da);
-    const pb = placed(b, db);
+    const pa = placed(a, da, equivalences);
+    const pb = placed(b, db, equivalences);
     for (const [reference, value] of pa.named) {
       const after = pb.named.get(reference) ?? pb.named.get(`X${reference}`);
       if (!pb.named.has(reference) && pb.named.has(`X${reference}`))
