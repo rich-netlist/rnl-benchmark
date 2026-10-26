@@ -247,6 +247,11 @@ function drawingDifferences(
       out.push(`document: ${cell} not found after import`);
       continue;
     }
+    // A Cell's name the netlist had to write otherwise ("Bootstrap switch" as
+    // bootstrap_switch) is lost, however its Cell is paired.
+    const nameOf = (document: SchematicDocument) => document.netlist?.name ?? document.name;
+    if (nameOf(da) !== nameOf(db))
+      out.push(`cell-name: ${nameOf(da)} rewritten as ${nameOf(db)}`);
     const pa = placed(a, da);
     const pb = placed(b, db);
     for (const [reference, value] of pa.named) {
