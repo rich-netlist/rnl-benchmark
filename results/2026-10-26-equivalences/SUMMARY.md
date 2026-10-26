@@ -11,12 +11,12 @@ Counts are circuits reaching at least that level.
 
 ## Counted as drawing the same
 
-Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, default-false; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
+Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, style-defaults; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
 
 | Format | Circuits | Differences |
 |---|---|---|
-| spice | 53 | 157 |
-| spectre | 54 | 162 |
+| spice | 56 | 203 |
+| spectre | 57 | 208 |
 
 ## Problems, by circuits affected
 
