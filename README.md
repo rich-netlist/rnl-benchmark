@@ -29,7 +29,7 @@ Each circuit is graded separately for SPICE+RNL and Spectre+RNL:
 
 Drawing differences are listed in each report for every circuit that imports, also below L2.
 
-Some differences draw the same and are counted as none: a hidden label the import does not bring back (`hidden-absent`); hidden annotations, since annotations are counted as shown (`hidden-extra`); a drawing text's span nesting or splitting, its characters and their styles compared as Analog Canvas compares styled text (`text-styles`); an arrow's legacy or default head fields, its heads compared as Analog Canvas draws them (`arrow-ends`); a style flag set false or a size scale of 1, the same as one unset (`style-defaults`); the anchor of an arrow, construction line, rectangle or circle, which Analog Canvas draws from its own points (`unused-anchor`). Each report lists the differences they count as none (`equivalentDifferences`), and `SUMMARY.md` counts them; `RNL_BENCH_STRICT=all`, or a comma-separated list of those names, counts them again.
+Some differences draw the same and are counted as none: a hidden label the import does not bring back (`hidden-absent`); hidden annotations, since annotations are counted as shown (`hidden-extra`); a drawing text's span nesting or splitting, its characters and their styles compared as Analog Canvas compares styled text (`text-styles`); an arrow's legacy or default head fields, its heads compared as Analog Canvas draws them (`arrow-ends`); a style flag set false or a size scale of 1, the same as one unset (`style-defaults`); the anchor of an arrow, construction line, rectangle or circle, which Analog Canvas draws from its own points (`unused-anchor`); a junction no wire touches, which draws nothing (`orphan-junction`). Each report lists the differences they count as none (`equivalentDifferences`), and `SUMMARY.md` counts them; `RNL_BENCH_STRICT=all`, or a comma-separated list of those names, counts them again.
 
 ## How the 100 were chosen
 
@@ -72,7 +72,7 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 |---|---|---|---|---|
 | `results/2026-10-23-baseline/` | `1052ca1be` | `0.1.0-preview.14` | 68 / 34 / 0 | 57 / 3 / 0 |
 | `results/2026-10-26-after-review/` | `acd08e069` | `0.5.1` | 73 / 34 / 6 | 72 / 3 / 0 |
-| `results/2026-10-26-equivalences/` | `a7eb32743` | `0.5.2` | 92 / 68 / 20 | 91 / 64 / 20 |
+| `results/2026-10-26-equivalences/` | `a7eb32743` | `0.5.2` | 92 / 68 / 21 | 91 / 64 / 21 |
 
 Each count is the circuits at that level or above. `2026-10-26-equivalences` is graded with the equivalences above; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 

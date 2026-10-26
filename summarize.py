@@ -71,7 +71,7 @@ equivalent = {fmt: [r for r in rows if r[fmt].get("equivalentDifferences")] for 
 if any(equivalent.values()):
     md += ["", "## Counted as drawing the same", "",
            "Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends,"
-           " style-defaults, unused-anchor; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as"
+           " style-defaults, unused-anchor, orphan-junction; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as"
            " `equivalentDifferences`:", "",
            "| Format | Circuits | Differences |", "|---|---|---|"]
     for fmt in FORMATS:

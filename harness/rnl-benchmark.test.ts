@@ -133,7 +133,9 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
  *   same as one left unset;
  * - unused-anchor: the anchor of an arrow, construction line, rectangle or
  *   circle, which Analog Canvas draws from its own points (resolveDraftingGeometry
- *   reads the anchor only of texts, leaders, callouts and floating symbols).
+ *   reads the anchor only of texts, leaders, callouts and floating symbols);
+ * - orphan-junction: a junction no wire touches, which draws nothing (a dot
+ *   is drawn only where wires meet).
  */
 const EQUIVALENCES = [
   "hidden-absent",
@@ -142,6 +144,7 @@ const EQUIVALENCES = [
   "arrow-ends",
   "style-defaults",
   "unused-anchor",
+  "orphan-junction",
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
@@ -262,9 +265,15 @@ function drawingDifferences(
     for (const item of pins.added) out.push(`pin-or-glyph: ${cell} added ${item}`);
     if (da.routes.length !== db.routes.length)
       out.push(`route: ${cell} ${da.routes.length} -> ${db.routes.length}`);
+    const touched = (document: SchematicDocument) =>
+      document.junctions.filter(
+        (junction) =>
+          !equivalences.has("orphan-junction") ||
+          document.routes.some((route) => JSON.stringify(route).includes(`"${junction.id}"`)),
+      );
     const junctions = multisetDiff(
-      da.junctions.map((item) => `${item.position.x},${item.position.y}`),
-      db.junctions.map((item) => `${item.position.x},${item.position.y}`),
+      touched(da).map((item) => `${item.position.x},${item.position.y}`),
+      touched(db).map((item) => `${item.position.x},${item.position.y}`),
     );
     if (junctions.missing.length || junctions.added.length)
       out.push(

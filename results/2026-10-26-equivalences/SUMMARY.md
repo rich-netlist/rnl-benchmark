@@ -4,19 +4,19 @@
 
 | | L1 imports cleanly | L2 same circuit | L3 same drawing |
 |---|---|---|---|
-| SPICE+RNL | 92 | 68 | 20 |
-| Spectre+RNL | 91 | 64 | 20 |
+| SPICE+RNL | 92 | 68 | 21 |
+| Spectre+RNL | 91 | 64 | 21 |
 
 Counts are circuits reaching at least that level.
 
 ## Counted as drawing the same
 
-Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, style-defaults, unused-anchor; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
+Differences the harness's equivalences count as none (hidden-absent, hidden-extra, text-styles, arrow-ends, style-defaults, unused-anchor, orphan-junction; `RNL_BENCH_STRICT=all` or a list of them turns them off), listed in each report as `equivalentDifferences`:
 
 | Format | Circuits | Differences |
 |---|---|---|
-| spice | 57 | 207 |
-| spectre | 58 | 212 |
+| spice | 57 | 208 |
+| spectre | 58 | 213 |
 
 ## Problems, by circuits affected
 
@@ -29,7 +29,7 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 | extra or missing pins/glyphs | #1783 | 14 | 14 | 3dryra4xaq, 6arzwp68jh, a5tz83j7hp |
 | instance symbol/placement/parameters changed | #1785 #1786 | 31 | 34 | 23v5t7erxh, 35nyqjtrkh, 3dryra4xaq |
 | wires lost or added | #1784 | 5 | 5 | 57xa4r682t, c8y9j9djzt, dhfnzqqagg |
-| junctions moved/lost | #1784 | 6 | 6 | 3dryra4xaq, 57xa4r682t, dhfnzqqagg |
+| junctions moved/lost | #1784 | 5 | 5 | 3dryra4xaq, 57xa4r682t, dhfnzqqagg |
 | annotations changed | #1785 | 13 | 13 | 6arzwp68jh, a5tz83j7hp, af6prxthxw |
 | drafting objects changed | #1787 | 29 | 29 | 23v5t7erxh, 35nyqjtrkh, 3dryra4xaq |
 | labels changed/shown/hidden | #1785 #1787 | 43 | 42 | 23v5t7erxh, 3dryra4xaq, 4vdb4hbfe3 |
@@ -122,7 +122,6 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 | `nznez6ma4p` bandgap | Magic Li | 13 | L2 | L2 | drafting objects changed |
 | `p3af2sg23j` Small Signal Model of CS AMP | Zengchun Chen | 8 | L2 | L2 | instance symbol/placement/parameters changed |
 | `pngpj38rva` Positive CMFB of Even Cascode Flying Cap | Zengchun Chen | 33 | L2 | L2 | instance symbol/placement/parameters changed, drafting objects changed, labels changed/shown/hidden |
-| `q53pvffgpx` Operational amplifier with class AB outp | g1286012685 | 29 | L2 | L2 | junctions moved/lost |
 | `qjpfesczpd` Wien-Bridge Osc | s1ham | 13 | L2 | L2 | instance symbol/placement/parameters changed, drafting objects changed |
 | `sf6e58mmjb` CTLE | THDCH | 10 | L2 | L2 | instance symbol/placement/parameters changed, drafting objects changed |
 | `tc5v5zbja4` Folded Opamp | s1ham | 18 | L2 | L2 | instance symbol/placement/parameters changed |
@@ -142,6 +141,7 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 | `g37crxfgf7` sense amplifier 1 | 18867155892 | 9 | L3 | L3 | — |
 | `j9cfz6mfs7` ADSL | Magic Li | 21 | L3 | L3 | — |
 | `nkj35a4ndr` Rail-to-rail folded-cascode op amp with  | Zhishuai Zhang | 59 | L3 | L3 | — |
+| `q53pvffgpx` Operational amplifier with class AB outp | g1286012685 | 29 | L3 | L3 | — |
 | `s7ngrw8566` tri-swich | 羅俊能 | 6 | L3 | L3 | — |
 | `stayz7tm4a` Figure 16.6 | Rgeph | 10 | L3 | L3 | — |
 | `tqy9f3gztf` LNA with Degeneration | Kerollos Ashraf | 12 | L3 | L3 | — |
