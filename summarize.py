@@ -47,6 +47,8 @@ for path in sorted(glob.glob(os.path.join(reports_dir, "*.json"))):
         row[fmt] = {"level": f["level"], "failure": f.get("failure"), "problems": hit, "differences": len(d)}
         if f.get("equivalentDifferences"):
             row[fmt]["equivalentDifferences"] = len(f["equivalentDifferences"])
+        if f.get("normalizedDefinitions"):
+            row[fmt]["normalizedDefinitions"] = f["normalizedDefinitions"]
     rows.append(row)
 
 summary = {
@@ -56,6 +58,7 @@ summary = {
     "atLeast": {fmt: {f"L{k}": sum(v for lv, v in levels[fmt].items() if lv >= k) for k in range(1, 4)} for fmt in FORMATS},
     "problems": {fmt: dict(classes[fmt].most_common()) for fmt in FORMATS},
     "circuitsByProblem": {name: examples[name] for name, _, _ in CLASSES if examples[name]},
+    "normalized": {fmt: {r["id"]: r[fmt]["normalizedDefinitions"] for r in rows if r[fmt].get("normalizedDefinitions")} for fmt in FORMATS},
     "rows": rows,
 }
 json.dump(summary, open(os.path.join(out_dir, "summary.json"), "w"), ensure_ascii=False, indent=1)
@@ -77,6 +80,17 @@ if any(equivalent.values()):
     for fmt in FORMATS:
         if equivalent[fmt]:
             md.append(f"| {fmt} | {len(equivalent[fmt])} | {sum(r[fmt]['equivalentDifferences'] for r in equivalent[fmt])} |")
+normalized = summary["normalized"]
+if any(normalized.values()):
+    md += ["", "## Normalized before comparing", "",
+           "External definitions the original declared no formal parameters for, compared as declaring the reviewed interface's"
+           " (harness `withReviewedFormals`; `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` turns it off):", "",
+           "| Format | Circuits | Circuit: definitions |", "|---|---|---|"]
+    for fmt in FORMATS:
+        if normalized[fmt]:
+            md.append(f"| {fmt} | {len(normalized[fmt])} | " + "; ".join(f"{cid}: {', '.join(names)}" for cid, names in sorted(normalized[fmt].items())) + " |")
+else:
+    md += ["", "No external definition was normalized before comparing."]
 md += ["", "## Problems, by circuits affected", "",
        "| Problem | Tracked in | SPICE+RNL | Spectre+RNL | e.g. |", "|---|---|---|---|---|"]
 for name, ref, _ in CLASSES:
