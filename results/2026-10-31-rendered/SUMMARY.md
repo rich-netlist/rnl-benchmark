@@ -15,8 +15,8 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 
 | Format | Circuits | Differences |
 |---|---|---|
-| spice | 63 | 323 |
-| spectre | 59 | 205 |
+| spice | 63 | 325 |
+| spectre | 59 | 207 |
 
 ## Normalized before comparing
 

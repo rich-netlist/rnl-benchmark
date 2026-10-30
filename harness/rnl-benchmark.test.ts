@@ -218,6 +218,17 @@ function comparable(object: Record<string, unknown>, equivalences: ReadonlySet<E
   if (equivalences.has("style-defaults"))
     for (const [key, item] of Object.entries(style))
       if (item === false || (key === "sizeScale" && item === 1)) delete style[key];
+  // A polarity mark with no words: RNL has no text to hold its role, and
+  // `label` draws it at the size unset does.
+  if (
+    equivalences.has("style-defaults") &&
+    next.polarity &&
+    next.typographyToken === "label" &&
+    styledCharacters((object.content as { runs?: unknown } | undefined)?.runs).every(
+      (character) => character === "<br>",
+    )
+  )
+    delete next.typographyToken;
   if (
     equivalences.has("unused-anchor") &&
     ["arrow", "construction-line", "rectangle", "circle"].includes(String(next.kind))
