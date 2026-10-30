@@ -26,6 +26,7 @@ CLASSES = [
     ("annotations changed", "#1785", lambda f, d: any(x.startswith("annotation:") for x in d)),
     ("drafting objects changed", "#1787", lambda f, d: any(x.startswith("drafting:") for x in d)),
     ("labels changed/shown/hidden", "#1785 #1787", lambda f, d: any(x.startswith("label:") for x in d)),
+    ("drawn differently (rendered)", "", lambda f, d: bool(f.get("renderedDifferences"))),
     ("Cells lost or renamed", "", lambda f, d: any(x.startswith("document:") for x in d)),
 ]
 

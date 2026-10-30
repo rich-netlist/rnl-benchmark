@@ -4,7 +4,7 @@
 // Run from an analog-canvas checkout (see README.md):
 //   RNL_BENCH_CORPUS=<repo>/circuits RNL_BENCH_OUT=<dir> [RNL_BENCH_IDS=a,b] \
 //     [RNL_BENCH_STRICT=all | hidden-absent,hidden-extra,…] \
-//     [RNL_BENCH_KEEP_ORIGINAL_FORMALS=1] \
+//     [RNL_BENCH_KEEP_ORIGINAL_FORMALS=1] [RNL_BENCH_SKIP_RENDERED=1] \
 //     npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -19,7 +19,9 @@ import {
   projectElectricalGraph,
 } from "@icm/netlist";
 import { parseProject, serializeProject } from "@icm/project-protocol";
+import { renderDocumentSvg } from "@icm/render-svg";
 import { createRnlExport, type RnlSnapshot } from "@icm/rnl";
+import { builtInSymbols, createProjectSymbolResolver } from "@icm/symbols";
 
 import { labelCensus, labelDifferences } from "../../../e2e/label-census";
 import { createRnlTestCore } from "./rnl-core.test-support";
@@ -174,6 +176,8 @@ const EQUIVALENCES = [
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
+/** RNL_BENCH_SKIP_RENDERED=1: grade by the compared fields alone, as before the drawn check. */
+const SKIP_RENDERED = Boolean(process.env.RNL_BENCH_SKIP_RENDERED);
 const ENABLED = new Set<Equivalence>(
   EQUIVALENCES.filter((name) => !STRICT.includes("all") && !STRICT.includes(name)),
 );
@@ -527,10 +531,213 @@ async function roundTrip(id: string, project: CircuitProject, format: "spice" | 
     const absorbed = strict.filter((line) => !kept.has(line));
     if (absorbed.length) result.equivalentDifferences = absorbed;
   }
+  const rendered = SKIP_RENDERED ? [] : renderedDifferences(project, back);
+  if (rendered.length) result.renderedDifferences = rendered;
   if (result.electrical !== "equal" || !netlist.identical) return result;
-  result.level = differences.length === 0 ? 3 : 2;
+  result.level = differences.length === 0 && rendered.length === 0 ? 3 : 2;
   return result;
 }
+
+const round = (value: string, digits: number) =>
+  String(Math.round(Number.parseFloat(value) * 10 ** digits) / 10 ** digits);
+
+/** A text as drawn: where, and each character with the style it ends up with. */
+function drawnText(svg: string): string {
+  const head = /^<text\b([^>]*)>/u.exec(svg)![1]!;
+  const attributes = (source: string) =>
+    Object.fromEntries(
+      [...source.matchAll(/([\w-]+)="([^"]*)"/gu)].map((match) => [match[1]!, match[2]!]),
+    );
+  // A size to 0.1, so 15.12 and 15.116 are one size: RNL writes four digits.
+  const size = (value: string) => round(value, 1);
+  const own = attributes(head);
+  const place = ["x", "y", "text-anchor", "transform", "fill"].map((name) =>
+    (own[name] ?? "").replace(/-?\d+\.\d+/gu, (number) => round(number, 1)),
+  );
+  const stack: Record<string, string>[] = [
+    {
+      "font-size": size(own["font-size"] ?? "0"),
+      "font-style": own["font-style"] ?? "",
+      "font-weight": own["font-weight"] ?? "",
+    },
+  ];
+  const characters: string[] = [];
+  // A shift moves the next character drawn, whichever span holds it.
+  let shift = "0,0";
+  for (const token of svg
+    .slice(head.length + "<text>".length, -"</text>".length)
+    .matchAll(/<tspan\b([^>]*)>|<\/tspan>|[^<]+/gu)) {
+    const [text, tag] = token;
+    if (text === "</tspan>") stack.pop();
+    else if (tag !== undefined) {
+      const span = attributes(tag);
+      const style = { ...stack.at(-1)! };
+      for (const item of (span.style ?? "").split(";")) {
+        const [name, value] = item.split(":");
+        if (name && value) style[name.trim()] = value.trim();
+      }
+      if (span["font-size"]) style["font-size"] = size(span["font-size"]);
+      if (span.dx !== undefined || span.dy !== undefined)
+        shift = `${round(span.dx ?? "0", 1)},${round(span.dy ?? "0", 1)}`;
+      stack.push(style);
+    } else
+      for (const character of text) {
+        characters.push(JSON.stringify([character, shift, Object.entries(stack.at(-1)!).sort()]));
+        shift = "0,0";
+      }
+  }
+  return JSON.stringify([place, characters]);
+}
+
+/** Straight strokes of a path as drawn, merged where they overlap; null where it curves. */
+function drawnStrokes(data: string): string[] | null {
+  if (/[^MLZ\d\s.,e-]/u.test(data)) return null;
+  const strokes: [number, number, number, number][] = [];
+  const tokens = data.match(/[MLZ]|-?\d+\.?\d*(?:e-?\d+)?/gu) ?? [];
+  let at: [number, number] | null = null;
+  for (let index = 0; index < tokens.length;) {
+    const token = tokens[index]!;
+    if (token !== "M" && token !== "L") {
+      index += 1;
+      continue;
+    }
+    const next: [number, number] = [
+      Number(round(tokens[index + 1]!, 2)),
+      Number(round(tokens[index + 2]!, 2)),
+    ];
+    index += 3;
+    if (token === "L" && at && (at[0] !== next[0] || at[1] !== next[1])) {
+      const [from, to] = at[0] < next[0] || (at[0] === next[0] && at[1] < next[1]) ? [at, next] : [next, at];
+      strokes.push([from[0], from[1], to[0], to[1]]);
+    }
+    at = next;
+  }
+  const lines = new Map<string, [number, number][]>();
+  const out: string[] = [];
+  for (const [x1, y1, x2, y2] of strokes) {
+    if (x1 !== x2 && y1 !== y2) out.push(`${x1},${y1} ${x2},${y2}`);
+    else {
+      const key = x1 === x2 ? `x=${x1}` : `y=${y1}`;
+      const spans = lines.get(key) ?? [];
+      spans.push(x1 === x2 ? [y1, y2] : [x1, x2]);
+      lines.set(key, spans);
+    }
+  }
+  for (const [key, spans] of lines) {
+    spans.sort((p, q) => p[0] - q[0] || p[1] - q[1]);
+    let [from, to] = spans[0]!;
+    for (const [start, end] of spans.slice(1)) {
+      if (start <= to) to = Math.max(to, end);
+      else {
+        out.push(`${key} ${from}..${to}`);
+        [from, to] = [start, end];
+      }
+    }
+    out.push(`${key} ${from}..${to}`);
+  }
+  return out;
+}
+
+/**
+ * What a drawing's SVG shows, in any order and however it is grouped: nothing
+ * invisible (the hit lines), ids and data attributes gone, straight strokes
+ * merged per stroke style, each text character by character.
+ */
+function drawnItems(svg: string): string[] {
+  const body = svg.replace(/<title[\s\S]*?<\/title>/u, "").replace(/<style[\s\S]*?<\/style>/u, "");
+  const items: string[] = [];
+  const strokes = new Map<string, string[]>();
+  for (const [raw] of body.matchAll(
+    /<(?:path|polyline|polygon|circle|ellipse|rect|line)\b[^>]*>|<text\b[\s\S]*?<\/text>/gu,
+  )) {
+    const item = raw
+      .replace(/\s(?:data-[\w-]+|id|aria-[\w-]+|class)="[^"]*"/gu, "")
+      .replace(/\s+/gu, " ");
+    if (/fill="none"/u.test(item) && /stroke="none"/u.test(item)) continue;
+    if (item.startsWith("<text")) {
+      items.push(`text ${drawnText(item)}`);
+      continue;
+    }
+    const data = /\sd="([^"]*)"/u.exec(item)?.[1];
+    const lines = data === undefined ? null : drawnStrokes(data);
+    if (lines) {
+      const style = item.replace(/\sd="[^"]*"/u, "");
+      strokes.set(style, [...(strokes.get(style) ?? []), ...lines]);
+    } else items.push(item.replace(/-?\d+\.\d+/gu, (number) => round(number, 2)));
+  }
+  for (const [style, lines] of strokes)
+    for (const line of lines) items.push(`stroke ${style} ${line}`);
+  return items.sort();
+}
+
+/**
+ * Where the two projects draw differently, as Analog Canvas renders them: the
+ * check behind "draws the same", which the fields compared above cannot see all
+ * of (a Cell's symbol, a wire's dash, a subscript's slant).
+ */
+function renderedDifferences(a: CircuitProject, b: CircuitProject): string[] {
+  const out: string[] = [];
+  const resolverA = createProjectSymbolResolver(a, builtInSymbols);
+  const resolverB = createProjectSymbolResolver(b, builtInSymbols);
+  const render = (
+    document: SchematicDocument,
+    resolver: ReturnType<typeof createProjectSymbolResolver>,
+  ) => drawnItems(renderDocumentSvg(document, resolver, { background: "transparent" }));
+  for (const { a: da, b: db } of documentPairs(a, b)) {
+    if (!db) continue;
+    let before: string[];
+    let after: string[];
+    try {
+      before = render(da, resolverA);
+      after = render(db, resolverB);
+    } catch (error) {
+      out.push(`rendered: ${da.name} cannot render: ${String(error).slice(0, 200)}`);
+      continue;
+    }
+    const lines = multisetDiff(before, after);
+    for (const item of lines.missing) out.push(`rendered: ${da.name} lost ${item.slice(0, 300)}`);
+    for (const item of lines.added) out.push(`rendered: ${da.name} added ${item.slice(0, 300)}`);
+  }
+  return out;
+}
+
+it("compares drawings as drawn", () => {
+  const same = (x: string, y: string) =>
+    multisetDiff(drawnItems(x), drawnItems(y)).missing.length === 0 &&
+    multisetDiff(drawnItems(x), drawnItems(y)).added.length === 0;
+  const path = (d: string, extra = "") => `<path d="${d}" stroke="#000"${extra}/>`;
+  const text = (inner: string, size = "15.116") =>
+    `<text x="1" y="2" font-size="${size}">${inner}</text>`;
+  const results: Record<string, boolean> = {
+    "strokes split otherwise": same(path("M 0 0 L 10 0"), path("M 5 0 L 10 0 M 0 0 L 5 0")),
+    "an id": same('<circle id="a" r="1"/>', '<circle id="b" r="1"/>'),
+    "a hit line": same("", '<polyline points="0,0 1,1" fill="none" stroke="none"/>'),
+    "a size rounded": same(text("<tspan>a</tspan>"), text("<tspan>a</tspan>", "15.12")),
+    "spans nested otherwise": same(
+      text('<tspan style="font-style:italic"><tspan style="font-weight:700">ab</tspan></tspan>'),
+      text('<tspan style="font-weight:700"><tspan style="font-style:italic">a</tspan><tspan style="font-style:italic">b</tspan></tspan>'),
+    ),
+    "a shift on the span around": same(
+      text('<tspan dy="5"><tspan style="font-weight:700">a</tspan></tspan>'),
+      text('<tspan dy="5" style="font-weight:700">a</tspan>'),
+    ),
+    "a moved stroke": !same(path("M 0 0 L 10 0"), path("M 0 1 L 10 1")),
+    "a dash": !same(path("M 0 0 L 10 0"), path("M 0 0 L 10 0", ' stroke-dasharray="3 3"')),
+    "a dot's size": !same('<circle r="4.72"/>', '<circle r="3.78"/>'),
+    "another shape": !same('<polygon points="0,0 1,0 0,1"/>', '<polygon points="0,0 1,0 1,1 0,1"/>'),
+    "a slant": !same(
+      text('<tspan style="font-style:normal">a</tspan>'),
+      text('<tspan style="font-style:italic">a</tspan>'),
+    ),
+    "a shift": !same(
+      text('<tspan dy="5">a</tspan>'),
+      text('<tspan dy="0">a</tspan>'),
+    ),
+    "a character": !same(text("<tspan>a</tspan>"), text("<tspan>b</tspan>")),
+  };
+  const wrong = Object.entries(results).filter(([, right]) => !right).map(([name]) => name);
+  if (wrong.length) throw new Error(`Drawn comparison wrong about: ${wrong.join(", ")}`);
+});
 
 it.each(IDS)(
   "RNL benchmark %s",
