@@ -189,8 +189,15 @@ function styledCharacters(value: unknown, styles: readonly string[] = []): strin
   const run = value as Record<string, unknown>;
   if (run.kind === "text" && typeof run.value === "string")
     return [...run.value].map((character) => `${character}|${[...new Set(styles)].sort().join(",")}`);
+  // A script is upright inside italic, as Analog Canvas draws it: only an
+  // italic span inside the script slants it.
   if (run.kind === "span")
-    return styledCharacters(run.children, [...styles, String(run.style)]);
+    return styledCharacters(run.children, [
+      ...(run.style === "subscript" || run.style === "superscript"
+        ? styles.filter((style) => style !== "italic")
+        : styles),
+      String(run.style),
+    ]);
   if (run.kind === "line-break") return ["<br>"];
   return Object.entries(run)
     .filter(([key]) => key !== "kind")

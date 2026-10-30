@@ -40,7 +40,7 @@ External definitions the original declared no formal parameters for, compared as
 | wires lost or added | #1784 | 3 | 0 | 3yb6zz6j2y, jkazvdj5zv, zj2kxb229f |
 | junctions moved/lost | #1784 | 5 | 1 | 3dryra4xaq, 3h96hmvpyv, 3yb6zz6j2y |
 | annotations changed | #1785 | 9 | 6 | 3yb6zz6j2y, 6arzwp68jh, 924v8n26es |
-| drafting objects changed | #1787 | 9 | 7 | 23v5t7erxh, 3dryra4xaq, 3yb6zz6j2y |
+| drafting objects changed | #1787 | 10 | 8 | 23v5t7erxh, 3dryra4xaq, 3yb6zz6j2y |
 | labels changed/shown/hidden | #1785 #1787 | 22 | 18 | 23v5t7erxh, 3dryra4xaq, 3h96hmvpyv |
 | drawn differently (rendered) |  | 35 | 31 | 23v5t7erxh, 3dryra4xaq, 3h96hmvpyv |
 | Cells lost or renamed |  | 1 | 4 | 924v8n26es |
@@ -75,7 +75,7 @@ External definitions the original declared no formal parameters for, compared as
 | `zkgtc257w2` Overall digitizer frontend with AC coupl | Magic Li | 18 | L1 | L1 | electrically different |
 | `3dryra4xaq` Cross-Coupled Interpolating Delay Cell | Zengchun Chen | 21 | L2 | L2 | extra or missing pins/glyphs, instance symbol/placement/parameters changed, junctions moved/lost, drafting objects changed, labels changed/shown/hidden, drawn differently (rendered) |
 | `435zm6qgpa` Two stage amplifier with an auxiliary of | Magic Li | 32 | L2 | L2 | drawn differently (rendered) |
-| `7q6a6v9ank` hysteresis comparator | sugar paradox | 23 | L2 | L2 | drawn differently (rendered) |
+| `7q6a6v9ank` hysteresis comparator | sugar paradox | 23 | L2 | L2 | drafting objects changed, drawn differently (rendered) |
 | `924v8n26es` LCVCO | Tzyer | 11 | L2 | L2 | extra or missing pins/glyphs, annotations changed, labels changed/shown/hidden, drawn differently (rendered), Cells lost or renamed |
 | `a3mjtfmdhx` pn latch lc vco | hopeful | 12 | L2 | L2 | labels changed/shown/hidden, drawn differently (rendered) |
 | `a5tz83j7hp` Transimpedance Amplifier with PD | 岩孙 | 3 | L2 | L2 | drawn differently (rendered) |
