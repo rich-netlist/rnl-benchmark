@@ -1,0 +1,268 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.3");
+//   @USE-PACKAGE(name="rnl-std", version="0.3");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.3")
+// }
+
+subckt bootstrap_track_hold_cell (vdd VSS clk_inverted vin gate_boost)
+CBOOTSTRAP (net2 net0) capacitor c=950f
+MBOOT_CAP_DISCHARGE (net0 clk_inverted VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=16 nf=8 m=1
+MBOOTSTRAP_CLAMP (vdd gate_boost net2 net2) sky130_fd_pr__pfet_01v8 l=0.15 w=32 nf=16 m=1
+MBOOTSTRAP_GATE_TRANSFER (gate_boost net1 net2 net2) sky130_fd_pr__pfet_01v8 l=0.15 w=32 nf=16 m=1
+MBOOTSTRAP_OFF_CLAMP (gate_boost vdd clk_internal VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=16 nf=8 m=1
+MBOOTSTRAP_PRECHARGE (vdd clk_internal gate_boost VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=16 nf=8 m=1
+MCLK_INV_N (clk_internal clk_inverted VSS VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=16 nf=8 m=1
+MCLK_INV_P (clk_internal clk_inverted vdd vdd) sky130_fd_pr__pfet_01v8 l=0.15 w=32 nf=16 m=1
+MGATE_CONTROL_PRECHARGE (net1 clk_internal vdd vdd) sky130_fd_pr__pfet_01v8 l=0.15 w=16 nf=8 m=1
+MGATE_CONTROL_TRACK (net1 clk_internal net0 VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=16 nf=8 m=1
+MINPUT_TRACK (net0 gate_boost vin VSS) sky130_fd_pr__nfet_01v8 l=0.15 w=32 nf=16 m=1
+// @RNL(author="analog-canvas") {
+//   %bootstrap_track_hold_cell_SYMBOL = @DEFINE-SYMBOL(box=[-13, -6, 13, 6]) {
+//     (-13, -1) @PIN(terminal="vin", label="\textbf{\textit{v}}_{\textbf{in}}", direction="left");
+//     (13, 0) @PIN(terminal="gate_boost", label="\textbf{\textit{gate}}_{\textbf{\textit{boost}}}", direction="right");
+//     (0, 6) @PIN(terminal="vdd", label="\textbf{\textit{v}}_{\textbf{dd}}", direction="up");
+//     (0, 0) @RECTANGLE(width=24, height=10);
+//     @LINE {(-13, 1) (-12, 1)};
+//     @LINE {(-13, -1) (-12, -1)};
+//     @LINE {(13, 0) (12, 0)};
+//     @LINE {(0, 6) (0, 5)}
+//   };
+//   # @SET-SYMBOL %bootstrap_track_hold_cell_SYMBOL;
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   #MCLK_INV_P @SET-SYMBOL $PMOS => @PLACE(8, 16) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MCLK_INV_P(part);
+//   #MCLK_INV_N @SET-SYMBOL $NMOS => @PLACE(8, 8) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MCLK_INV_N(part);
+//   #MGATE_CONTROL_PRECHARGE @SET-SYMBOL $PMOS => @PLACE(30, 16) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MGATE_CONTROL_PRECHARGE(part);
+//   #MGATE_CONTROL_TRACK @SET-SYMBOL $NMOS => @PLACE(30, 8) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MGATE_CONTROL_TRACK(part);
+//   #MBOOTSTRAP_GATE_TRANSFER @SET-SYMBOL $PMOS_4TERM => @PLACE(52, 11) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MBOOTSTRAP_GATE_TRANSFER(part);
+//   #MBOOTSTRAP_CLAMP @SET-SYMBOL $PMOS_4TERM => @PLACE(80, 16) => @ORIENT("R180");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MBOOTSTRAP_CLAMP(part);
+//   #CBOOTSTRAP @SET-SYMBOL $CAPACITOR => @PLACE(80, 10) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="950fF") #CBOOTSTRAP(part);
+//   #MBOOT_CAP_DISCHARGE @SET-SYMBOL $NMOS => @PLACE(80, 0) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MBOOT_CAP_DISCHARGE(part);
+//   #MINPUT_TRACK @SET-SYMBOL $NMOS => @PLACE(100, -6) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MINPUT_TRACK(part);
+//   #MBOOTSTRAP_PRECHARGE @SET-SYMBOL $NMOS => @PLACE(114, 16) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MBOOTSTRAP_PRECHARGE(part);
+//   #MBOOTSTRAP_OFF_CLAMP @SET-SYMBOL $NMOS => @PLACE(114, 8) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.15u") #MBOOTSTRAP_OFF_CLAMP(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(8, 6) => @ORIENT("R0") => %gnd1;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(80, -2) => @ORIENT("R0") => %gnd2;
+//   $IO_PORT @ATTACH &clk_inverted(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-2, 12) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &clk_inverted(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(74, 0) => @ORIENT("R0") => %port2;
+//   $IO_PORT @ATTACH &vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(96, -10) => @ORIENT("R0") => %port3;
+//   $IO_PORT @ATTACH &gate_boost(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(136, 12) => @ORIENT("MY") => %port4;
+//   $SUPPLY @ATTACH &vdd(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(109, 10) => @ORIENT("R0") => %vdd1;
+//   &vdd @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   %j1 = (3, 8);
+//   %j2 = (8, 12);
+//   $JUNCTION @ATTACH %j2;
+//   %j3 = (25, 8);
+//   %j4 = (30, 11);
+//   $JUNCTION @ATTACH %j4;
+//   %j5 = (80, 13);
+//   $JUNCTION @ATTACH %j5;
+//   %j6 = (53, 13);
+//   $JUNCTION @ATTACH %j6;
+//   %j7 = (80, 5);
+//   $JUNCTION @ATTACH %j7;
+//   %j8 = (114, 12);
+//   $JUNCTION @ATTACH %j8;
+//   %j9 = (87, 16);
+//   %j10 = (52, 6);
+//   %j11 = (108, -6);
+//   %j12 = (107, 16);
+//   %j13 = (114, 3);
+//   %j14 = (8, 20);
+//   $JUNCTION @ATTACH %j14;
+//   %j15 = (3, 12);
+//   $JUNCTION @ATTACH %j15;
+//   %j16 = (25, 12);
+//   $JUNCTION @ATTACH %j16;
+//   %j17 = (30, 20);
+//   $JUNCTION @ATTACH %j17;
+//   %j18 = (80, 20);
+//   $JUNCTION @ATTACH %j18;
+//   %j19 = (114, 20);
+//   $JUNCTION @ATTACH %j19;
+//   %j20 = (6, 20);
+//   %j21 = (116, 20);
+//   &net1 @WIRE(mode="straight") {#MGATE_CONTROL_PRECHARGE:1 %j4};
+//   &net1 @WIRE(mode="straight") {%j4 #MGATE_CONTROL_TRACK:1};
+//   &net1 @WIRE(mode="straight") {#MBOOTSTRAP_GATE_TRANSFER:2 %j4};
+//   &net2 @WIRE(mode="straight") {#MBOOTSTRAP_CLAMP:3 %j5};
+//   &net2 @WIRE(mode="straight") {%j5 #CBOOTSTRAP:1};
+//   &net2 @WIRE(mode="straight") {#MBOOTSTRAP_GATE_TRANSFER:3 %j6};
+//   &net2 @WIRE(mode="straight") {%j6 %j5};
+//   &net2 @WIRE(mode="straight", linestyle="dashed") {#MBOOTSTRAP_CLAMP:4 (79, 16) (79, 14) #MBOOTSTRAP_CLAMP:3};
+//   &net2 @WIRE(mode="straight", linestyle="dashed") {#MBOOTSTRAP_GATE_TRANSFER:4 (53, 11) %j6};
+//   &net0 @WIRE(mode="straight") {#CBOOTSTRAP:2 %j7};
+//   &net0 @WIRE(mode="straight") {%j7 #MBOOT_CAP_DISCHARGE:1};
+//   &net0 @WIRE(mode="straight") {#MGATE_CONTROL_TRACK:3 (30, 5) %j7};
+//   &clk_inverted @WIRE(mode="straight") {%port2:p #MBOOT_CAP_DISCHARGE:2};
+//   &net0 @WIRE(mode="straight") {#MINPUT_TRACK:1 (100, 5) %j7};
+//   &vin @WIRE(mode="straight") {%port3:p (100, -10) #MINPUT_TRACK:3};
+//   &gate_boost @WIRE(mode="straight") {#MBOOTSTRAP_PRECHARGE:3 %j8};
+//   &gate_boost @WIRE(mode="straight") {%j8 #MBOOTSTRAP_OFF_CLAMP:1};
+//   &gate_boost @WIRE(mode="straight") {%port4:p %j8};
+//   &vdd @WIRE(mode="straight") {#MBOOTSTRAP_OFF_CLAMP:2 (109, 8) %vdd1:p};
+//   &gate_boost @WIRE(mode="straight") {#MBOOTSTRAP_CLAMP:2 %j9};
+//   &gate_boost @WIRE(mode="straight") {#MBOOTSTRAP_GATE_TRANSFER:1 %j10};
+//   &gate_boost @WIRE(mode="straight") {#MINPUT_TRACK:2 %j11};
+//   &clk_internal @WIRE(mode="straight") {#MBOOTSTRAP_PRECHARGE:2 %j12};
+//   &clk_internal @WIRE(mode="straight") {#MBOOTSTRAP_OFF_CLAMP:3 %j13};
+//   &vdd @WIRE(mode="straight") {#MCLK_INV_P:3 %j14};
+//   &clk_inverted @WIRE(mode="straight") {%port1:p %j15};
+//   &clk_inverted @WIRE(mode="straight") {%j15 %j1};
+//   &clk_inverted @WIRE(mode="straight") {%j15 (3, 16) #MCLK_INV_P:2};
+//   &clk_inverted @WIRE(mode="straight") {%j1 #MCLK_INV_N:2};
+//   &clk_internal @WIRE(mode="straight") {%j16 %j3};
+//   &clk_internal @WIRE(mode="straight") {%j16 (25, 16) #MGATE_CONTROL_PRECHARGE:2};
+//   &clk_internal @WIRE(mode="straight") {%j16 %j2};
+//   &clk_internal @WIRE(mode="straight") {%j3 #MGATE_CONTROL_TRACK:2};
+//   &clk_internal @WIRE(mode="straight") {#MCLK_INV_N:1 %j2};
+//   &clk_internal @WIRE(mode="straight") {%j2 #MCLK_INV_P:1};
+//   &vdd @WIRE(mode="straight") {#MGATE_CONTROL_PRECHARGE:3 %j17};
+//   &vdd @WIRE(mode="straight") {#MBOOTSTRAP_CLAMP:1 %j18};
+//   &vdd @WIRE(mode="straight") {#MBOOTSTRAP_PRECHARGE:1 %j19};
+//   &vdd @WIRE(mode="straight", linestyle="bold") {%j20 %j14};
+//   &vdd @WIRE(mode="straight", linestyle="bold") {%j14 %j17};
+//   &vdd @WIRE(mode="straight", linestyle="bold") {%j17 %j18};
+//   &vdd @WIRE(mode="straight", linestyle="bold") {%j18 %j19};
+//   &vdd @WIRE(mode="straight", linestyle="bold") {%j19 %j21};
+//   &VSS @WIRE(mode="straight") {%gnd2:p #MBOOT_CAP_DISCHARGE:3};
+//   &VSS @WIRE(mode="straight") {%gnd1:p #MCLK_INV_N:3};
+//   $JUNCTION @ATTACH (80, 14)(p) => %dot1;
+//   #MCLK_INV_P
+//       @TEXT("\textbf{\textit{MCLK}}_{\textbf{INV\_P}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MCLK_INV_P::name(label);
+//   #MCLK_INV_N
+//       @TEXT("\textbf{\textit{MCLK}}_{\textbf{INV\_N}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MCLK_INV_N::name(label);
+//   #MGATE_CONTROL_PRECHARGE
+//       @TEXT("\textbf{\textit{MGATE}}_{\textbf{CONTROL\_PRECHARGE}}", key="name", dx=0.4, dy=-0.5, halign="start",
+//       valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MGATE_CONTROL_PRECHARGE::name(label);
+//   #MGATE_CONTROL_TRACK
+//       @TEXT("\textbf{\textit{MGATE}}_{\textbf{CONTROL\_TRACK}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MGATE_CONTROL_TRACK::name(label);
+//   #MBOOTSTRAP_GATE_TRANSFER
+//       @TEXT("\textbf{\textit{MBOOTSTRAP}}_{\textbf{GATE\_TRANSFER}}", key="name", dx=2.5, dy=-1, halign="start",
+//       valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MBOOTSTRAP_GATE_TRANSFER::name(label);
+//   #MBOOTSTRAP_CLAMP
+//       @TEXT("\textbf{\textit{MBOOTSTRAP}}_{\textbf{CLAMP}}", key="name", dx=-2.2, dy=-0.5, halign="end", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MBOOTSTRAP_CLAMP::name(label);
+//   #CBOOTSTRAP
+//       @TEXT("\textbf{\textit{C}}_{\textbf{BOOTSTRAP}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CBOOTSTRAP::name(label);
+//   #CBOOTSTRAP @TEXT("\textbf{950fF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="value") #CBOOTSTRAP::value(label);
+//   #MBOOT_CAP_DISCHARGE
+//       @TEXT("\textbf{\textit{MBOOT}}_{\textbf{CAP\_DISCHARGE}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MBOOT_CAP_DISCHARGE::name(label);
+//   #MINPUT_TRACK
+//       @TEXT("\textbf{\textit{MINPUT}}_{\textbf{TRACK}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MINPUT_TRACK::name(label);
+//   #MBOOTSTRAP_PRECHARGE
+//       @TEXT("\textbf{\textit{MBOOTSTRAP}}_{\textbf{PRECHARGE}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MBOOTSTRAP_PRECHARGE::name(label);
+//   #MBOOTSTRAP_OFF_CLAMP
+//       @TEXT("\textbf{\textit{MBOOTSTRAP}}_{\textbf{OFF\_CLAMP}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MBOOTSTRAP_OFF_CLAMP::name(label);
+//   %port1
+//       @TEXT("\textbf{\textit{clk}}_{\textbf{inverted}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+//   %port2
+//       @TEXT("\textbf{\textit{clk}}_{\textbf{inverted}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
+//   %port3 @TEXT("\textbf{\textit{v}}_{\textbf{in}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::name(label);
+//   %port4
+//       @TEXT("\textbf{\textit{gate}}_{\textbf{boost}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline",
+//       size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port4::name(label);
+//   &vdd @TEXT("\textbf{\textit{v}}_{\textbf{dd}}", halign="middle", size=1.5116) => @PLACE(109, 12.8) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   &vdd @TEXT("\textbf{\textit{v}}_{\textbf{dd}}", size=1.5116) => @PLACE(117, 19) => %power2;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power2(label);
+//   &clk_internal @TEXT("\textbf{\textit{clk}}_{\textbf{internal}}", halign="middle", size=1.5116) => @PLACE(15, 13) => %label1;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+//   &clk_internal @TEXT("\textbf{\textit{clk}}_{\textbf{internal}}", halign="middle", size=1.5116) => @PLACE(107, 17) => %label2;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label2(label);
+//   &clk_internal @TEXT("\textbf{\textit{clk}}_{\textbf{internal}}", size=1.5116) => @PLACE(114.8, 3.8) => %label3;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label3(label);
+//   &gate_boost @TEXT("\textbf{\textit{gate}}_{\textbf{boost}}", size=1.5116) => @PLACE(87, 17) => %label4;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label4(label);
+//   &gate_boost @TEXT("\textbf{\textit{gate}}_{\textbf{boost}}", size=1.5116) => @PLACE(52.8, 6.6) => %label5;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label5(label);
+//   &gate_boost @TEXT("\textbf{\textit{gate}}_{\textbf{boost}}", size=1.5116) => @PLACE(108, -5) => %label6;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label6(label)
+// }
+ends bootstrap_track_hold_cell
+
+subckt bootstrap_gate_driver (vdd VSS clk vinp vinn gatep gaten)
+XBOOTSTRAP_N (vdd VSS clk vinn gaten) bootstrap_track_hold_cell
+XBOOTSTRAP_P (vdd VSS clk vinp gatep) bootstrap_track_hold_cell
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   $IO_PORT @ATTACH &clk(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(2, 1) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &vinp(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(2, -1) => @ORIENT("R0") => %port2;
+//   $IO_PORT @ATTACH &clk(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(2, -19) => @ORIENT("R0") => %port3;
+//   $IO_PORT @ATTACH &vinn(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(2, -21) => @ORIENT("R0") => %port4;
+//   $IO_PORT @ATTACH &gatep(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(38, 0) => @ORIENT("MY") => %port5;
+//   $IO_PORT @ATTACH &gaten(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(38, -20) => @ORIENT("MY") => %port6;
+//   $SUPPLY @ATTACH &vdd(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(20, 8) => @ORIENT("R0") => %vdd1;
+//   $SUPPLY @ATTACH &vdd(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(20, -12) => @ORIENT("R0") => %vdd2;
+//   #XBOOTSTRAP_P @PLACE(20, 0) => @ORIENT("R0");
+//   #XBOOTSTRAP_N @PLACE(20, -20) => @ORIENT("R0");
+//   &vdd @REMOVE-FROM $PORT_FILL_SET;
+//   &VSS @REMOVE-FROM $PORT_FILL_SET;
+//   &vinp @WIRE(mode="straight") {%port2:p #XBOOTSTRAP_P:4};
+//   &vinn @WIRE(mode="straight") {%port4:p #XBOOTSTRAP_N:4};
+//   &gatep @WIRE(mode="straight") {%port5:p #XBOOTSTRAP_P:5};
+//   &gaten @WIRE(mode="straight") {%port6:p #XBOOTSTRAP_N:5};
+//   &vdd @WIRE(mode="straight") {%vdd1:p #XBOOTSTRAP_P:1};
+//   &vdd @WIRE(mode="straight") {%vdd2:p #XBOOTSTRAP_N:1};
+//   %port1 @TEXT("\textbf{\textit{clk}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+//   %port2 @TEXT("\textbf{\textit{v}}_{\textbf{inp}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
+//   %port3 @TEXT("\textbf{\textit{clk}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::name(label);
+//   %port4 @TEXT("\textbf{\textit{v}}_{\textbf{inn}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port4::name(label);
+//   %port5 @TEXT("\textbf{\textit{gatep}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port5::name(label);
+//   %port6 @TEXT("\textbf{\textit{gaten}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port6::name(label);
+//   &vdd @TEXT("\textbf{\textit{v}}_{\textbf{dd}}", size=1.5116) => @PLACE(22, 9) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   &vdd @TEXT("\textbf{\textit{v}}_{\textbf{dd}}", size=1.5116) => @PLACE(22, -11) => %power2;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power2(label);
+//   #XBOOTSTRAP_P
+//       @TEXT("\textbf{bootstrap\_track\_hold\_cell}", key="value", dx=0, dy=-6.5, halign="middle", valign="baseline",
+//       size=1.5116);
+//   #XBOOTSTRAP_N
+//       @TEXT("\textbf{bootstrap\_track\_hold\_cell}", key="value", dx=0, dy=-6.5, halign="middle", valign="baseline", size=1.5116)
+// }
+ends bootstrap_gate_driver
