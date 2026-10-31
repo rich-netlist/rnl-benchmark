@@ -162,7 +162,9 @@ function multisetDiff(a: readonly string[], b: readonly string[]) {
  *   is drawn only where wires meet);
  * - default-ac-phase: a source's AC phase of 0, the default, the same as one
  *   left unset, as Analog Canvas compares circuits (comparedParameters); the
- *   netlist prints 0 either way.
+ *   netlist prints 0 either way;
+ * - empty-note: a drawing text with no characters and no polarity mark, which
+ *   draws nothing.
  */
 const EQUIVALENCES = [
   "hidden-absent",
@@ -173,6 +175,7 @@ const EQUIVALENCES = [
   "unused-anchor",
   "orphan-junction",
   "default-ac-phase",
+  "empty-note",
 ] as const;
 type Equivalence = (typeof EQUIVALENCES)[number];
 const STRICT = (process.env.RNL_BENCH_STRICT ?? "").split(",").filter(Boolean);
@@ -355,7 +358,10 @@ function drawingDifferences(
       };
     };
     const drawn = (document: SchematicDocument) =>
-      (document.drafting?.objects ?? []).map(anchoredTo(document)).map((item) =>
+      (document.drafting?.objects ?? [])
+        .filter((item) => !(equivalences.has("empty-note") && isEmptyNote(item)))
+        .map(anchoredTo(document))
+        .map((item) =>
         JSON.stringify(withoutIds(comparable(item as Record<string, unknown>, equivalences))),
       );
     const drafting = multisetDiff(drawn(da), drawn(db));
@@ -656,6 +662,20 @@ function drawnStrokes(data: string): string[] | null {
   return out;
 }
 
+/** A drawing text with no characters and no polarity mark: it draws nothing. */
+function isEmptyNote(item: unknown): boolean {
+  const object = item as {
+    kind?: string;
+    polarity?: string;
+    content?: { runs?: { kind?: string }[] };
+  };
+  return (
+    object.kind === "text" &&
+    !object.polarity &&
+    (object.content?.runs ?? []).every((run) => run.kind === "line-break")
+  );
+}
+
 /**
  * What a drawing's SVG shows, in any order and however it is grouped: nothing
  * invisible (the hit lines), ids and data attributes gone, straight strokes
@@ -673,6 +693,8 @@ function drawnItems(svg: string): string[] {
       .replace(/\s+/gu, " ");
     if (/fill="none"/u.test(item) && /stroke="none"/u.test(item)) continue;
     if (item.startsWith("<text")) {
+      // A text with no characters shows nothing.
+      if (!item.replace(/<[^>]*>/gu, "").trim()) continue;
       items.push(`text ${drawnText(item)}`);
       continue;
     }
@@ -718,6 +740,20 @@ function renderedDifferences(a: CircuitProject, b: CircuitProject): string[] {
   }
   return out;
 }
+
+it("counts an empty note as nothing drawn", () => {
+  const note = (runs: unknown[], extra = {}) => ({ kind: "text", content: { runs }, ...extra });
+  const empty = note([{ kind: "line-break" }]);
+  if (!isEmptyNote(empty)) throw new Error("a note of a line break is empty");
+  if (isEmptyNote(note([{ kind: "text", value: "A" }])))
+    throw new Error("a note with words is not empty");
+  if (isEmptyNote(note([{ kind: "line-break" }], { polarity: "positive" })))
+    throw new Error("a polarity mark draws its mark");
+  if (drawnItems('<text x="1" y="2"></text>').length)
+    throw new Error("a text with no characters draws nothing");
+  if (!drawnItems('<text x="1" y="2">A</text>').length)
+    throw new Error("a text with a character draws");
+});
 
 it("compares drawings as drawn", () => {
   const same = (x: string, y: string) =>

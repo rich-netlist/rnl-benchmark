@@ -1,4 +1,4 @@
-# Results: n2-rend-main
+# Results: 2026-10-31-rendered
 
 100 circuits, each round-tripped as SPICE+RNL and Spectre+RNL.
 
@@ -15,8 +15,8 @@ Differences the harness's equivalences count as none (hidden-absent, hidden-extr
 
 | Format | Circuits | Differences |
 |---|---|---|
-| spice | 63 | 325 |
-| spectre | 59 | 207 |
+| spice | 63 | 326 |
+| spectre | 59 | 208 |
 
 ## Normalized before comparing
 
@@ -40,7 +40,7 @@ External definitions the original declared no formal parameters for, compared as
 | wires lost or added | #1784 | 3 | 0 | 3yb6zz6j2y, jkazvdj5zv, zj2kxb229f |
 | junctions moved/lost | #1784 | 5 | 1 | 3dryra4xaq, 3h96hmvpyv, 3yb6zz6j2y |
 | annotations changed | #1785 | 9 | 6 | 3yb6zz6j2y, 6arzwp68jh, 924v8n26es |
-| drafting objects changed | #1787 | 10 | 8 | 23v5t7erxh, 3dryra4xaq, 3yb6zz6j2y |
+| drafting objects changed | #1787 | 9 | 7 | 23v5t7erxh, 3dryra4xaq, 3yb6zz6j2y |
 | labels changed/shown/hidden | #1785 #1787 | 22 | 18 | 23v5t7erxh, 3dryra4xaq, 3h96hmvpyv |
 | drawn differently (rendered) |  | 35 | 31 | 23v5t7erxh, 3dryra4xaq, 3h96hmvpyv |
 | Cells lost or renamed |  | 1 | 4 | 924v8n26es |
@@ -91,7 +91,7 @@ External definitions the original declared no formal parameters for, compared as
 | `hxakhrwq8b` Rectifier_CCP | dkhoatrang | 16 | L2 | L2 | drawn differently (rendered) |
 | `nkj35a4ndr` Rail-to-rail folded-cascode op amp with  | Zhishuai Zhang | 59 | L2 | L2 | drawn differently (rendered) |
 | `nxt979sfnb` RC network | Purusa | 11 | L2 | L2 | drawn differently (rendered) |
-| `ptf9v5dbak` low-voltage, low-noise operational ampli | Magic Li | 55 | L2 | L2 | drafting objects changed, labels changed/shown/hidden, drawn differently (rendered) |
+| `ptf9v5dbak` low-voltage, low-noise operational ampli | Magic Li | 55 | L2 | L2 | labels changed/shown/hidden, drawn differently (rendered) |
 | `q53pvffgpx` Operational amplifier with class AB outp | g1286012685 | 29 | L2 | L2 | drawn differently (rendered) |
 | `v4dfj332kp` Three-stage switched-capacitor ring ampl | Kezhuo Liu | 43 | L2 | L2 | labels changed/shown/hidden |
 | `zbq2cgqygw` D-latch | 陈宗良 | 5 | L2 | L2 | drawn differently (rendered) |
