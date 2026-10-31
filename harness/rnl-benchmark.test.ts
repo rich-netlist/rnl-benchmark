@@ -396,10 +396,22 @@ function drawingDifferences(
     cell: renamed.get(label.cell) ?? label.cell,
   }));
   const after = labelCensus(b);
-  const labelled = new Set(after.map((label) => `${label.cell} ${label.kind} ${label.owner}`));
+  const owner = (label: { cell: string; kind: string; owner: string }) =>
+    `${label.cell} ${label.kind} ${label.owner}`;
+  const back = new Set(after.map((label) => `${owner(label)} ${label.parameter}`));
   for (const line of labelDifferences(before, after)) {
     const hidden = /^(.*): hidden before, shown$/u.exec(line);
-    if (equivalences.has("hidden-absent") && hidden && !labelled.has(hidden[1]!)) continue;
+    if (
+      equivalences.has("hidden-absent") &&
+      hidden &&
+      !before.some(
+        (label) =>
+          label.hidden &&
+          owner(label) === hidden[1] &&
+          back.has(`${owner(label)} ${label.parameter}`),
+      )
+    )
+      continue;
     out.push(`label: ${line}`);
   }
   return out;
