@@ -1,6 +1,6 @@
 # RNL benchmark
 
-100 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen, and a harness that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
+100 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen, and a harness (in analog-canvas) that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
 
 It answers one question per change to RNL or to Canvas's RNL adapter: do more circuits survive the round trip than before, and did any get worse?
 
@@ -10,7 +10,6 @@ It answers one question per change to RNL or to Canvas's RNL adapter: do more ci
 |---|---|
 | `circuits/<id>.icproj.json` | The 100 Analog Canvas project files, byte for byte as stored. Never edited. |
 | `manifest.json` | Per circuit: name, author, part count, source snapshot, Gallery URL, SHA-256 of the file, feature tags. |
-| `harness/rnl-benchmark.test.ts` | The round-trip harness (runs inside an analog-canvas checkout). |
 | `summarize.py` | Turns a run's reports into `summary.json` and `SUMMARY.md`. |
 | `results/<date>-<label>/` | One run: `reports/<id>.json`, `summary.json`, `SUMMARY.md`, and `rnl/<id>.{spice,spectre}.rnl`, the files Canvas wrote. |
 
@@ -60,13 +59,12 @@ Gaps: no circuit uses native buses (shipped after the snapshot), and few use no-
 From an [analog-canvas](https://github.com/cascode-ai/analog-canvas) checkout with dependencies installed:
 
 ```bash
-cp <this repo>/harness/rnl-benchmark.test.ts apps/editor/src/features/netlist-export/
 RNL_BENCH_CORPUS=<this repo>/circuits RNL_BENCH_OUT=<out dir> \
   npx vitest run apps/editor/src/features/netlist-export/rnl-benchmark.test.ts
 python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <out dir> "<label>"
 ```
 
-`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_STRICT=all` turns off the equivalences above, and `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` the normalization. All 100 take about 20 seconds. Remove the copied test file afterwards; it is not part of analog-canvas.
+`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_STRICT=all` turns off the equivalences above, and `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` the normalization. All 100 take about two minutes. The harness lives in analog-canvas (`apps/editor/src/features/netlist-export/rnl-benchmark.test.ts`, since cascode-ai/analog-canvas#2258), next to the importer it grades, and is skipped there unless `RNL_BENCH_CORPUS` is set.
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 
@@ -79,6 +77,7 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 | `results/2026-10-26-reviewed-formals/` | `acd08e069` | `0.5.1` | 73 / 38 / 6 | 72 / 3 / 0 |
 | `results/2026-10-26-equivalences/` | `a7eb32743` | `0.5.2` | 92 / 68 / 21 | 91 / 64 / 21 |
 | `results/2026-10-31-rendered/` | `1abf83781` | `0.5.2` | 99 / 83 / 60 | 95 / 83 / 60 |
+| `results/2026-11-11-runtime-0.5.5/` | `57a1cd5af` | `0.5.5` | 100 / 97 / 83 | 100 / 92 / 83 |
 
 Each count is the circuits at that level or above. `2026-10-26-reviewed-formals` is the same commit and runtime as `2026-10-26-after-review`, graded with the external-definition normalization (above): its `.rnl` files are that run's, byte for byte, so it keeps only its reports and summary. Without the normalization it grades as `2026-10-26-after-review`. `2026-10-26-equivalences` is graded with the equivalences above, without the normalization; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 
