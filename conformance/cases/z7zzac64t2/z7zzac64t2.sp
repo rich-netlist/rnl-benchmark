@@ -1,0 +1,80 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.6")
+* }
+.subckt Main VDD VSS Vin Vout
+I1 VDD net0 DC 100u
+XM1 Vin net0 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 Vout net0 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 net0 Vin 1k
+R2 Vout net0 1k
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH #(level);
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(26, -34) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M1") #XM1(part);
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(46, -34) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M2") #XM2(part);
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(31, -29) => @ORIENT("R270");
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(41, -29) => @ORIENT("R270");
+*   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(36, -27) => @ORIENT("R0");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(26, -36) => @ORIENT("R0") => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(46, -36) => @ORIENT("R0") => %gnd2;
+*   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(26, -27) => @ORIENT("R270") => %port1;
+*   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(46, -27) => @ORIENT("R270") => %port2;
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(36, -25) => @ORIENT("R0") => %vdd1;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (46, -29);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (46, -27);
+*   %j3 = (26, -29);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (26, -27);
+*   %j5 = (36, -34);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (37, -34);
+*   $JUNCTION @ATTACH %j6;
+*   %j7 = (35, -34);
+*   $JUNCTION @ATTACH %j7;
+*   %j8 = (36, -26);
+*   &net0 @WIRE(mode="straight") {#XM1:2 %j7};
+*   &net0 @WIRE(mode="straight") {%j7 %j5};
+*   &net0 @WIRE(mode="straight") {%j5 %j6};
+*   &net0 @WIRE(mode="straight") {%j6 #XM2:2};
+*   &Vout @WIRE(mode="straight") {#R2:1 %j1};
+*   &Vout @WIRE(mode="straight") {%j1 #XM2:1};
+*   &Vout @WIRE(mode="straight") {%j1 %j2};
+*   &Vin @WIRE(mode="straight") {#XM1:1 %j3};
+*   &Vin @WIRE(mode="straight") {%j3 #R1:2};
+*   &Vin @WIRE(mode="straight") {%j3 %j4};
+*   &net0 @WIRE(mode="straight") {#I1:2 %j5};
+*   &net0 @WIRE(mode="straight") {#R2:2 (37, -29) %j6};
+*   &net0 @WIRE(mode="straight") {#R1:1 (35, -29) %j7};
+*   &VDD @WIRE(mode="straight") {#I1:1 %j8};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #XM1:3};
+*   &VSS @WIRE(mode="straight") {%gnd2:p #XM2:3};
+*   &VDD @WIRE(mode="straight") {#I1:1 %vdd1:p};
+*   &Vout @WIRE(mode="straight") {%j2 %port2:p};
+*   &Vin @WIRE(mode="straight") {%j4 %port1:p};
+*   #XM1 @TEXT("\textbf{\textit{M}}_{\textbf{11}}", key="name", dx=3, dy=2, halign="end", valign="baseline", size=1.5116);
+*   #XM2
+*       @TEXT("\textbf{\textit{M}}_{\textbf{1}}_{\textbf{2}}", key="name", dx=-3.5, dy=2, halign="start", valign="baseline",
+*       size=1.5116);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=-0.5, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
+*   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
+*   #I1 @TEXT("\textbf{\textit{I}}_{\textbf{B}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-0.5, dy=2, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=-2, dy=2, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
+*   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116) => %power1;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+*   (36, -36.2) @TEXT("\textbf{\textit{G}}", halign="middle", size=1.5116, bold=true) => %text1;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text)
+* }
+.ends Main

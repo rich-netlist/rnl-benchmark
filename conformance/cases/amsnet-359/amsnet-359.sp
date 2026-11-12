@@ -1,0 +1,105 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.6");
+*   @USE-PACKAGE(name="rnl-std-functional", version="0.3")
+* }
+.subckt opamp VIP VIN VDD VSS VOUT params: gain=1e6 vhigh=5 vlow=-5
+Blin nlin 0 V={gain*(V(VIP)-V(VIN))}
+Bcore VOUT 0 V={0.5*(vhigh+(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12)))-sqrt((vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))*(vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))}
+.ends opamp
+
+.subckt dut VSS X Vout
+C1 X VSS 1p
+C2 Vout VSS 1p
+C3 Vout net0 1p
+R1 X net1 1k
+R2 Vout net2 1k
+R3 net0 X 1k
+Vin net1 VSS DC 1
+X1 X NC0001 0 VSS net2 opamp gain=1e6
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #Vin @SET-SYMBOL $VOLTAGE_SOURCE => @PLACE(10, -28) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #Vin(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #Vin(part);
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(15, -24) => @ORIENT("R270");
+*   #X1 @SET-SYMBOL $OPAMP_5TERM => @PLACE(27, -23) => @ORIENT("MX");
+*   $CANVAS_PARAMETER @ATTACH(name="vhigh", text="VDD") #X1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="vlow", text="VSS") #X1(part);
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(33, -23) => @ORIENT("R270");
+*   #R3 @SET-SYMBOL $RESISTOR => @PLACE(27, -18) => @ORIENT("R270");
+*   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(33, -18) => @ORIENT("R270");
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(19, -29) => @ORIENT("R0");
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(37, -28) => @ORIENT("R0");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(10, -30) => @ORIENT("R0") => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(19, -31) => @ORIENT("R0") => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(37, -30) => @ORIENT("R0") => %gnd3;
+*   $IO_PORT @ATTACH &X(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(18, -21) => @ORIENT("R0") => %port1;
+*   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(42, -23) => @ORIENT("R180") => %port2;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   $NO_CONNECT @ATTACH #X1:2(t);
+*   %j1 = (19, -24);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (21, -24);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (21, -18);
+*   %j4 = (37, -23);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (39, -23);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (21, -21);
+*   $JUNCTION @ATTACH %j6;
+*   &net1 @WIRE(mode="straight") {#Vin:1 (10, -24) #R1:2};
+*   &net0 @WIRE(mode="straight") {#R3:1 #C3:2};
+*   &net2 @WIRE(mode="straight") {#X1:5 #R2:2};
+*   &Vout @WIRE(mode="straight") {#R2:1 %j4};
+*   &Vout @WIRE(mode="straight") {%j4 %j5};
+*   &Vout @WIRE(mode="straight") {%j5 %port2:p};
+*   &Vout @WIRE(mode="straight") {#C2:1 %j4};
+*   &Vout @WIRE(mode="straight") {#C3:1 (39, -18) %j5};
+*   &X @WIRE(mode="straight") {#R1:1 %j1};
+*   &X @WIRE(mode="straight") {%port1:p %j6};
+*   &X @WIRE(mode="straight") {%j1 #C1:1};
+*   &X @WIRE(mode="straight") {%j1 %j2};
+*   &X @WIRE(mode="straight") {%j3 %j6};
+*   &X @WIRE(mode="straight") {%j3 #R3:2};
+*   &X @WIRE(mode="straight") {%j6 %j2};
+*   &X @WIRE(mode="straight") {%j2 #X1:1};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #Vin:2};
+*   &VSS @WIRE(mode="straight") {#C1:2 %gnd2:p};
+*   &VSS @WIRE(mode="straight") {#C2:2 %gnd3:p};
+*   #Vin @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #Vin::name(label);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0, dy=-2, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
+*   #X1 @TEXT("\textbf{\textit{A}}_{\textbf{1}}", key="name", dx=-0.5, dy=-4.5, halign="middle", valign="baseline", size=1.5116);
+*   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0, dy=-2, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
+*   #R3 @TEXT("\textbf{\textit{R}}_{\textbf{3}}", key="name", dx=0, dy=1.4, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R3::name(label);
+*   #C3 @TEXT("\textbf{\textit{C}}_{\textbf{3}}", key="name", dx=0, dy=-2.3, halign="middle", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #C3::name(label);
+*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
+*   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #C2::name(label);
+*   %port1 @TEXT("\textbf{\textit{X}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
+*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label)
+* }
+.ends dut
