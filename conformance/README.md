@@ -6,7 +6,7 @@ A tool supports RNL when what it reads, it can write again. The suite gives RNL 
 |---|---|
 | **R1** reads | The written file reads with no error. |
 | **R2** same circuit | Every level has the same parts, values and connections. Names of parts and of unnamed nets may change; named ports and globals may not. |
-| **R3** same drawing | R2, and every part and glyph is drawn with the same symbol at the same place and orientation, and every wire runs through the same points. An object with no symbol (a semantic usage) draws nothing and is not compared. |
+| **R3** same drawing | R2, and every part and glyph draws the same line art at the same place (its outlines as rendered, rounded to 0.01 units; texts, styles and the symbol's name aside), and every wire runs through the same points. |
 
 ## Cases
 
