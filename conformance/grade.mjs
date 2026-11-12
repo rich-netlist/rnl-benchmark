@@ -7,9 +7,9 @@
 //   R2 same circuit   every level has the same parts, values and connections
 //                     (names of parts and of unnamed nets may differ)
 //   R3 same drawing   and every part, glyph and wire is drawn as before:
-//                     the same symbol at the same place and orientation
-//                     (an object with no symbol, such as a semantic usage,
-//                     draws nothing and is not compared)
+//                     each part and glyph the same line art at the same
+//                     place (its texts, styles and symbol's name aside),
+//                     each wire through the same points
 //
 //   node conformance/grade.mjs <cases dir> <written dir> <out dir> [label]
 //
@@ -80,7 +80,9 @@ async function snapshot(entry, files) {
     entry,
     files: all,
     package_dirs: [...dirs, ...roots],
-    parts: { host: true, model: true },
+    svg: false,
+    primitives: true,
+    parts: { host: true, model: true, drawing: true },
   });
 }
 
@@ -121,16 +123,58 @@ function circuitOf(level) {
     .sort();
 }
 
-/** What a level draws: parts and glyphs by symbol, place and turn; wires by their points (R3). */
-function drawingOf(level) {
+/**
+ * The line art of one drawn object, as a picture: each straight piece of its
+ * outlines as an undirected segment, each curve, circle and ellipse by its
+ * geometry, and whether it is filled, rounded to 0.01 units. Its texts and
+ * its styles are not compared, nor how the file names its symbol.
+ */
+function lineArt(primitives) {
+  const r = (v) => Math.round(v * 100) / 100;
+  const pt = ([x, y]) => `${r(x)},${r(y)}`;
+  const parts = new Set();
+  const segment = (a, b) => {
+    const [p, q] = [pt(a), pt(b)].sort();
+    if (p !== q) parts.add(`L ${p} ${q}`);
+  };
+  for (const prim of primitives) {
+    const fill = prim.fill ? " filled" : "";
+    if (prim.kind === "rect") {
+      const [x0, y0] = prim.min, [x1, y1] = prim.max;
+      const c = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+      c.forEach((a, i) => segment(a, c[(i + 1) % 4]));
+      if (fill) parts.add(`F ${pt(prim.min)} ${pt(prim.max)}`);
+    } else if (prim.kind === "circle") parts.add(`C ${pt(prim.center)} ${r(prim.r)}${fill}`);
+    else if (prim.kind === "ellipse") parts.add(`E ${pt(prim.center)} ${r(prim.rx)} ${r(prim.ry)}${fill}`);
+    else if (prim.kind === "path") {
+      let start, at;
+      for (const seg of prim.segments) {
+        if (seg.kind === "move") start = at = seg.to;
+        else if (seg.kind === "line") (segment(at, seg.to), (at = seg.to));
+        else if (seg.kind === "close") (start && at && segment(at, start), (at = start));
+        else if (seg.kind === "arc") {
+          const [p, q] = [pt(at), pt(seg.to)].sort();
+          parts.add(`A ${p} ${q} ${r(seg.r)} ${seg.large} ${seg.ccw}`), (at = seg.to);
+        } else if (seg.kind === "cubic") parts.add(`B ${pt(at)} ${pt(seg.c1)} ${pt(seg.c2)} ${pt(seg.to)}`), (at = seg.to);
+      }
+      if (fill) parts.add(`F path ${prim.segments.length}`);
+    }
+  }
+  return [...parts].sort().join(";");
+}
+
+/** What a level draws: each part and glyph as its line art; wires by their points (R3). */
+function drawingOf(level, drawn) {
   const model = level.model;
   if (!model) return { items: [], wires: [] };
-  const symbolName = (o) => o.symbol?.value ?? "";
-  // A usage with no symbol, such as a semantic one, draws nothing.
-  const items = model.objects
-    .filter((o) => o.at?.value && symbolName(o))
-    .map((o) => `${o.kind}:${symbolName(o)}@${o.at.value.map(round).join(",")}/${o.orient?.value ?? "R0"}`)
-    .sort();
+  // Each object's drawing, its pin names included, is its item (`Primitive.owner`).
+  const byItem = new Map();
+  for (const prim of drawn?.primitives ?? []) {
+    if (!/^item-/u.test(prim.owner) || prim.kind === "text" || prim.kind === "flyline") continue;
+    if (!byItem.has(prim.owner)) byItem.set(prim.owner, []);
+    byItem.get(prim.owner).push(prim);
+  }
+  const items = [...byItem.values()].map(lineArt).filter(Boolean).sort();
   const wires = model.wires
     .map((w) => {
       const pts = w.points.map((p) => p.map(round).join(","));
@@ -181,6 +225,9 @@ for (const name of readdirSync(CASES).filter((n) => statSync(join(CASES, n)).isD
       continue;
     }
     report.level = 1;
+    // The Document lists the drawing levels as the snapshot does.
+    const drawnOf = (snap) => new Map(snap.levels.map((l, i) => [l, snap.drawing?.levels?.[i]]));
+    const drawnBefore = drawnOf(before), drawnAfter = drawnOf(after);
     const levelsBefore = new Map(before.levels.map((l) => [levelKey(l), l]));
     const levelsAfter = new Map(after.levels.map((l) => [levelKey(l), l]));
     const circuit = [], drawing = [];
@@ -193,7 +240,7 @@ for (const name of readdirSync(CASES).filter((n) => statSync(join(CASES, n)).isD
       }
       const c = diff(circuitOf(l), circuitOf(m));
       if (c.missing.length || c.added.length) circuit.push(`${key}: -${c.missing.length} +${c.added.length} ${c.missing.slice(0, 2).join(" ")} → ${c.added.slice(0, 2).join(" ")}`);
-      const da = drawingOf(l), db = drawingOf(m);
+      const da = drawingOf(l, drawnBefore.get(l)), db = drawingOf(m, drawnAfter.get(m));
       const di = diff(da.items, db.items), dw = diff(da.wires, db.wires);
       if (di.missing.length || di.added.length) drawing.push(`${key} items: -${di.missing.length} +${di.added.length} ${di.missing.slice(0, 2).join(" ")} → ${di.added.slice(0, 2).join(" ")}`);
       if (dw.missing.length || dw.added.length) drawing.push(`${key} wires: -${dw.missing.length} +${dw.added.length}`);
