@@ -8,6 +8,8 @@
 //                     (names of parts and of unnamed nets may differ)
 //   R3 same drawing   and every part, glyph and wire is drawn as before:
 //                     the same symbol at the same place and orientation
+//                     (an object with no symbol, such as a semantic usage,
+//                     draws nothing and is not compared)
 //
 //   node conformance/grade.mjs <cases dir> <written dir> <out dir> [label]
 //
@@ -124,8 +126,9 @@ function drawingOf(level) {
   const model = level.model;
   if (!model) return { items: [], wires: [] };
   const symbolName = (o) => o.symbol?.value ?? "";
+  // A usage with no symbol, such as a semantic one, draws nothing.
   const items = model.objects
-    .filter((o) => o.at?.value)
+    .filter((o) => o.at?.value && symbolName(o))
     .map((o) => `${o.kind}:${symbolName(o)}@${o.at.value.map(round).join(",")}/${o.orient?.value ?? "R0"}`)
     .sort();
   const wires = model.wires
