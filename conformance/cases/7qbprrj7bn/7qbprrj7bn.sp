@@ -1,0 +1,87 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.3");
+*   @USE-PACKAGE(name="rnl-std", version="0.3");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.6")
+* }
+.subckt Main VDD VSS
+XM1 net4 net4 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 net3 net4 net0 VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM3 net3 net3 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM4 net4 net3 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 net0 VSS 1k
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH #(level);
+*   #XM1 @SET-SYMBOL $NMOS => @PLACE(29, -31) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M1") #XM1(part);
+*   #XM2 @SET-SYMBOL $NMOS => @PLACE(41, -31) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M2") #XM2(part);
+*   #XM3 @SET-SYMBOL $PMOS => @PLACE(41, -21) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M3") #XM3(part);
+*   #XM4 @SET-SYMBOL $PMOS => @PLACE(29, -21) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M4") #XM4(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(29, -33) => @ORIENT("R0") => %gnd1;
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(41, -35) => @ORIENT("MY");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(41, -37) => @ORIENT("R0") => %gnd2;
+*   &VDD @REMOVE-FROM $PORT_FILL_SET;
+*   &VSS @REMOVE-FROM $PORT_FILL_SET;
+*   %j1 = (29, -28);
+*   $JUNCTION @ATTACH %j1;
+*   %j2 = (37, -21);
+*   $JUNCTION @ATTACH %j2;
+*   %j3 = (41, -24);
+*   $JUNCTION @ATTACH %j3;
+*   %j4 = (29, -17);
+*   $JUNCTION @ATTACH %j4;
+*   %j5 = (41, -17);
+*   $JUNCTION @ATTACH %j5;
+*   %j6 = (48, -28);
+*   %j7 = (45, -18);
+*   %j8 = (28, -17);
+*   %j9 = (42, -17);
+*   &net4 @WIRE(mode="straight") {#XM1:2 #XM2:2};
+*   &net4 @WIRE(mode="straight") {#XM1:1 %j1};
+*   &net4 @WIRE(mode="straight") {%j1 #XM4:1};
+*   &net4 @WIRE(mode="straight") {%j1 (32, -28) #XM1:2};
+*   &net3 @WIRE(mode="straight") {#XM4:2 %j2};
+*   &net3 @WIRE(mode="straight") {%j2 #XM3:2};
+*   &net3 @WIRE(mode="straight") {%j2 (37, -24) %j3};
+*   &net3 @WIRE(mode="straight") {#XM3:1 %j3};
+*   &net3 @WIRE(mode="straight") {%j3 #XM2:1};
+*   &VDD @WIRE(mode="straight") {#XM4:3 %j4};
+*   &VDD @WIRE(mode="straight") {#XM3:3 %j5};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j8 %j4};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j4 %j5};
+*   &VDD @WIRE(mode="straight", linestyle="bold") {%j5 %j9};
+*   &VSS @WIRE(mode="straight") {%gnd1:p #XM1:3};
+*   &net0 @WIRE(mode="straight") {#XM2:3 #R1:1};
+*   &VSS @WIRE(mode="straight") {%gnd2:p #R1:2};
+*   $JUNCTION @ATTACH (32, -31)(p) => %dot1;
+*   #XM1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=3.5, dy=-2.5, halign="end", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM1::name(label);
+*   #XM2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=-4.5, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM2::name(label);
+*   #XM3 @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=-4.5, dy=1.5, halign="start", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM3::name(label);
+*   #XM4 @TEXT("\textbf{\textit{M}}_{\textbf{4}}", key="name", dx=3.5, dy=1.5, halign="end", valign="baseline", size=1.5116);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM4::name(label);
+*   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{S}}", key="name", dx=3, dy=-0.5, halign="end", valign="baseline", size=1.5116);
+*   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116) => @PLACE(42.5, -17.5) => %power1;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+*   @LINE(arrow="end", arrowsize=1.656977) {(29, -25.5) (29, -27.5)} => @LAYER("top") => %arrow1;
+*   @LINE(arrow="end", arrowsize=1.656977) {(41, -26.5) (41, -28.5)} => @LAYER("top") => %arrow2;
+*   (44.5, -26) @TEXT("\textbf{\textit{I}}_{\textbf{out}}", halign="middle", size=1.5116, bold=true) => %text1;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+*   (27, -26.5) @TEXT("\textbf{\textit{I}}_{\textbf{REF}}", halign="middle", size=1.5116, bold=true) => %text2;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+*   (43.5, -21.5) @TEXT("\textbf{(}\frac{\textbf{W}}{\textbf{L}}\textbf{)P}", halign="middle", size=1.5116) => %text3;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text3(text);
+*   (44, -31.5) @TEXT("\textbf{K(}\frac{\textbf{W}}{\textbf{L}}\textbf{)N}", halign="middle", size=1.5116) => %text4;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text4(text);
+*   (26.5, -31.5) @TEXT("\textbf{(}\frac{\textbf{W}}{\textbf{L}}\textbf{)N}", halign="middle", size=1.5116) => %text5;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text5(text);
+*   (27, -21.5) @TEXT("\textbf{(}\frac{\textbf{W}}{\textbf{L}}\textbf{)P}", halign="middle", size=1.5116) => %text6;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text6(text)
+* }
+.ends Main
