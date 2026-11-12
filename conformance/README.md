@@ -6,7 +6,7 @@ A tool supports RNL when what it reads, it can write again. The suite gives RNL 
 |---|---|
 | **R1** reads | The written file reads with no error. |
 | **R2** same circuit | Every level has the same parts, values and connections. Names of parts and of unnamed nets may change; named ports and globals may not. |
-| **R3** same drawing | R2, and every part and glyph is drawn with the same symbol at the same place and orientation, and every wire runs through the same points. |
+| **R3** same drawing | R2, and every part and glyph is drawn with the same symbol at the same place and orientation, and every wire runs through the same points. An object with no symbol (a semantic usage) draws nothing and is not compared. |
 
 ## Cases
 
@@ -32,5 +32,6 @@ Analog Canvas runs it with its driver `apps/editor/src/features/netlist-export/r
 | Run | Tool | runtime | R1 / R2 / R3 (of 101 entries) |
 |---|---|---|---|
 | [`results/2026-11-12-analog-canvas`](results/2026-11-12-analog-canvas/SUMMARY.md) | Analog Canvas `6bcce5731` | 0.5.5 | 99 / 99 / 91 |
+| [`results/2026-11-12-analog-canvas-357eb4815`](results/2026-11-12-analog-canvas-357eb4815/SUMMARY.md) | Analog Canvas `357eb4815` | 0.5.5 | 101 / 101 / 99 |
 
 Each `SUMMARY.md` lists the entries below R3 and their first difference.
