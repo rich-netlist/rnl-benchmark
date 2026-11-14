@@ -1,10 +1,10 @@
 # RNL conformance: self-check
 
-101 entries in 52 cases.
+99 entries in 50 cases.
 
 | R1 reads | R2 same circuit | R3 same drawing |
 |---|---|---|
-| 101 | 101 | 101 |
+| 99 | 99 | 99 |
 
 | Case | Entry | Level | First difference |
 |---|---|---|---|
