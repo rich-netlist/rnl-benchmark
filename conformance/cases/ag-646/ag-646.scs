@@ -1,9 +1,11 @@
 simulator lang=spectre
 // @RNL(type="header") {
-//   @VERSION("0.3");
-//   @USE-PACKAGE(name="rnl-std", version="0.3");
-//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
-//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.6")
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
 // }
 
 // Crystal: Butterworth-Van Dyke model, fs = 1/(2*pi*sqrt(lm*cm))
@@ -31,13 +33,13 @@ X1 (net2 net1) crystal c0=5p cm=20f lm=12.7m rm=25
 //   };
 //   # @SET-SYMBOL %dut_SYMBOL;
 //   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
-//   #M1 @SET-SYMBOL $PMOS => @PLACE(9, 0) => @ORIENT("R0");
-//   #M2 @SET-SYMBOL $NMOS => @PLACE(9, -7) => @ORIENT("R0");
+//   #M1 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(9, 0) => @ORIENT("R0");
+//   #M2 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(9, -7) => @ORIENT("R0");
 //   #R2 @SET-SYMBOL $RESISTOR => @PLACE(14, -8) => @ORIENT("R0");
 //   $CANVAS_PARAMETER_TEXT @ATTACH(name="r", text="10kΩ") #R2(part);
 //   #R1 @SET-SYMBOL $RESISTOR => @PLACE(7, -13) => @ORIENT("R90");
 //   $CANVAS_PARAMETER_TEXT @ATTACH(name="r", text="1Meg") #R1(part);
-//   #X1 @SET-SYMBOL $CANVAS_CRYSTAL => @PLACE(7, -18) => @ORIENT("R90");
+//   #X1 @SET-SYMBOL(terminals=[[1, "n1"], [2, "n2"]]) $CRYSTAL => @PLACE(7, -18) => @ORIENT("R90");
 //   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(0, -22) => @ORIENT("R0");
 //   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="10pF") #C1(part);
 //   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(14, -22) => @ORIENT("R0");
@@ -46,20 +48,12 @@ X1 (net2 net1) crystal c0=5p cm=20f lm=12.7m rm=25
 //   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(9, -9) => @ORIENT("R0") => %gnd1;
 //   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(0, -24) => @ORIENT("R0") => %gnd2;
 //   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(14, -24) => @ORIENT("R0") => %gnd3;
-//   &"+3.3V" @REMOVE-FROM $PORT_FILL_SET;
-//   &VSS @REMOVE-FROM $PORT_FILL_SET;
 //   %j1 = (4, -3);
-//   $JUNCTION @ATTACH %j1;
 //   %j2 = (9, -3);
-//   $JUNCTION @ATTACH %j2;
 //   %j3 = (0, -18);
-//   $JUNCTION @ATTACH %j3;
 //   %j4 = (14, -18);
-//   $JUNCTION @ATTACH %j4;
 //   %j5 = (14, -13);
-//   $JUNCTION @ATTACH %j5;
 //   %j6 = (0, -13);
-//   $JUNCTION @ATTACH %j6;
 //   &net0 @WIRE(mode="straight") {#M1:1 %j2};
 //   &net0 @WIRE(mode="straight") {%j2 #M2:1};
 //   &net0 @WIRE(mode="straight") {%j2 (14, -3) #R2:1};
@@ -75,32 +69,61 @@ X1 (net2 net1) crystal c0=5p cm=20f lm=12.7m rm=25
 //   &net2 @WIRE(mode="straight") {%j3 #X1:1};
 //   &net2 @WIRE(mode="straight") {%j1 (4, 0) #M1:2};
 //   &net2 @WIRE(mode="straight") {%j1 (4, -7) #M2:2};
-//   &"+3.3V" @WIRE(mode="straight") {#M1:3 %vdd1:p};
-//   &VSS @WIRE(mode="straight") {%gnd1:p #M2:3};
-//   &VSS @WIRE(mode="straight") {%gnd2:p #C1:2};
-//   &VSS @WIRE(mode="straight") {%gnd3:p #C2:2};
-//   #M1 @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   &"+3.3V" @WIRE(mode="straight") {#M1:3 %vdd1::pin};
+//   &VSS @WIRE(mode="straight") {%gnd1::pin #M2:3};
+//   &VSS @WIRE(mode="straight") {%gnd2::pin #C1:2};
+//   &VSS @WIRE(mode="straight") {%gnd3::pin #C2:2};
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(9, -3) => %dot1;
+//   $JUNCTION @ATTACH %j5(p) => @PLACE(14, -13) => %dot2;
+//   $JUNCTION @ATTACH %j4(p) => @PLACE(14, -18) => %dot3;
+//   $JUNCTION @ATTACH %j6(p) => @PLACE(0, -13) => %dot4;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(0, -18) => %dot5;
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(4, -3) => %dot6;
+//   #M1
+//       @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #M1::name(label);
-//   #M2 @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #M2
+//       @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #M2::name(label);
-//   #R2 @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #R2
+//       @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
-//   #R2 @TEXT("\textbf{10kΩ}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #R2
+//       @TEXT("\textbf{10kΩ}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="value") #R2::value(label);
-//   #R1 @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=-1, dy=-2.6, halign="end", valign="baseline", size=1.5116);
+//   #R1
+//       @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=-1, dy=-2.6, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
-//   #R1 @TEXT("\textbf{1Meg}", key="value", dx=-0.4, dy=-2.6, halign="start", valign="baseline", size=1.5116);
+//   #R1
+//       @TEXT("\textbf{1Meg}", key="value", dx=-0.4, dy=-2.6, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="value") #R1::value(label);
-//   #X1 @TEXT("\textbf{\textit{Crystal}}", key="name", dx=0, dy=-2.4, halign="middle", valign="baseline", size=1.5116);
-//   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #X1
+//       @TEXT("\textbf{\textit{Crystal}}", key="name", dx=0, dy=-2.4, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   #C1
+//       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
-//   #C1 @TEXT("\textbf{10pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #C1
+//       @TEXT("\textbf{10pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="value") #C1::value(label);
-//   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+//   #C2
+//       @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="name") #C2::name(label);
-//   #C2 @TEXT("\textbf{10pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116);
+//   #C2
+//       @TEXT("\textbf{10pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
 //   $CANVAS_LABEL @ATTACH(bind="value") #C2::value(label);
-//   %vdd1 @TEXT("\textbf{\textit{+3.3V}}", dx=2, dy=1, size=1.5116) => %power1;
-//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label)
+//   %vdd1 @TEXT("\textbf{\textit{+3.3V}}", dx=2, dy=1, size=1.5116, bold=false) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   %vdd1 @TEXT("${p}", key="netname", textvisible=false)
 // }
 ends dut

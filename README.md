@@ -80,6 +80,7 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 | `results/2026-10-26-equivalences/` | `a7eb32743` | `0.5.2` | 92 / 68 / 21 | 91 / 64 / 21 |
 | `results/2026-10-31-rendered/` | `1abf83781` | `0.5.2` | 99 / 83 / 60 | 95 / 83 / 60 |
 | `results/2026-11-11-runtime-0.5.5/` | `57a1cd5af` | `0.5.5` | 100 / 97 / 83 | 100 / 92 / 83 |
+| `results/2026-11-15-rnl-0.4/` | `9cef3e7b1` (merged as `f966cdf94`) | `0.6.0-dev.6bdd5ce6`, RNL 0.4 | 100 / 100 / 86 | 100 / 100 / 86 |
 
 Each count is the circuits at that level or above. `2026-10-26-reviewed-formals` is the same commit and runtime as `2026-10-26-after-review`, graded with the external-definition normalization (above): its `.rnl` files are that run's, byte for byte, so it keeps only its reports and summary. Without the normalization it grades as `2026-10-26-after-review`. `2026-10-26-equivalences` is graded with the equivalences above, without the normalization; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 

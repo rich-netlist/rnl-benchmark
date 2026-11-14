@@ -1,10 +1,12 @@
 
 * @RNL(type="header") {
-*   @VERSION("0.3");
-*   @USE-PACKAGE(name="rnl-std", version="0.3");
-*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.3");
-*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.6");
-*   @USE-PACKAGE(name="rnl-std-functional", version="0.3")
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @USE-PACKAGE(name="rnl-std-functional", version="0.4")
 * }
 .subckt opamp VIP VIN VDD VSS VOUT params: gain=1e6 vhigh=5 vlow=-5
 Blin nlin 0 V={gain*(V(VIP)-V(VIN))}
@@ -21,7 +23,7 @@ X1 VSS net0 0 VSS Vout opamp
 *   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
 *   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(13, -20) => @ORIENT("R0") => %port1;
 *   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(15, -20) => @ORIENT("R270");
-*   #X1 @SET-SYMBOL $OPAMP_5TERM => @PLACE(29, -21) => @ORIENT("MX");
+*   #X1 @SET-SYMBOL(terminals=[[1, "inp"], [2, "inn"], [5, "out"]]) $OPAMP => @PLACE(29, -21) => @ORIENT("MX");
 *   #Cin @SET-SYMBOL $CAPACITOR => @PLACE(19, -23) => @ORIENT("R0");
 *   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(19, -25) => @ORIENT("R0") => %gnd1;
 *   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(24, -23) => @ORIENT("R0") => %gnd2;
@@ -29,35 +31,48 @@ X1 VSS net0 0 VSS Vout opamp
 *   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(26, -15) => @ORIENT("R270");
 *   #CL @SET-SYMBOL $CAPACITOR => @PLACE(33, -24) => @ORIENT("R0");
 *   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(33, -26) => @ORIENT("R0") => %gnd3;
-*   &VSS @REMOVE-FROM $PORT_FILL_SET;
 *   %j1 = (19, -20);
-*   $JUNCTION @ATTACH %j1;
 *   %j2 = (33, -21);
-*   $JUNCTION @ATTACH %j2;
-*   &VSS @WIRE(mode="straight") {#X1:1 (24, -22) %gnd2:p};
+*   &VSS @WIRE(mode="straight") {#X1:1 (24, -22) %gnd2::pin};
 *   &net0 @WIRE(mode="straight") {#C1:1 %j1};
 *   &net0 @WIRE(mode="straight") {%j1 #Cin:1};
 *   &net0 @WIRE(mode="straight") {%j1 (19, -15) #C2:2};
 *   &net0 @WIRE(mode="straight") {%j1 #X1:2};
 *   &Vout @WIRE(mode="straight") {#C2:1 (33, -15) %j2};
 *   &Vout @WIRE(mode="straight") {#X1:5 %j2};
-*   &Vout @WIRE(mode="straight") {%j2 %port2:p};
+*   &Vout @WIRE(mode="straight") {%j2 %port2::pin};
 *   &Vout @WIRE(mode="straight") {%j2 #CL:1};
-*   &Vin @WIRE(mode="straight") {#C1:2 %port1:p};
-*   &VSS @WIRE(mode="straight") {#Cin:2 %gnd1:p};
-*   &VSS @WIRE(mode="straight") {#CL:2 %gnd3:p};
-*   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="name", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116);
-*   $CANVAS_LABEL @ATTACH(bind="port") %port1::name(label);
-*   #C1 @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116);
+*   &Vin @WIRE(mode="straight") {#C1:2 %port1::pin};
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(33, -21) => %dot1;
+*   &VSS @WIRE(mode="straight") {#Cin:2 %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#CL:2 %gnd3::pin};
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(19, -20) => %dot2;
+*   %port1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   #C1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
 *   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
-*   #X1 @TEXT("\textbf{\textit{G}}_{\textbf{m}}", key="name", dx=-1, dy=-4, halign="middle", valign="baseline", size=1.5116);
-*   #Cin @TEXT("\textbf{\textit{C}}_{\textbf{in}}", key="name", dx=-4, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #X1
+*       @TEXT("\textbf{\textit{G}}_{\textbf{m}}", key="name", dx=-1, dy=-4, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #Cin
+*       @TEXT("\textbf{\textit{C}}_{\textbf{in}}", key="name", dx=-4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
 *   $CANVAS_LABEL @ATTACH(bind="name") #Cin::name(label);
-*   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="name", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
-*   $CANVAS_LABEL @ATTACH(bind="port") %port2::name(label);
-*   #C2 @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=0.5, dy=2, halign="middle", valign="baseline", size=1.5116);
+*   %port2
+*       @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+*   #C2
+*       @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=0.5, dy=2, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
 *   $CANVAS_LABEL @ATTACH(bind="name") #C2::name(label);
-*   #CL @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116);
+*   #CL
+*       @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
 *   $CANVAS_LABEL @ATTACH(bind="name") #CL::name(label)
 * }
 .ends dut
