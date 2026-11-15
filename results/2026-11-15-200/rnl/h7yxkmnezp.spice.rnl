@@ -1,0 +1,108 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+* }
+.subckt Main VSS vg
+C1 net0 vg 1p
+C2 net0 VSS 1p
+I1 VSS net0 DC 100u
+R1 vg net1 1k
+R2 net0 VSS 1k
+V1 net1 VSS DC 1.8
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH #(level);
+*   #V1 @SET-SYMBOL $VOLTAGE_SOURCE => @PLACE(10, -32) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #V1(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(10, -34) => @ORIENT("R0") => %gnd1;
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(14, -28) => @ORIENT("R270");
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(39, -32) => @ORIENT("R0");
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(20, -28) => @ORIENT("R270");
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(34, -32) => @ORIENT("R0");
+*   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(24, -31) => @ORIENT("R180");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1m") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1m") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #I1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #I1(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(24, -34) => @ORIENT("R0") => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(34, -34) => @ORIENT("R0") => %gnd3;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(39, -34) => @ORIENT("R0") => %gnd4;
+*   $IO_PORT @ATTACH &vg(p) => @SET-SYMBOL $CANVAS_PORT_FILLED => @PLACE(18, -28) => @ORIENT("R0") => %port1;
+*   %j1 = (34, -28);
+*   %j2 = (39, -28);
+*   %j3 = (41, -28);
+*   %j4 = (22, -28);
+*   %j5 = (24, -28);
+*   &net1 @WIRE(mode="straight") {#V1:1 (10, -28) #R1:2};
+*   &vg @WIRE(mode="straight") {#R1:1 #C1:2};
+*   &VSS @WIRE(mode="straight") {%gnd2::pin #I1:1};
+*   &net0 @WIRE(mode="straight") {%j4 %j5};
+*   &net0 @WIRE(mode="straight") {%j5 #I1:2};
+*   &net0 @WIRE(mode="straight") {%j5 %j1};
+*   &net0 @WIRE(mode="straight") {%j1 #C2:1};
+*   &net0 @WIRE(mode="straight") {%j1 %j2};
+*   &net0 @WIRE(mode="straight") {%j2 #R2:1};
+*   &net0 @WIRE(mode="straight") {%j2 %j3};
+*   &VSS @WIRE(mode="straight") {%gnd1::pin #V1:2};
+*   &VSS @WIRE(mode="straight") {#C2:2 %gnd3::pin};
+*   &VSS @WIRE(mode="straight") {%gnd4::pin #R2:2};
+*   &net0 @WIRE(mode="straight") {%j4 #C1:1};
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(24, -28) => %dot1;
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(34, -28) => %dot2;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(39, -28) => %dot3;
+*   &vg @WIRE(mode="straight") {#C1:2 %port1::pin};
+*   #V1
+*       @TEXT("\textbf{\textit{v}}_{\textbf{in}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #R1
+*       @TEXT("\textbf{\textit{R}}_{\textbf{S}}", key="name", dx=0, dy=-2, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #R2
+*       @TEXT("\textbf{\textit{R}}_{\textbf{L}}", key="name", dx=1, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #C1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{gs}}", key="name", dx=-1, dy=-2, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #C2
+*       @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #I1
+*       @TEXT("\textbf{\textit{g}}_{\textbf{m}}\textbf{\textit{(v}}_{\textbf{g}}\textbf{\textit{-v}}_{\textbf{o}}\textbf{\textit{)}}",
+*       key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false, textvisible=true);
+*   %port1
+*       @TEXT("\textbf{\textit{v}}_{\textbf{g}}", key="netname", dx=0, dy=1, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   (41, -27.1) @TEXT("\textbf{\textit{v}}_{\textbf{o}}", halign="middle", size=1.5116, bold=false) => %text1;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+*   (33.5, -39.5)
+*       @TEXT("\textbf{\textit{r}}_{\textbf{o}}\textbf{\textit{→∞; g}}_{\textbf{mb}}\textbf{\textit{=0; v}}_{\textbf{gs}}\textbf{\textit{=v}}_{\textbf{g}}\textbf{\textit{-v}}_{\textbf{o}}", halign="end", size=1.5116, bold=false)
+*       => %text2;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text)
+* }
+.ends Main

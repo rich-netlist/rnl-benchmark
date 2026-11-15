@@ -1,0 +1,95 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+// }
+
+subckt dut
+C (net3 net2) capacitor c=1p
+C1 (net1 net0) capacitor c=1p
+L (net0 net2) inductor l=1n
+L2 (net3 net1) inductor l=1n
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false, subscript_after_first=true) #(level);
+//   #L @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(25, -29) => @ORIENT("R0");
+//   #L2 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(40, -29) => @ORIENT("R180");
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(33, -22) => @ORIENT("R270");
+//   #C @SET-SYMBOL $CAPACITOR => @PLACE(33, -37) => @ORIENT("R270");
+//   %j1 = (25, -22);
+//   %j2 = (25, -37);
+//   %j3 = (40, -22);
+//   %j4 = (7, -22);
+//   %j5 = (7, -37);
+//   %j6 = (63, -22);
+//   %j7 = (64, -37);
+//   %j8 = (40, -37);
+//   &net0 @WIRE(mode="straight") {%j1 #L:1};
+//   &net0 @WIRE(mode="straight") {%j1 #C1:2};
+//   &net0 @WIRE(mode="straight") {%j1 %j4};
+//   &net2 @WIRE(mode="straight") {#L:2 %j2};
+//   &net2 @WIRE(mode="straight") {%j2 #C:2};
+//   &net2 @WIRE(mode="straight") {%j2 %j5};
+//   &net1 @WIRE(mode="straight") {#C1:1 %j3};
+//   &net1 @WIRE(mode="straight") {%j3 #L2:2};
+//   &net1 @WIRE(mode="straight") {%j3 %j6};
+//   &net3 @WIRE(mode="straight") {#C:1 %j8};
+//   &net3 @WIRE(mode="straight") {#L2:1 %j8};
+//   &net3 @WIRE(mode="straight") {%j8 %j7};
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(25, -22) => %dot1;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(40, -22) => %dot2;
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(25, -37) => %dot3;
+//   $JUNCTION @ATTACH %j8(p) => @PLACE(40, -37) => %dot4;
+//   #L
+//       @TEXT("\textbf{\textit{L}}", key="name", dx=1.6, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L::name(label);
+//   #L2
+//       @TEXT("\textbf{\textit{L}}", key="name", dx=-1.6, dy=-0.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   #C1
+//       @TEXT("\textbf{\textit{C}}", key="name", dx=0, dy=-2.4, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   #C
+//       @TEXT("\textbf{\textit{C}}", key="name", dx=0, dy=-2.4, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C::name(label);
+//   (15.5, -19.5) @TEXT("\textbf{V}_{\textbf{1}}", halign="middle", size=1.5116, bold=false) => %text1;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+//   (16.5, -38.5) @TEXT("\textbf{V}_{\textbf{2}}", halign="middle", size=1.5116, bold=false) => %text2;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+//   (45, -20) @TEXT("\textbf{V}_{\textbf{4}}\textbf{=-V}_{\textbf{2}}", halign="middle", size=1.5116, bold=false) => %text3;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text3(text);
+//   (44.5, -39.5) @TEXT("\textbf{V}_{\textbf{3}}\textbf{=-V}_{\textbf{1}}", halign="middle", size=1.5116, bold=false) => %text4;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text4(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(22.5, -24) (22.5, -35.5)} => @LAYER("top") => %arrow1;
+//   (19, -28) @TEXT("\textbf{I}_{\textbf{L}}", halign="middle", size=1.5116, bold=false) => %text5;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text5(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(25, -18.5) (40, -18.5)} => @LAYER("top") => %arrow2;
+//   (32, -16.5) @TEXT("\textbf{I}_{\textbf{C}}", halign="middle", size=1.5116, bold=false) => %text6;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text6(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(7.5, -23.5) (19, -23.5) (19.5, -23.5)} => @LAYER("top") => %arrow3;
+//   (13, -25) @TEXT("\textbf{I}_{\textbf{1}}", halign="middle", size=1.5116, bold=false) => %text7;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text7(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(7.5, -36) (20, -36)} => @LAYER("top") => %arrow4;
+//   (13, -34.5) @TEXT("\textbf{I}_{\textbf{2}}", halign="middle", size=1.5116, bold=false) => %text8;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text8(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(64, -35.5) (44.5, -35.5)} => @LAYER("top") => %arrow5;
+//   @LINE(arrow="end", arrowsize=1.656977) {(64.5, -24) (44, -24)} => @LAYER("top") => %arrow6;
+//   (54, -34) @TEXT("\textbf{I}_{\textbf{3}}", halign="middle", size=1.5116, bold=false) => %text9;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text9(text);
+//   (52.5, -25.5) @TEXT("\textbf{I}_{\textbf{4}}", halign="middle", size=1.5116, bold=false) => %text10;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text10(text);
+//   (3, -19.5) @TEXT("\textbf{Port1}", halign="middle", size=1.5116, bold=false) => %text11;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text11(text);
+//   (3, -36) @TEXT("\textbf{Port2}", halign="middle", size=1.5116, bold=false) => %text12;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text12(text);
+//   (68, -36) @TEXT("\textbf{Port3}", halign="middle", size=1.5116, bold=false) => %text13;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text13(text);
+//   (68, -19) @TEXT("\textbf{Port4}", halign="middle", size=1.5116, bold=false) => %text14;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text14(text)
+// }
+ends dut

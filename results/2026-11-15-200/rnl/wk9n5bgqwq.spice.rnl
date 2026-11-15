@@ -1,0 +1,178 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @USE-PACKAGE(name="rnl-std-logic", version="0.4")
+* }
+* Ideal and-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt and_gate A B Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+BhB hB 0 V={0.5*(1+tanh((V(B,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(V(hA)*V(hB))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends and_gate
+
+* Ideal d-flip-flop-q: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt d_flip_flop_q D CK Q VDD VSS params: vt=10m td=10p
+BhD hD 0 V={0.5*(1+tanh((V(D,VSS)-0.5*V(VDD,VSS))/vt))}
+BhCK hCK 0 V={0.5*(1+tanh((V(CK,VSS)-0.5*V(VDD,VSS))/vt))}
+Bm 0 nm I={10m*((V(hD)-V(nm))*(1-V(hCK)))}
+Cm nm 0 1p
+Rm nm 0 1T
+Bs 0 ns I={10m*((V(nm)-V(ns))*V(hCK))}
+Cs ns 0 1p
+Rs ns 0 1T
+Bf nfn VSS V={V(VDD,VSS)*(0.5*(1+tanh((V(ns)-0.5)/10m)))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BQ Q VSS V={V(ndl,VSS)}
+.ends d_flip_flop_q
+
+* Ideal inverter: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt inverter A Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(1-V(hA))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends inverter
+
+* Ideal or-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt or_gate A B Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+BhB hB 0 V={0.5*(1+tanh((V(B,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(1-(1-V(hA))*(1-V(hB)))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends or_gate
+
+.subckt Main VDD VSS CLK
+X1 net2 CLK net3 VDD VSS d_flip_flop_q
+X2 net7 CLK net0 VDD VSS d_flip_flop_q
+X3 MC net2 net4 VDD VSS d_flip_flop_q
+X4 net5 net2 net1 VDD VSS d_flip_flop_q
+X5 net2 net6 net7 VDD VSS and_gate
+X6 MC net4 net5 VDD VSS and_gate
+X7 net3 MC net6 VDD VSS or_gate
+X8 net0 net2 VDD VSS inverter
+X9 net1 MC VDD VSS inverter
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH #(level);
+*   #X5 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $AND_2INPUT => @PLACE(34, -23) => @ORIENT("R0");
+*   $CANVAS_UNNAMED @ATTACH #X5(part);
+*   #X7 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $OR_2INPUT => @PLACE(27, -24) => @ORIENT("R0");
+*   $CANVAS_UNNAMED @ATTACH #X7(part);
+*   $IO_PORT @ATTACH &CLK(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(12, -31) => @ORIENT("R0") => %port1;
+*   #X6 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $AND_2INPUT => @PLACE(70, -22) => @ORIENT("R0");
+*   $CANVAS_UNNAMED @ATTACH #X6(part);
+*   #X8 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(48, -24) => @ORIENT("R0");
+*   $CANVAS_UNNAMED @ATTACH #X8(part);
+*   #X9 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(85, -23) => @ORIENT("R0");
+*   $CANVAS_UNNAMED @ATTACH #X9(part);
+*   #X1 @SET-SYMBOL(terminals=[[1, "d"], [2, "ck"], [3, "q"]]) $D_FLIP_FLOP_Q_ONLY => @PLACE(19, -23) => @ORIENT("R0");
+*   #X2 @SET-SYMBOL(terminals=[[1, "d"], [2, "ck"], [3, "q"]]) $D_FLIP_FLOP_Q_ONLY => @PLACE(41, -24) => @ORIENT("R0");
+*   #X3 @SET-SYMBOL(terminals=[[1, "d"], [2, "ck"], [3, "q"]]) $D_FLIP_FLOP_Q_ONLY => @PLACE(61, -23) => @ORIENT("R0");
+*   #X4 @SET-SYMBOL(terminals=[[1, "d"], [2, "ck"], [3, "q"]]) $D_FLIP_FLOP_Q_ONLY => @PLACE(78, -23) => @ORIENT("R0");
+*   %j1 = (30, -16);
+*   %j2 = (14, -31);
+*   %j3 = (51, -24);
+*   %j4 = (88, -23);
+*   %j5 = (23, -23);
+*   %j6 = (15, -24);
+*   %j7 = (15, -22);
+*   %j8 = (37, -23);
+*   %j9 = (37, -25);
+*   %j10 = (57, -22);
+*   %j11 = (65, -16);
+*   &net3 @WIRE(mode="straight") {%j5 #X7:1};
+*   &net6 @WIRE(mode="straight") {#X7:3 #X5:2};
+*   &net7 @WIRE(mode="straight") {#X5:3 %j8};
+*   &CLK @WIRE(mode="straight") {%j2 (14, -24) %j6};
+*   &CLK @WIRE(mode="straight") {%j2 (37, -31) %j9};
+*   &CLK @WIRE(mode="straight") {%j2 %port1::pin};
+*   &net2 @WIRE(mode="straight") {%j7 (14, -22) (14, -16) %j1};
+*   &net2 @WIRE(mode="straight") {%j1 (30, -22) #X5:1};
+*   &net2 @WIRE(mode="straight") {%j1 (51, -16) %j3};
+*   &net2 @WIRE(mode="straight") {#X8:2 %j3};
+*   &net2 @WIRE(mode="straight") {%j3 #X3:2};
+*   &net2 @WIRE(mode="straight") {#X3:2 (57, -31) (74, -31) #X4:2};
+*   &net5 @WIRE(mode="straight") {#X6:3 #X4:1};
+*   &MC @WIRE(mode="straight") {#X7:2 (24, -37) (88, -37) %j4};
+*   &MC @WIRE(mode="straight") {%j10 (57, -16) %j11};
+*   &MC @WIRE(mode="straight") {%j11 (65, -21) #X6:1};
+*   &MC @WIRE(mode="straight") {%j11 (88, -16) %j4};
+*   &MC @WIRE(mode="straight") {#X9:2 %j4};
+*   &net4 @WIRE(mode="straight") {#X3:3 #X6:2};
+*   &net0 @WIRE(mode="straight") {#X2:3 #X8:1};
+*   &net1 @WIRE(mode="straight") {#X9:1 #X4:3};
+*   &net2 @WIRE(mode="straight") {%j7 #X1:1};
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(30, -16) => %dot1;
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(51, -24) => %dot2;
+*   $JUNCTION @ATTACH (57, -24)(p) => @PLACE(57, -24) => %dot3;
+*   &net3 @WIRE(mode="straight") {%j5 #X1:3};
+*   &MC @WIRE(mode="straight") {%j10 #X3:1};
+*   $JUNCTION @ATTACH %j11(p) => @PLACE(65, -16) => %dot4;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(88, -23) => %dot5;
+*   &net7 @WIRE(mode="straight") {%j8 #X2:1};
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(14, -31) => %dot6;
+*   &CLK @WIRE(mode="straight") {%j6 #X1:2};
+*   &CLK @WIRE(mode="straight") {%j9 #X2:2};
+*   #X5
+*       @TEXT("\textbf{\textit{X5}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X5::name(label);
+*   #X7
+*       @TEXT("\textbf{\textit{X7}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X7::name(label);
+*   %port1
+*       @TEXT("\textbf{\textit{CLK}}", key="netname", dx=-2, dy=-1, halign="end", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   #X6
+*       @TEXT("\textbf{\textit{X6}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X6::name(label);
+*   #X8
+*       @TEXT("\textbf{\textit{X8}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X8::name(label);
+*   #X9
+*       @TEXT("\textbf{\textit{X9}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X9::name(label);
+*   &MC @TEXT("\textbf{\textit{MC}}", size=1.5116, bold=false) => @PLACE(30, -35.5) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+*   (27, -27) @TEXT("\textbf{\textit{OR}}", halign="middle", size=1.5116, bold=true) => %text1;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+*   (34, -26.4) @TEXT("\textbf{\textit{AND1}}", halign="middle", size=1.5116, bold=true) => %text2;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+*   (19, -27.5) @TEXT("\textbf{\textit{DFF1}}", halign="middle", size=1.5116, bold=true) => %text3;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text3(text);
+*   (41, -28.5) @TEXT("\textbf{\textit{DFF2}}", halign="middle", size=1.5116, bold=true) => %text4;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text4(text);
+*   (61, -27.5) @TEXT("\textbf{\textit{DFF3}}", halign="middle", size=1.5116, bold=true) => %text5;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text5(text);
+*   (78, -27.5) @TEXT("\textbf{\textit{DFF4}}", halign="middle", size=1.5116, bold=true) => %text6;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text6(text);
+*   (69.5, -25.8) @TEXT("\textbf{\textit{AND2}}", halign="middle", size=1.5116, bold=true) => %text7;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text7(text);
+*   (47.5, -27.7) @TEXT("\textbf{\textit{INV1}}", halign="middle", size=1.5116, bold=true) => %text8;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text8(text);
+*   (84.5, -26.2) @TEXT("\textbf{\textit{INV2}}", halign="middle", size=1.5116, bold=true) => %text9;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text9(text);
+*   (33, -26.5) @RECTANGLE(width=40, height=25, linestyle="dashed", linecolor="#dc2626") => @LAYER("top");
+*   (30.5, -12.5) @TEXT("\textbf{\textit{DIV 2/3}}", halign="middle", size=1.5116, bold=true, textcolor="#dc2626") => %text10;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text10(text);
+*   (72.5, -26.5) @RECTANGLE(width=35, height=25, linestyle="dashed", linecolor="#059669") => @LAYER("top");
+*   (74, -12.5) @TEXT("\textbf{\textit{DIV 3}}", halign="middle", size=1.5116, bold=true, textcolor="#059669") => %text11;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text11(text)
+* }
+.ends Main
