@@ -1,6 +1,6 @@
 # RNL benchmark
 
-Two suites: the frozen **round-trip benchmark** below (100 Analog Canvas circuits, graded inside Analog Canvas), and the tool-neutral **[conformance suite](conformance/README.md)**, which grades any tool that reads and writes RNL with the RNL runtime alone.
+Two suites: the frozen **round-trip benchmark** below (100 Analog Canvas circuits, graded inside Analog Canvas, and a second set of 160, **[Season 1](season1/README.md)**, chosen by people for Schematic Arena, 20 in each of eight circuit families), and the tool-neutral **[conformance suite](conformance/README.md)**, which grades any tool that reads and writes RNL with the RNL runtime alone.
 
 100 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen, and a harness (in analog-canvas) that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
 
@@ -14,6 +14,7 @@ It answers one question per change to RNL or to Canvas's RNL adapter: do more ci
 | `manifest.json` | Per circuit: name, author, part count, source snapshot, Gallery URL, SHA-256 of the file, feature tags. |
 | `summarize.py` | Turns a run's reports into `summary.json` and `SUMMARY.md`. |
 | `results/<date>-<label>/` | One run: `reports/<id>.json`, `summary.json`, `SUMMARY.md`, and `rnl/<id>.{spice,spectre}.rnl`, the files Canvas wrote. |
+| `season1/` | The second set, 160 circuits frozen on 2026-11-15, laid out the same way (`circuits/`, `manifest.json`, `results/`), with how it was made (`freeze.py`). |
 
 The `.rnl` files of a run are also plain inputs for the RNL runtime and Viewer on their own.
 

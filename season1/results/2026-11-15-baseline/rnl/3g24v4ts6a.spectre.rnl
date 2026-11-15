@@ -1,0 +1,215 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+// }
+
+subckt reflection_phase_shifter (VSS rfin rfout vtune)
+C1 (rfin VSS) capacitor c=3.2p
+C2 (net0 VSS) capacitor c=3.2p
+C3 (net3 VSS) capacitor c=3.2p
+C4 (rfout VSS) capacitor c=3.2p
+L1 (net0 rfin) inductor l=2.35n
+L2 (rfin rfout) inductor l=3.3n
+L3 (net3 rfout) inductor l=2.35n
+L4 (net0 net3) inductor l=3.3n
+L5 (net1 net0) inductor l=1.5n
+L6 (net2 net3) inductor l=1.5n
+MV1 (net1 vtune net1 VSS) sky130_fd_pr__nfet_01v8 l=0.5 w=480 nf=80 m=1
+MV2 (net2 vtune net2 VSS) sky130_fd_pr__nfet_01v8 l=0.5 w=480 nf=80 m=1
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   #L1 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(18, 0) => @ORIENT("R270");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="2.35nH") #L1(part);
+//   #L3 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(18, -16) => @ORIENT("R270");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="2.35nH") #L3(part);
+//   #L2 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(10, -8) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="3.3nH") #L2(part);
+//   #L4 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(26, -8) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="3.3nH") #L4(part);
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(6, -4) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="3.2pF") #C1(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(6, -8) => @ORIENT("R0") => %gnd1;
+//   #C4 @SET-SYMBOL $CAPACITOR => @PLACE(6, -20) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="3.2pF") #C4(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(6, -24) => @ORIENT("R0") => %gnd2;
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(30, -4) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="3.2pF") #C2(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(30, -8) => @ORIENT("R0") => %gnd3;
+//   #C3 @SET-SYMBOL $CAPACITOR => @PLACE(30, -20) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="c", text="3.2pF") #C3(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(30, -24) => @ORIENT("R0") => %gnd4;
+//   #L5 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(40, 0) => @ORIENT("R270");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="1.5nH") #L5(part);
+//   #MV1 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(46, 0) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.5u") #MV1(part);
+//   #L6 @SET-SYMBOL $CANVAS_INDUCTOR_LARGE => @PLACE(40, -16) => @ORIENT("R270");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="1.5nH") #L6(part);
+//   #MV2 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(46, -16) => @ORIENT("MY");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="l", text="0.5u") #MV2(part);
+//   $IO_PORT @ATTACH &rfin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, 0) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &rfout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, -16) => @ORIENT("R0") => %port2;
+//   $IO_PORT @ATTACH &vtune(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(54, 0) => @ORIENT("MY") => %port3;
+//   $IO_PORT @ATTACH &vtune(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(54, -16) => @ORIENT("MY") => %port4;
+//   %j1 = (6, 0);
+//   %j2 = (10, 0);
+//   %j3 = (26, 0);
+//   %j4 = (30, 0);
+//   %j5 = (6, -16);
+//   %j6 = (10, -16);
+//   %j7 = (26, -16);
+//   %j8 = (30, -16);
+//   %j9 = (44, 0);
+//   %j10 = (44, -16);
+//   &rfin @WIRE(mode="straight") {%port1::pin %j1};
+//   &rfin @WIRE(mode="straight") {%j1 %j2};
+//   &rfin @WIRE(mode="straight") {%j2 #L1:2};
+//   &rfin @WIRE(mode="straight") {#C1:1 %j1};
+//   &rfin @WIRE(mode="straight") {#L2:1 %j2};
+//   &net0 @WIRE(mode="straight") {#L1:1 %j3};
+//   &net0 @WIRE(mode="straight") {%j3 %j4};
+//   &net0 @WIRE(mode="straight") {%j4 #L5:2};
+//   &net0 @WIRE(mode="straight") {#L4:1 %j3};
+//   &net0 @WIRE(mode="straight") {#C2:1 %j4};
+//   &rfout @WIRE(mode="straight") {%port2::pin %j5};
+//   &rfout @WIRE(mode="straight") {%j5 %j6};
+//   &rfout @WIRE(mode="straight") {%j6 #L3:2};
+//   &rfout @WIRE(mode="straight") {#C4:1 %j5};
+//   &rfout @WIRE(mode="straight") {#L2:2 %j6};
+//   &net3 @WIRE(mode="straight") {#L3:1 %j7};
+//   &net3 @WIRE(mode="straight") {%j7 %j8};
+//   &net3 @WIRE(mode="straight") {%j8 #L6:2};
+//   &net3 @WIRE(mode="straight") {#L4:2 %j7};
+//   &net3 @WIRE(mode="straight") {#C3:1 %j8};
+//   &VSS @WIRE(mode="straight") {#C1:2 %gnd1::pin};
+//   &VSS @WIRE(mode="straight") {#C2:2 %gnd3::pin};
+//   &VSS @WIRE(mode="straight") {#C4:2 %gnd2::pin};
+//   &VSS @WIRE(mode="straight") {#C3:2 %gnd4::pin};
+//   &vtune @WIRE(mode="straight") {#MV1:2 %port3::pin};
+//   &vtune @WIRE(mode="straight") {#MV2:2 %port4::pin};
+//   &net1 @WIRE(mode="straight") {#MV1:1 (44, 2) %j9};
+//   &net1 @WIRE(mode="straight") {%j9 (44, -2) #MV1:3};
+//   &net2 @WIRE(mode="straight") {#MV2:1 (44, -14) %j10};
+//   &net2 @WIRE(mode="straight") {%j10 (44, -18) #MV2:3};
+//   &net1 @WIRE(mode="straight") {#L5:1 %j9};
+//   &net2 @WIRE(mode="straight") {#L6:1 %j10};
+//   $JUNCTION @ATTACH %j5(p) => @PLACE(6, -16) => %dot1;
+//   $JUNCTION @ATTACH %j6(p) => @PLACE(10, -16) => %dot2;
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(6, 0) => %dot3;
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(10, 0) => %dot4;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(26, 0) => %dot5;
+//   $JUNCTION @ATTACH %j4(p) => @PLACE(30, 0) => %dot6;
+//   $JUNCTION @ATTACH %j9(p) => @PLACE(44, 0) => %dot7;
+//   $JUNCTION @ATTACH %j10(p) => @PLACE(44, -16) => %dot8;
+//   $JUNCTION @ATTACH %j7(p) => @PLACE(26, -16) => %dot9;
+//   $JUNCTION @ATTACH %j8(p) => @PLACE(30, -16) => %dot10;
+//   #L1
+//       @TEXT("\textbf{\textit{L}}_{\textbf{1}}", key="name", dx=0, dy=-2.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L1::name(label);
+//   #L1
+//       @TEXT("\textbf{2.35nH}", key="value", dx=0, dy=-4.6, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L1::value(label);
+//   #L3
+//       @TEXT("\textbf{\textit{L}}_{\textbf{3}}", key="name", dx=0, dy=-2.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L3::name(label);
+//   #L3
+//       @TEXT("\textbf{2.35nH}", key="value", dx=0, dy=-4.6, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L3::value(label);
+//   #L2
+//       @TEXT("\textbf{\textit{L}}_{\textbf{2}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L2::name(label);
+//   #L2
+//       @TEXT("\textbf{3.3nH}", key="value", dx=1.5, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L2::value(label);
+//   #L4
+//       @TEXT("\textbf{\textit{L}}_{\textbf{4}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L4::name(label);
+//   #L4
+//       @TEXT("\textbf{3.3nH}", key="value", dx=-1.5, dy=-2.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L4::value(label);
+//   #C1
+//       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=-1.2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
+//   #C1
+//       @TEXT("\textbf{3.2pF}", key="value", dx=-1.2, dy=-2.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #C1::value(label);
+//   #C4
+//       @TEXT("\textbf{\textit{C}}_{\textbf{4}}", key="name", dx=-1.2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C4::name(label);
+//   #C4
+//       @TEXT("\textbf{3.2pF}", key="value", dx=-1.2, dy=-2.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #C4::value(label);
+//   #C2
+//       @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C2::name(label);
+//   #C2
+//       @TEXT("\textbf{3.2pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #C2::value(label);
+//   #C3
+//       @TEXT("\textbf{\textit{C}}_{\textbf{3}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C3::name(label);
+//   #C3
+//       @TEXT("\textbf{3.2pF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #C3::value(label);
+//   #L5
+//       @TEXT("\textbf{\textit{L}}_{\textbf{5}}", key="name", dx=0, dy=-2.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L5::name(label);
+//   #L5
+//       @TEXT("\textbf{1.5nH}", key="value", dx=0, dy=-4.6, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L5::value(label);
+//   #MV1
+//       @TEXT("\textbf{\textit{M}}_{\textbf{V1}}", key="name", dx=2.5, dy=3.4, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MV1::name(label);
+//   #L6
+//       @TEXT("\textbf{\textit{L}}_{\textbf{6}}", key="name", dx=0, dy=-2.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #L6::name(label);
+//   #L6
+//       @TEXT("\textbf{1.5nH}", key="value", dx=0, dy=-4.6, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="value") #L6::value(label);
+//   #MV2
+//       @TEXT("\textbf{\textit{M}}_{\textbf{V2}}", key="name", dx=2.5, dy=3.4, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #MV2::name(label);
+//   %port1
+//       @TEXT("\textbf{\textit{rfin}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+//   %port2
+//       @TEXT("\textbf{\textit{rfout}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+//   %port3
+//       @TEXT("\textbf{\textit{v}}_{\textbf{tune}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::netname(label);
+//   %port4
+//       @TEXT("\textbf{\textit{v}}_{\textbf{tune}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port4::netname(label)
+// }
+ends reflection_phase_shifter
