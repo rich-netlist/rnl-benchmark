@@ -1,0 +1,865 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+//   @DEVICE(model="sky130_fd_pr__pfet_01v8", terminals=["d", "g", "s", "b"], type="pmos");
+//   @DEVICE(model="sky130_fd_pr__nfet_01v8", terminals=["d", "g", "s", "b"], type="nmos")
+// }
+
+subckt Hybrid_Nested_Miller_Four_Stage_Operational_Amplifier (VDD VSS Vi\+ Vi\- Vo)
+CM1a (net3 Vo) capacitor c=1.3p
+CM1b (Vo net2) capacitor c=1.3p
+CM2a (net12 net13) capacitor c=.5p
+CM2b (net12 net14) capacitor c=.5p
+CM3 (net12 Vo) capacitor c=1.3p
+I1 (net11 VSS) isource dc=10u
+M101 (net15 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=2
+M110 (net6 Vi\- net15 VDD) sky130_fd_pr__pfet_01v8 l=4 w=10 nf=1 m=1
+M120 (net7 Vi\+ net15 VDD) sky130_fd_pr__pfet_01v8 l=4 w=10 nf=1 m=1
+M130 (net12 net8 net7 VSS) sky130_fd_pr__nfet_01v8 l=1 w=50 nf=1 m=1
+M131 (net7 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=50 nf=1 m=1
+M150 (net9 net8 net6 VSS) sky130_fd_pr__nfet_01v8 l=1 w=50 nf=1 m=2
+M151 (net6 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=50 nf=1 m=2
+M160 (net12 net9 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=20 nf=1 m=1
+M180 (net9 net9 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=40 nf=1 m=1
+M2 (net10 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=25 nf=1 m=1
+M240 (net13 net12 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=20 nf=1 m=1
+M241 (net13 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=25 nf=1 m=1
+M250 (net14 net12 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=20 nf=1 m=1
+M251 (net14 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=25 nf=1 m=1
+M3 (net11 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=1
+M300 (net3 net14 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=2 nf=1 m=1
+M301 (net3 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=50 nf=1 m=1
+M310 (net2 net13 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=2 nf=1 m=1
+M311 (net2 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=50 nf=1 m=1
+M400 (Vo net3 VDD VDD) sky130_fd_pr__pfet_01v8 l=1 w=46.6666666667 nf=1 m=9
+M410 (Vo net2 VSS VSS) sky130_fd_pr__nfet_01v8 l=1 w=46.6666666667 nf=1 m=3
+M500 (net14 net0 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=4 nf=1 m=1
+M501 (net17 net0 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=4 nf=1 m=1
+M502 (net17 net17 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=10 nf=1 m=1
+M503 (net3 net17 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=30 nf=1 m=1
+M505 (net16 net10 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=50 nf=1 m=1
+M510 (net2 net4 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=2 nf=1 m=1
+M511 (net18 net4 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=2 nf=1 m=1
+M512 (net18 net18 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=10 nf=1 m=1
+M513 (net2 net18 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=30 nf=1 m=1
+M520 (net13 net5 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=2 nf=1 m=1
+M521 (net18 net5 net16 VSS) sky130_fd_pr__nfet_01v8 l=2 w=2 nf=1 m=1
+M530 (net0 net0 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=3 nf=1 m=1
+M531 (net0 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=1
+M540 (net4 net4 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=3 nf=1 m=1
+M541 (net4 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=2
+M550 (net5 net5 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=3 nf=1 m=1
+M560 (net1 net3 VDD VDD) sky130_fd_pr__pfet_01v8 l=1 w=24 nf=1 m=1
+M570 (net1 net1 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=4 nf=1 m=1
+M580 (net4 net1 VSS VSS) sky130_fd_pr__nfet_01v8 l=2 w=4 nf=1 m=1
+M590 (net5 net2 VSS VSS) sky130_fd_pr__nfet_01v8 l=1 w=8 nf=1 m=1
+M591 (net5 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=2
+M600 (net8 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=50 nf=1 m=1
+M610 (net8 net8 VSS VSS) sky130_fd_pr__nfet_01v8 l=1 w=2 nf=1 m=1
+M620 (net10 net11 VDD VDD) sky130_fd_pr__pfet_01v8 l=2 w=25 nf=1 m=1
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   $CANVAS_CELL_NAME @ATTACH(name="Hybrid-Nested-Miller Four-Stage Operational Amplifier") #(level);
+//   #M3 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(5, -4) => @ORIENT("MY");
+//   #M101 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(11, -4) => @ORIENT("MY");
+//   #M180 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(25, -10.4) => @ORIENT("MY");
+//   #M160 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(32, -10.4) => @ORIENT("R0");
+//   #M600 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(39, -4) => @ORIENT("MY");
+//   #M240 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(47, -16.8) => @ORIENT("R0");
+//   #M250 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(55, -16.8) => @ORIENT("R0");
+//   #M620 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(60, -4) => @ORIENT("MY");
+//   #M531 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(67, -4) => @ORIENT("MY");
+//   #M502 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(75, -10.4) => @ORIENT("MY");
+//   #M503 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(83, -10.4) => @ORIENT("R0");
+//   #M512 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(94, -10.4) => @ORIENT("MY");
+//   #M513 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(100, -10.4) => @ORIENT("R0");
+//   #M541 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(106, -4) => @ORIENT("MY");
+//   #M591 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(125, -4) => @ORIENT("R0");
+//   #M560 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(88, -26.4) => @ORIENT("MY");
+//   #M300 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(133, -20) => @ORIENT("R0");
+//   #M310 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(141, -23.2) => @ORIENT("R0");
+//   #M400 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(148, -26.4) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="w", text="46.666666666666664u") #M400(part);
+//   #M120 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(11, -10.4) => @ORIENT("R0");
+//   #M110 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(18, -10.4) => @ORIENT("MY");
+//   #M150 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(25, -16.8) => @ORIENT("MY");
+//   #M130 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(32, -16.8) => @ORIENT("R0");
+//   #M610 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(39, -16.8) => @ORIENT("R0");
+//   #M151 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(25, -54.4) => @ORIENT("MY");
+//   #M131 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(32, -54.4) => @ORIENT("R0");
+//   #M241 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(47, -54.4) => @ORIENT("R0");
+//   #M251 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(55, -54.4) => @ORIENT("R0");
+//   #M2 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(60, -54.4) => @ORIENT("MY");
+//   #M501 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(75, -41.6) => @ORIENT("R0");
+//   #M500 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(81, -41.6) => @ORIENT("R0");
+//   #M505 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(84, -54.4) => @ORIENT("MY");
+//   #M530 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(67, -48) => @ORIENT("MY");
+//   #M570 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(88, -48) => @ORIENT("MY");
+//   #M580 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(100, -48) => @ORIENT("R0");
+//   #M511 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(94, -41.6) => @ORIENT("MY");
+//   #M510 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(100, -41.6) => @ORIENT("MY");
+//   #M521 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(106, -41.6) => @ORIENT("MY");
+//   #M520 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(116, -41.6) => @ORIENT("MY");
+//   #M540 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(106, -48) => @ORIENT("MY");
+//   #M550 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(116, -48) => @ORIENT("R0");
+//   #M590 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(125, -48) => @ORIENT("MY");
+//   #M301 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(133, -54.4) => @ORIENT("MY");
+//   #M311 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(141, -54.4) => @ORIENT("R0");
+//   #M410 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(148, -48) => @ORIENT("R0");
+//   $CANVAS_PARAMETER_TEXT @ATTACH(name="w", text="46.666666666666664u") #M410(part);
+//   #CM2a @SET-SYMBOL $CAPACITOR => @PLACE(43, -20) => @ORIENT("R0");
+//   #CM2b @SET-SYMBOL $CAPACITOR => @PLACE(51, -20) => @ORIENT("R0");
+//   #CM1a @SET-SYMBOL $CAPACITOR => @PLACE(144, -30) => @ORIENT("R0");
+//   #CM1b @SET-SYMBOL $CAPACITOR => @PLACE(144, -44.4) => @ORIENT("R0");
+//   #CM3 @SET-SYMBOL $CAPACITOR => @PLACE(137, -33.6) => @ORIENT("R90");
+//   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(5, -54.4) => @ORIENT("R0");
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(148, 0.5) => @ORIENT("R0") => %vdd1;
+//   $IO_PORT @ATTACH &"Vi+"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(6.4, -10.4) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &"Vi-"(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(23, -10.4) => @ORIENT("MY") => %port2;
+//   $IO_PORT @ATTACH &Vo(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(153, -33.6) => @ORIENT("MY") => %port3;
+//   %j1 = (148, 0);
+//   %j2 = (148, -58.4);
+//   %j3 = (75, -13.6);
+//   %j4 = (94, -13.6);
+//   %j5 = (94, -37.6);
+//   %j6 = (106, -37.6);
+//   %j7 = (11, 0);
+//   %j8 = (25, 0);
+//   %j9 = (75, 0);
+//   %j10 = (83, 0);
+//   %j11 = (94, 0);
+//   %j12 = (100, 0);
+//   %j13 = (106, 0);
+//   %j14 = (125, 0);
+//   %j15 = (32, 0);
+//   %j16 = (39, 0);
+//   %j17 = (47, 0);
+//   %j18 = (55, 0);
+//   %j19 = (60, 0);
+//   %j20 = (67, 0);
+//   %j21 = (133, 0);
+//   %j22 = (141, 0);
+//   %j23 = (88, 0);
+//   %j24 = (9, -4);
+//   %j25 = (5, -7.2);
+//   %j26 = (60, -51.2);
+//   %j27 = (64, -54.4);
+//   %j28 = (11, -7.2);
+//   %j29 = (18, -7.2);
+//   %j30 = (32, -19.6);
+//   %j31 = (25, -20.8);
+//   %j32 = (28.5, -10.4);
+//   %j33 = (28.5, -13.6);
+//   %j34 = (25, -13.6);
+//   %j35 = (35, -16.8);
+//   %j36 = (35, -14.8);
+//   %j37 = (32, -13.6);
+//   %j38 = (41, -16.8);
+//   %j39 = (47, -23.2);
+//   %j40 = (116, -23.2);
+//   %j41 = (55, -22);
+//   %j42 = (81, -22);
+//   %j43 = (67, -41.6);
+//   %j44 = (67, -44.8);
+//   %j45 = (71, -48);
+//   %j46 = (71, -44.8);
+//   %j47 = (133, -26.4);
+//   %j48 = (144, -26.4);
+//   %j49 = (88, -45.2);
+//   %j50 = (92, -48);
+//   %j51 = (92, -45.2);
+//   %j52 = (81, -44);
+//   %j53 = (84, -44);
+//   %j54 = (94, -44);
+//   %j55 = (100, -44);
+//   %j56 = (106, -44);
+//   %j57 = (100, -31.2);
+//   %j58 = (141, -31.2);
+//   %j59 = (141, -48);
+//   %j60 = (144, -48);
+//   %j61 = (104, -41.6);
+//   %j62 = (104, -45.2);
+//   %j63 = (100, -45.2);
+//   %j64 = (106, -45.2);
+//   %j65 = (109.4, -48);
+//   %j66 = (109.4, -45.2);
+//   %j67 = (125, -41.6);
+//   %j68 = (125, -45.6);
+//   %j69 = (116, -45.6);
+//   %j70 = (148, -33.6);
+//   %j71 = (144, -33.6);
+//   %j72 = (25, -58.4);
+//   %j73 = (32, -58.4);
+//   %j74 = (39, -58.4);
+//   %j75 = (47, -58.4);
+//   %j76 = (55, -58.4);
+//   %j77 = (60, -58.4);
+//   %j78 = (67, -58.4);
+//   %j79 = (84, -58.4);
+//   %j80 = (88, -58.4);
+//   %j81 = (100, -58.4);
+//   %j82 = (106, -58.4);
+//   %j83 = (116, -58.4);
+//   %j84 = (125, -58.4);
+//   %j85 = (133, -58.4);
+//   %j86 = (141, -58.4);
+//   %j87 = (43, -16.8);
+//   %j88 = (51, -16.8);
+//   &net18 @WIRE(mode="straight") {%j6 #M521:1};
+//   &net18 @WIRE(mode="straight") {%j6 %j5};
+//   &net18 @WIRE(mode="straight") {#M512:1 %j4};
+//   &net18 @WIRE(mode="straight") {%j4 %j5};
+//   &net18 @WIRE(mode="straight") {%j4 (97, -13.6) #M513:2};
+//   &net18 @WIRE(mode="straight") {%j5 #M511:1};
+//   &VDD @WIRE(mode="straight") {%j11 #M512:3};
+//   &VDD @WIRE(mode="straight") {%j11 %j12};
+//   &VDD @WIRE(mode="straight") {%j11 %j23};
+//   &VDD @WIRE(mode="straight") {%j23 %j10};
+//   &VDD @WIRE(mode="straight") {%j12 #M513:3};
+//   &VDD @WIRE(mode="straight") {%j12 %j13};
+//   &VDD @WIRE(mode="straight") {%j7 #M101:3};
+//   &VDD @WIRE(mode="straight") {%j7 %j8};
+//   &VDD @WIRE(mode="straight") {%j7 (5, 0) #M3:3};
+//   &VDD @WIRE(mode="straight") {%j13 #M541:3};
+//   &VDD @WIRE(mode="straight") {%j13 %j14};
+//   &VDD @WIRE(mode="straight") {%j14 #M591:3};
+//   &VDD @WIRE(mode="straight") {%j14 %j21};
+//   &VDD @WIRE(mode="straight") {%j21 %j22};
+//   &VDD @WIRE(mode="straight") {%j22 %j1};
+//   &VDD @WIRE(mode="straight") {%j8 #M180:3};
+//   &VDD @WIRE(mode="straight") {%j8 %j15};
+//   &VDD @WIRE(mode="straight") {%j15 #M160:3};
+//   &VDD @WIRE(mode="straight") {%j15 %j16};
+//   &VDD @WIRE(mode="straight") {%j16 #M600:3};
+//   &VDD @WIRE(mode="straight") {%j16 %j17};
+//   &VDD @WIRE(mode="straight") {%j17 #M240:3};
+//   &VDD @WIRE(mode="straight") {%j17 %j18};
+//   &VDD @WIRE(mode="straight") {%j18 #M250:3};
+//   &VDD @WIRE(mode="straight") {%j18 %j19};
+//   &VDD @WIRE(mode="straight") {%j19 #M620:3};
+//   &VDD @WIRE(mode="straight") {%j19 %j20};
+//   &VDD @WIRE(mode="straight") {%j20 #M531:3};
+//   &VDD @WIRE(mode="straight") {%j20 %j9};
+//   &VDD @WIRE(mode="straight") {%j9 #M502:3};
+//   &VDD @WIRE(mode="straight") {%j9 %j10};
+//   &VDD @WIRE(mode="straight") {%j10 #M503:3};
+//   &VDD @WIRE(mode="straight") {#M300:3 %j21};
+//   &VDD @WIRE(mode="straight") {#M310:3 %j22};
+//   &VDD @WIRE(mode="straight") {#M400:3 %j1};
+//   &VDD @WIRE(mode="straight") {%vdd1::pin %j1};
+//   &VDD @WIRE(mode="straight") {#M560:3 %j23};
+//   &net11 @WIRE(mode="straight") {#M541:2 #M591:2};
+//   &net11 @WIRE(mode="straight") {#M541:2 #M531:2};
+//   &net11 @WIRE(mode="straight") {#M101:2 #M600:2};
+//   &net11 @WIRE(mode="straight") {#M101:2 %j24};
+//   &net11 @WIRE(mode="straight") {#M600:2 #M620:2};
+//   &net11 @WIRE(mode="straight") {#I1:1 %j25};
+//   &net11 @WIRE(mode="straight") {#M3:1 %j25};
+//   &net11 @WIRE(mode="straight") {%j25 (9, -7.2) %j24};
+//   &net11 @WIRE(mode="straight") {#M620:2 #M531:2};
+//   &net11 @WIRE(mode="straight") {#M3:2 %j24};
+//   &net10 @WIRE(mode="straight") {#M301:2 #M311:2};
+//   &net10 @WIRE(mode="straight") {#M301:2 #M505:2};
+//   &net10 @WIRE(mode="straight") {#M151:2 #M131:2};
+//   &net10 @WIRE(mode="straight") {#M131:2 #M241:2};
+//   &net10 @WIRE(mode="straight") {#M241:2 #M251:2};
+//   &net10 @WIRE(mode="straight") {#M251:2 #M2:2};
+//   &net10 @WIRE(mode="straight") {%j26 #M2:1};
+//   &net10 @WIRE(mode="straight") {%j26 #M620:1};
+//   &net10 @WIRE(mode="straight") {%j26 (64, -51.2) %j27};
+//   &net10 @WIRE(mode="straight") {#M2:2 %j27};
+//   &net10 @WIRE(mode="straight") {%j27 #M505:2};
+//   &net15 @WIRE(mode="straight") {#M101:1 %j28};
+//   &net15 @WIRE(mode="straight") {%j28 %j29};
+//   &net15 @WIRE(mode="straight") {%j29 #M110:3};
+//   &net15 @WIRE(mode="straight") {%j28 #M120:3};
+//   &net7 @WIRE(mode="straight") {#M120:1 (11, -19.6) %j30};
+//   &net7 @WIRE(mode="straight") {#M130:3 %j30};
+//   &net7 @WIRE(mode="straight") {%j30 #M131:1};
+//   &net6 @WIRE(mode="straight") {#M110:1 (18, -20.8) %j31};
+//   &net6 @WIRE(mode="straight") {#M150:3 %j31};
+//   &net6 @WIRE(mode="straight") {%j31 #M151:1};
+//   &net9 @WIRE(mode="straight") {#M180:2 %j32};
+//   &net9 @WIRE(mode="straight") {%j32 #M160:2};
+//   &net9 @WIRE(mode="straight") {%j32 %j33};
+//   &net9 @WIRE(mode="straight") {%j33 %j34};
+//   &net9 @WIRE(mode="straight") {%j34 #M180:1};
+//   &net9 @WIRE(mode="straight") {%j34 #M150:1};
+//   &net8 @WIRE(mode="straight") {#M150:2 #M130:2};
+//   &net8 @WIRE(mode="straight") {#M130:2 %j35};
+//   &net8 @WIRE(mode="straight") {%j35 #M610:2};
+//   &net8 @WIRE(mode="straight") {%j35 %j36};
+//   &net8 @WIRE(mode="straight") {%j36 #M610:1};
+//   &net8 @WIRE(mode="straight") {#M600:1 #M610:1};
+//   &net12 @WIRE(mode="straight") {#CM3:1 (41, -33.6) %j38};
+//   &net12 @WIRE(mode="straight") {#M160:1 %j37};
+//   &net12 @WIRE(mode="straight") {%j37 #M130:1};
+//   &net12 @WIRE(mode="straight") {%j37 (41, -13.6) %j38};
+//   &net12 @WIRE(mode="straight") {%j38 %j87};
+//   &net12 @WIRE(mode="straight") {%j87 #CM2a:1};
+//   &net12 @WIRE(mode="straight") {#M240:2 %j88};
+//   &net12 @WIRE(mode="straight") {%j88 #CM2b:1};
+//   &net12 @WIRE(mode="straight") {%j88 #M250:2};
+//   &net13 @WIRE(mode="straight") {%j40 #M520:1};
+//   &net13 @WIRE(mode="straight") {%j40 #M310:2};
+//   &net13 @WIRE(mode="straight") {%j40 %j39};
+//   &net13 @WIRE(mode="straight") {#CM2a:2 (43, -23.2) %j39};
+//   &net13 @WIRE(mode="straight") {#M240:1 %j39};
+//   &net13 @WIRE(mode="straight") {%j39 #M241:1};
+//   &net14 @WIRE(mode="straight") {#M300:2 (130, -22) %j42};
+//   &net14 @WIRE(mode="straight") {#CM2b:2 %j41};
+//   &net14 @WIRE(mode="straight") {#M250:1 %j41};
+//   &net14 @WIRE(mode="straight") {%j41 %j42};
+//   &net14 @WIRE(mode="straight") {%j41 #M251:1};
+//   &net14 @WIRE(mode="straight") {%j42 #M500:1};
+//   &net0 @WIRE(mode="straight") {#M531:1 %j43};
+//   &net0 @WIRE(mode="straight") {%j43 %j44};
+//   &net0 @WIRE(mode="straight") {%j44 #M530:1};
+//   &net0 @WIRE(mode="straight") {%j43 #M501:2};
+//   &net0 @WIRE(mode="straight") {#M501:2 #M500:2};
+//   &net0 @WIRE(mode="straight") {#M530:2 %j45};
+//   &net0 @WIRE(mode="straight") {%j45 %j46};
+//   &net0 @WIRE(mode="straight") {%j46 %j44};
+//   &net3 @WIRE(mode="straight") {#M300:1 %j47};
+//   &net3 @WIRE(mode="straight") {%j47 #M301:1};
+//   &net3 @WIRE(mode="straight") {%j47 %j48};
+//   &net3 @WIRE(mode="straight") {%j47 #M560:2};
+//   &net3 @WIRE(mode="straight") {%j48 #CM1a:1};
+//   &net3 @WIRE(mode="straight") {%j48 #M400:2};
+//   &net3 @WIRE(mode="straight") {#M503:1 (83, -26.4) #M560:2};
+//   &net1 @WIRE(mode="straight") {#M560:1 %j49};
+//   &net1 @WIRE(mode="straight") {%j49 #M570:1};
+//   &net1 @WIRE(mode="straight") {#M570:2 %j50};
+//   &net1 @WIRE(mode="straight") {%j50 %j51};
+//   &net1 @WIRE(mode="straight") {%j51 %j49};
+//   &net1 @WIRE(mode="straight") {%j50 #M580:2};
+//   &net16 @WIRE(mode="straight") {#M511:3 %j54};
+//   &net16 @WIRE(mode="straight") {%j54 %j55};
+//   &net16 @WIRE(mode="straight") {%j54 %j53};
+//   &net16 @WIRE(mode="straight") {#M510:3 %j55};
+//   &net16 @WIRE(mode="straight") {%j55 %j56};
+//   &net16 @WIRE(mode="straight") {#M521:3 %j56};
+//   &net16 @WIRE(mode="straight") {%j56 (116, -44) #M520:3};
+//   &net16 @WIRE(mode="straight") {#M501:3 (75, -44) %j52};
+//   &net16 @WIRE(mode="straight") {#M500:3 %j52};
+//   &net16 @WIRE(mode="straight") {%j52 %j53};
+//   &net16 @WIRE(mode="straight") {%j53 #M505:1};
+//   &net2 @WIRE(mode="straight") {#M513:1 %j57};
+//   &net2 @WIRE(mode="straight") {%j57 #M510:1};
+//   &net2 @WIRE(mode="straight") {%j57 %j58};
+//   &net2 @WIRE(mode="straight") {#M590:2 %j59};
+//   &net2 @WIRE(mode="straight") {#M310:1 %j58};
+//   &net2 @WIRE(mode="straight") {%j58 %j59};
+//   &net2 @WIRE(mode="straight") {%j59 #M311:1};
+//   &net2 @WIRE(mode="straight") {%j59 %j60};
+//   &net2 @WIRE(mode="straight") {#CM1b:2 %j60};
+//   &net2 @WIRE(mode="straight") {%j60 #M410:2};
+//   &net4 @WIRE(mode="straight") {#M511:2 #M510:2};
+//   &net4 @WIRE(mode="straight") {%j63 #M580:1};
+//   &net4 @WIRE(mode="straight") {%j63 %j62};
+//   &net4 @WIRE(mode="straight") {#M510:2 %j61};
+//   &net4 @WIRE(mode="straight") {%j61 %j62};
+//   &net4 @WIRE(mode="straight") {%j61 (104, -35.2) (106, -35.2) #M541:1};
+//   &net4 @WIRE(mode="straight") {%j62 %j64};
+//   &net4 @WIRE(mode="straight") {%j64 #M540:1};
+//   &net4 @WIRE(mode="straight") {%j64 %j66};
+//   &net4 @WIRE(mode="straight") {#M540:2 %j65};
+//   &net4 @WIRE(mode="straight") {%j66 %j65};
+//   &net5 @WIRE(mode="straight") {#M521:2 #M520:2};
+//   &net5 @WIRE(mode="straight") {#M550:2 (113, -45.6) %j69};
+//   &net5 @WIRE(mode="straight") {%j69 #M550:1};
+//   &net5 @WIRE(mode="straight") {%j69 %j68};
+//   &net5 @WIRE(mode="straight") {#M520:2 %j67};
+//   &net5 @WIRE(mode="straight") {#M591:1 %j67};
+//   &net5 @WIRE(mode="straight") {%j67 %j68};
+//   &net5 @WIRE(mode="straight") {%j68 #M590:1};
+//   &Vo @WIRE(mode="straight") {#M400:1 %j70};
+//   &Vo @WIRE(mode="straight") {%j70 #M410:1};
+//   &Vo @WIRE(mode="straight") {#CM1a:2 %j71};
+//   &Vo @WIRE(mode="straight") {%j71 %j70};
+//   &Vo @WIRE(mode="straight") {%j71 #CM3:2};
+//   &Vo @WIRE(mode="straight") {%j71 #CM1b:1};
+//   &Vo @WIRE(mode="straight") {%j70 %port3::pin};
+//   &"Vi+" @WIRE(mode="straight") {%port1::pin #M120:2};
+//   &"Vi-" @WIRE(mode="straight") {#M110:2 %port2::pin};
+//   &net17 @WIRE(mode="straight") {#M502:1 %j3};
+//   &net17 @WIRE(mode="straight") {%j3 #M501:1};
+//   &net17 @WIRE(mode="straight") {%j3 (78, -13.6) #M502:2};
+//   &net17 @WIRE(mode="straight") {#M502:2 #M503:2};
+//   &net12 @WIRE(mode="straight") {%j87 #M240:2};
+//   &VSS @WIRE(mode="straight") {#M580:3 %j81};
+//   &VSS @WIRE(mode="straight") {%j81 %j82};
+//   &VSS @WIRE(mode="straight") {%j81 %j80};
+//   &VSS @WIRE(mode="straight") {#M540:3 %j82};
+//   &VSS @WIRE(mode="straight") {%j82 %j83};
+//   &VSS @WIRE(mode="straight") {#M550:3 %j83};
+//   &VSS @WIRE(mode="straight") {%j83 %j84};
+//   &VSS @WIRE(mode="straight") {#M590:3 %j84};
+//   &VSS @WIRE(mode="straight") {%j84 %j85};
+//   &VSS @WIRE(mode="straight") {#M301:3 %j85};
+//   &VSS @WIRE(mode="straight") {%j85 %j86};
+//   &VSS @WIRE(mode="straight") {#M311:3 %j86};
+//   &VSS @WIRE(mode="straight") {%j86 %j2};
+//   &VSS @WIRE(mode="straight") {#M410:3 %j2};
+//   &VSS @WIRE(mode="straight") {#M151:3 %j72};
+//   &VSS @WIRE(mode="straight") {%j72 %j73};
+//   &VSS @WIRE(mode="straight") {%j72 (5, -58.4) #I1:2};
+//   &VSS @WIRE(mode="straight") {#M131:3 %j73};
+//   &VSS @WIRE(mode="straight") {%j73 %j74};
+//   &VSS @WIRE(mode="straight") {#M610:3 %j74};
+//   &VSS @WIRE(mode="straight") {%j74 %j75};
+//   &VSS @WIRE(mode="straight") {#M241:3 %j75};
+//   &VSS @WIRE(mode="straight") {%j75 %j76};
+//   &VSS @WIRE(mode="straight") {#M251:3 %j76};
+//   &VSS @WIRE(mode="straight") {%j76 %j77};
+//   &VSS @WIRE(mode="straight") {#M2:3 %j77};
+//   &VSS @WIRE(mode="straight") {%j77 %j78};
+//   &VSS @WIRE(mode="straight") {#M530:3 %j78};
+//   &VSS @WIRE(mode="straight") {%j78 %j79};
+//   &VSS @WIRE(mode="straight") {#M505:3 %j79};
+//   &VSS @WIRE(mode="straight") {%j79 %j80};
+//   &VSS @WIRE(mode="straight") {#M570:3 %j80};
+//   $JUNCTION @ATTACH %j43(p) => @PLACE(67, -41.6) => %dot1;
+//   $JUNCTION @ATTACH %j44(p) => @PLACE(67, -44.8) => %dot2;
+//   $JUNCTION @ATTACH %j49(p) => @PLACE(88, -45.2) => %dot3;
+//   $JUNCTION @ATTACH %j50(p) => @PLACE(92, -48) => %dot4;
+//   $JUNCTION @ATTACH %j57(p) => @PLACE(100, -31.2) => %dot5;
+//   $JUNCTION @ATTACH %j58(p) => @PLACE(141, -31.2) => %dot6;
+//   $JUNCTION @ATTACH %j59(p) => @PLACE(141, -48) => %dot7;
+//   $JUNCTION @ATTACH %j60(p) => @PLACE(144, -48) => %dot8;
+//   $JUNCTION @ATTACH %j47(p) => @PLACE(133, -26.4) => %dot9;
+//   $JUNCTION @ATTACH %j48(p) => @PLACE(144, -26.4) => %dot10;
+//   $JUNCTION @ATTACH %j61(p) => @PLACE(104, -41.6) => %dot11;
+//   $JUNCTION @ATTACH %j62(p) => @PLACE(104, -45.2) => %dot12;
+//   $JUNCTION @ATTACH %j64(p) => @PLACE(106, -45.2) => %dot13;
+//   $JUNCTION @ATTACH %j69(p) => @PLACE(116, -45.6) => %dot14;
+//   $JUNCTION @ATTACH %j67(p) => @PLACE(125, -41.6) => %dot15;
+//   $JUNCTION @ATTACH %j68(p) => @PLACE(125, -45.6) => %dot16;
+//   $JUNCTION @ATTACH %j31(p) => @PLACE(25, -20.8) => %dot17;
+//   $JUNCTION @ATTACH %j30(p) => @PLACE(32, -19.6) => %dot18;
+//   $JUNCTION @ATTACH %j35(p) => @PLACE(35, -16.8) => %dot19;
+//   $JUNCTION @ATTACH (39, -14.8)(p) => @PLACE(39, -14.8) => %dot20;
+//   $JUNCTION @ATTACH %j34(p) => @PLACE(25, -13.6) => %dot21;
+//   $JUNCTION @ATTACH %j32(p) => @PLACE(28.5, -10.4) => %dot22;
+//   $JUNCTION @ATTACH %j26(p) => @PLACE(60, -51.2) => %dot23;
+//   $JUNCTION @ATTACH %j27(p) => @PLACE(64, -54.4) => %dot24;
+//   $JUNCTION @ATTACH %j71(p) => @PLACE(144, -33.6) => %dot25;
+//   $JUNCTION @ATTACH %j70(p) => @PLACE(148, -33.6) => %dot26;
+//   $JUNCTION @ATTACH %j25(p) => @PLACE(5, -7.2) => %dot27;
+//   $JUNCTION @ATTACH %j24(p) => @PLACE(9, -4) => %dot28;
+//   $JUNCTION @ATTACH %j37(p) => @PLACE(32, -13.6) => %dot29;
+//   $JUNCTION @ATTACH %j38(p) => @PLACE(41, -16.8) => %dot30;
+//   $JUNCTION @ATTACH %j87(p) => @PLACE(43, -16.8) => %dot31;
+//   $JUNCTION @ATTACH %j88(p) => @PLACE(51, -16.8) => %dot32;
+//   $JUNCTION @ATTACH %j39(p) => @PLACE(47, -23.2) => %dot33;
+//   $JUNCTION @ATTACH %j40(p) => @PLACE(116, -23.2) => %dot34;
+//   $JUNCTION @ATTACH %j41(p) => @PLACE(55, -22) => %dot35;
+//   $JUNCTION @ATTACH %j42(p) => @PLACE(81, -22) => %dot36;
+//   $JUNCTION @ATTACH %j28(p) => @PLACE(11, -7.2) => %dot37;
+//   $JUNCTION @ATTACH %j52(p) => @PLACE(81, -44) => %dot38;
+//   $JUNCTION @ATTACH %j53(p) => @PLACE(84, -44) => %dot39;
+//   $JUNCTION @ATTACH %j54(p) => @PLACE(94, -44) => %dot40;
+//   $JUNCTION @ATTACH %j55(p) => @PLACE(100, -44) => %dot41;
+//   $JUNCTION @ATTACH %j56(p) => @PLACE(106, -44) => %dot42;
+//   $JUNCTION @ATTACH %j7(p) => @PLACE(11, 0) => %dot43;
+//   $JUNCTION @ATTACH %j8(p) => @PLACE(25, 0) => %dot44;
+//   $JUNCTION @ATTACH %j15(p) => @PLACE(32, 0) => %dot45;
+//   $JUNCTION @ATTACH %j16(p) => @PLACE(39, 0) => %dot46;
+//   $JUNCTION @ATTACH %j17(p) => @PLACE(47, 0) => %dot47;
+//   $JUNCTION @ATTACH %j18(p) => @PLACE(55, 0) => %dot48;
+//   $JUNCTION @ATTACH %j19(p) => @PLACE(60, 0) => %dot49;
+//   $JUNCTION @ATTACH %j20(p) => @PLACE(67, 0) => %dot50;
+//   $JUNCTION @ATTACH %j9(p) => @PLACE(75, 0) => %dot51;
+//   $JUNCTION @ATTACH %j10(p) => @PLACE(83, 0) => %dot52;
+//   $JUNCTION @ATTACH %j23(p) => @PLACE(88, 0) => %dot53;
+//   $JUNCTION @ATTACH %j11(p) => @PLACE(94, 0) => %dot54;
+//   $JUNCTION @ATTACH %j12(p) => @PLACE(100, 0) => %dot55;
+//   $JUNCTION @ATTACH %j13(p) => @PLACE(106, 0) => %dot56;
+//   $JUNCTION @ATTACH %j14(p) => @PLACE(125, 0) => %dot57;
+//   $JUNCTION @ATTACH %j21(p) => @PLACE(133, 0) => %dot58;
+//   $JUNCTION @ATTACH %j22(p) => @PLACE(141, 0) => %dot59;
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(148, 0) => %dot60;
+//   $JUNCTION @ATTACH %j72(p) => @PLACE(25, -58.4) => %dot61;
+//   $JUNCTION @ATTACH %j73(p) => @PLACE(32, -58.4) => %dot62;
+//   $JUNCTION @ATTACH %j74(p) => @PLACE(39, -58.4) => %dot63;
+//   $JUNCTION @ATTACH %j75(p) => @PLACE(47, -58.4) => %dot64;
+//   $JUNCTION @ATTACH %j76(p) => @PLACE(55, -58.4) => %dot65;
+//   $JUNCTION @ATTACH %j77(p) => @PLACE(60, -58.4) => %dot66;
+//   $JUNCTION @ATTACH %j78(p) => @PLACE(67, -58.4) => %dot67;
+//   $JUNCTION @ATTACH %j79(p) => @PLACE(84, -58.4) => %dot68;
+//   $JUNCTION @ATTACH %j80(p) => @PLACE(88, -58.4) => %dot69;
+//   $JUNCTION @ATTACH %j81(p) => @PLACE(100, -58.4) => %dot70;
+//   $JUNCTION @ATTACH %j82(p) => @PLACE(106, -58.4) => %dot71;
+//   $JUNCTION @ATTACH %j83(p) => @PLACE(116, -58.4) => %dot72;
+//   $JUNCTION @ATTACH %j84(p) => @PLACE(125, -58.4) => %dot73;
+//   $JUNCTION @ATTACH %j85(p) => @PLACE(133, -58.4) => %dot74;
+//   $JUNCTION @ATTACH %j86(p) => @PLACE(141, -58.4) => %dot75;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(75, -13.6) => %dot76;
+//   $JUNCTION @ATTACH (78, -10.4)(p) => @PLACE(78, -10.4) => %dot77;
+//   $JUNCTION @ATTACH %j4(p) => @PLACE(94, -13.6) => %dot78;
+//   $JUNCTION @ATTACH %j5(p) => @PLACE(94, -37.6) => %dot79;
+//   &net18 @WIRE(mode="straight") {#M512:2 #M513:2};
+//   $JUNCTION @ATTACH (97, -10.4)(p) => @PLACE(97, -10.4) => %dot80;
+//   &VDD @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", size=1.5116, bold=false) => @PLACE(149.4, 2.3) => %label1;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+//   &VSS @TEXT("\textbf{\textit{V}}_{\textbf{SS}}", size=1.5116, bold=false) => @PLACE(149.4, -58.8) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   %port1 @TEXT("\textbf{\textit{V}}_{\textbf{i+}}", dx=-1.7, dy=-0.3, halign="end", size=1.5116, bold=false) => %label2;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label2(label);
+//   %port2 @TEXT("\textbf{\textit{V}}_{\textbf{i-}}", dx=0, dy=-2.8, halign="end", size=1.5116, bold=false) => %label3;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label3(label);
+//   %port3 @TEXT("\textbf{\textit{V}}_{\textbf{o}}", dx=1.3, dy=-0.3, size=1.5116, bold=false) => %label4;
+//   $CANVAS_LABEL @ATTACH(bind="net") %label4(label);
+//   #M3
+//       @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M3::name(label);
+//   #M101
+//       @TEXT("\textbf{\textit{M}}_{\textbf{101}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M101::name(label);
+//   #M180
+//       @TEXT("\textbf{\textit{M}}_{\textbf{180}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M180::name(label);
+//   #M160
+//       @TEXT("\textbf{\textit{M}}_{\textbf{160}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M160::name(label);
+//   #M600
+//       @TEXT("\textbf{\textit{M}}_{\textbf{600}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M600::name(label);
+//   #M240
+//       @TEXT("\textbf{\textit{M}}_{\textbf{240}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M240::name(label);
+//   #M250
+//       @TEXT("\textbf{\textit{M}}_{\textbf{250}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M250::name(label);
+//   #M620
+//       @TEXT("\textbf{\textit{M}}_{\textbf{620}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M620::name(label);
+//   #M531
+//       @TEXT("\textbf{\textit{M}}_{\textbf{531}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M531::name(label);
+//   #M502
+//       @TEXT("\textbf{\textit{M}}_{\textbf{502}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M502::name(label);
+//   #M503
+//       @TEXT("\textbf{\textit{M}}_{\textbf{503}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M503::name(label);
+//   #M512
+//       @TEXT("\textbf{\textit{M}}_{\textbf{512}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M512::name(label);
+//   #M513
+//       @TEXT("\textbf{\textit{M}}_{\textbf{513}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M513::name(label);
+//   #M541
+//       @TEXT("\textbf{\textit{M}}_{\textbf{541}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M541::name(label);
+//   #M591
+//       @TEXT("\textbf{\textit{M}}_{\textbf{591}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M591::name(label);
+//   #M560
+//       @TEXT("\textbf{\textit{M}}_{\textbf{560}}", key="name", dx=1.4, dy=-3.6, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M560::name(label);
+//   #M300
+//       @TEXT("\textbf{\textit{M}}_{\textbf{300}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M300::name(label);
+//   #M310
+//       @TEXT("\textbf{\textit{M}}_{\textbf{310}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M310::name(label);
+//   #M400
+//       @TEXT("\textbf{\textit{M}}_{\textbf{400}}", key="name", dx=0.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M400::name(label);
+//   #M120
+//       @TEXT("\textbf{\textit{M}}_{\textbf{120}}", key="name", dx=-0.6, dy=-2.7, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M120::name(label);
+//   #M110
+//       @TEXT("\textbf{\textit{M}}_{\textbf{110}}", key="name", dx=-1.4, dy=1.2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M110::name(label);
+//   #M150
+//       @TEXT("\textbf{\textit{M}}_{\textbf{150}}", key="name", dx=-0.6, dy=-0.3, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M150::name(label);
+//   #M130
+//       @TEXT("\textbf{\textit{M}}_{\textbf{130}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M130::name(label);
+//   #M610
+//       @TEXT("\textbf{\textit{M}}_{\textbf{610}}", key="name", dx=-1.6, dy=-4.6, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M610::name(label);
+//   #M151
+//       @TEXT("\textbf{\textit{M}}_{\textbf{151}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M151::name(label);
+//   #M131
+//       @TEXT("\textbf{\textit{M}}_{\textbf{131}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M131::name(label);
+//   #M241
+//       @TEXT("\textbf{\textit{M}}_{\textbf{241}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M241::name(label);
+//   #M251
+//       @TEXT("\textbf{\textit{M}}_{\textbf{251}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M251::name(label);
+//   #M2
+//       @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=-0.6, dy=2, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M2::name(label);
+//   #M501
+//       @TEXT("\textbf{\textit{M}}_{\textbf{501}}", key="name", dx=0.6, dy=2.3, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M501::name(label);
+//   #M500
+//       @TEXT("\textbf{\textit{M}}_{\textbf{500}}", key="name", dx=0.6, dy=2.3, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M500::name(label);
+//   #M505
+//       @TEXT("\textbf{\textit{M}}_{\textbf{505}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M505::name(label);
+//   #M530
+//       @TEXT("\textbf{\textit{M}}_{\textbf{530}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M530::name(label);
+//   #M570
+//       @TEXT("\textbf{\textit{M}}_{\textbf{570}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M570::name(label);
+//   #M580
+//       @TEXT("\textbf{\textit{M}}_{\textbf{580}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M580::name(label);
+//   #M511
+//       @TEXT("\textbf{\textit{M}}_{\textbf{511}}", key="name", dx=-0.6, dy=2.3, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M511::name(label);
+//   #M510
+//       @TEXT("\textbf{\textit{M}}_{\textbf{510}}", key="name", dx=-0.6, dy=2.3, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M510::name(label);
+//   #M521
+//       @TEXT("\textbf{\textit{M}}_{\textbf{521}}", key="name", dx=2.6, dy=2, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M521::name(label);
+//   #M520
+//       @TEXT("\textbf{\textit{M}}_{\textbf{520}}", key="name", dx=-0.6, dy=2.3, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M520::name(label);
+//   #M540
+//       @TEXT("\textbf{\textit{M}}_{\textbf{540}}", key="name", dx=2.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M540::name(label);
+//   #M550
+//       @TEXT("\textbf{\textit{M}}_{\textbf{550}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M550::name(label);
+//   #M590
+//       @TEXT("\textbf{\textit{M}}_{\textbf{590}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M590::name(label);
+//   #M301
+//       @TEXT("\textbf{\textit{M}}_{\textbf{301}}", key="name", dx=-0.6, dy=-2.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M301::name(label);
+//   #M311
+//       @TEXT("\textbf{\textit{M}}_{\textbf{311}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M311::name(label);
+//   #M410
+//       @TEXT("\textbf{\textit{M}}_{\textbf{410}}", key="name", dx=0.6, dy=-2.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #M410::name(label);
+//   #CM2a
+//       @TEXT("\textbf{\textit{C}}_{\textbf{M2a}}", key="name", dx=0, dy=-4.8, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CM2a::name(label);
+//   #CM2b
+//       @TEXT("\textbf{\textit{C}}_{\textbf{M2b}}", key="name", dx=0, dy=-4.8, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CM2b::name(label);
+//   #CM1a
+//       @TEXT("\textbf{\textit{C}}_{\textbf{M1a}}", key="name", dx=6, dy=-0.3, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CM1a::name(label);
+//   #CM1b
+//       @TEXT("\textbf{\textit{C}}_{\textbf{M1b}}", key="name", dx=6, dy=-0.3, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CM1b::name(label);
+//   #CM3
+//       @TEXT("\textbf{\textit{C}}_{\textbf{M3}}", key="name", dx=0, dy=-2.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CM3::name(label);
+//   #I1
+//       @TEXT("\textbf{\textit{I}}_{\textbf{1}}", key="name", dx=1.6, dy=-0.3, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #I1::name(label);
+//   #M3
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M101
+//       @TEXT("Source W/L=100/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M180
+//       @TEXT("Source W/L=40/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M160
+//       @TEXT("Source W/L=20/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M600
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M240
+//       @TEXT("Source W/L=20/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M250
+//       @TEXT("Source W/L=20/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M620
+//       @TEXT("Source W/L=25/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M531
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M502
+//       @TEXT("Source W/L=10/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M503
+//       @TEXT("Source W/L=30/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M512
+//       @TEXT("Source W/L=10/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M513
+//       @TEXT("Source W/L=30/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M541
+//       @TEXT("Source W/L=100/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M591
+//       @TEXT("Source W/L=100/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M560
+//       @TEXT("Source W/L=24/1; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M300
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M310
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M400
+//       @TEXT("Source W/L=420/1; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M120
+//       @TEXT("Source W/L=10/4; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M110
+//       @TEXT("Source W/L=10/4; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M150
+//       @TEXT("Source W/L=100/1; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M130
+//       @TEXT("Source W/L=50/1; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M610
+//       @TEXT("Source W/L=2/1; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M151
+//       @TEXT("Source W/L=100/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M131
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M241
+//       @TEXT("Source W/L=25/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M251
+//       @TEXT("Source W/L=25/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M2
+//       @TEXT("Source W/L=25/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M501
+//       @TEXT("Source W/L=4/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M500
+//       @TEXT("Source W/L=4/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M505
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M530
+//       @TEXT("Source W/L=3/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M570
+//       @TEXT("Source W/L=4/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M580
+//       @TEXT("Source W/L=4/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M511
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M510
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M521
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M520
+//       @TEXT("Source W/L=2/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M540
+//       @TEXT("Source W/L=3/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M550
+//       @TEXT("Source W/L=3/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M590
+//       @TEXT("Source W/L=8/1; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M301
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M311
+//       @TEXT("Source W/L=50/2; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   #M410
+//       @TEXT("Source W/L=140/1; physical unit not specified", key="value", dx=-1, dy=0, halign="start", valign="baseline",
+//       size=1.5116, bold=false, textvisible=false);
+//   (0, 0)
+//       @TEXT("Unassigned adjacent source text: M140 50/1. Original figure6-37 has no fourth transistor glyph at this location. This text is not assigned as a device, a M610 value, or an actual electrical parameter.",
+//       size=1.5116, bold=false, textvisible=false);
+//   %vdd1 @TEXT("${p}", key="netname", textvisible=false);
+//   %port1 @TEXT("${p}", key="netname", textvisible=false);
+//   %port2 @TEXT("${p}", key="netname", textvisible=false);
+//   %port3 @TEXT("${p}", key="netname", textvisible=false)
+// }
+ends Hybrid_Nested_Miller_Four_Stage_Operational_Amplifier

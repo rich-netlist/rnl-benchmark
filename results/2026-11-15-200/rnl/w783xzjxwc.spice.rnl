@@ -1,0 +1,97 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+* }
+.subckt dut VIN VSS VC S1
+.model ideal_switch SW(RON=1 ROFF=1e12 VT=0.5 VH=0)
+C1 VC VSS 1p
+Ileakage VC VSS DC 1m
+IOUT net0 VC DC 1m
+S1 VIN net0 S1 VSS ideal_switch
+* @RNL(author="analog-canvas") {
+*   %dut_SYMBOL = @DEFINE-SYMBOL(box=[-5, -4, 5, 4]) {
+*     (0, 4) @PIN(terminal="VIN", label="\textbf{\textit{V}}_{\textbf{\textit{IN}}}", direction="up");
+*     (5, -1) @PIN(terminal="VC", label="\textbf{\textit{V}}_{\textbf{\textit{C}}}", direction="right");
+*     (0, 0) @RECTANGLE(width=8, height=6);
+*     @LINE {(0, 4) (0, 3)};
+*     @LINE {(5, -1) (4, -1)}
+*   };
+*   # @SET-SYMBOL %dut_SYMBOL;
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #S1 @SET-SYMBOL $CANVAS_SIMPLE_SWITCH => @PLACE(32, -19) => @ORIENT("R0");
+*   $SUPPLY @ATTACH &VIN(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(30, -19) => @ORIENT("R90") => %vdd1;
+*   #IOUT @SET-SYMBOL $CURRENT_SOURCE => @PLACE(34, -22) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1m") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1m") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #IOUT(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #IOUT(part);
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(34, -29) => @ORIENT("R0");
+*   #Ileakage @SET-SYMBOL $CURRENT_SOURCE => @PLACE(39, -29) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1m") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1m") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #Ileakage(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #Ileakage(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(34, -31) => @ORIENT("R0") => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(39, -31) => @ORIENT("R0") => %gnd2;
+*   $IO_PORT @ATTACH &VC(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(41, -26) => @ORIENT("R180") => %port1;
+*   %j1 = (34, -26);
+*   %j2 = (39, -26);
+*   &net0 @WIRE(mode="straight") {#IOUT:1 #S1:2};
+*   &VC @WIRE(mode="straight") {#IOUT:2 %j1};
+*   &VC @WIRE(mode="straight") {%j1 #C1:1};
+*   &VC @WIRE(mode="straight") {%j1 %j2};
+*   &VC @WIRE(mode="straight") {%j2 #Ileakage:1};
+*   &VC @WIRE(mode="straight") {%j2 %port1::pin};
+*   &VIN @WIRE(mode="straight") {#S1:1 %vdd1::pin};
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(34, -26) => %dot1;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(39, -26) => %dot2;
+*   &VSS @WIRE(mode="straight") {#C1:2 %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {%gnd2::pin #Ileakage:2};
+*   #S1
+*       @TEXT("\textbf{\textit{S}}_{\textbf{1}}", key="name", dx=2.5, dy=1, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #S1::name(label);
+*   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{\textit{IN}}}", dx=-2.5, dy=2, size=1.5116, bold=false) => %power1;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+*   #IOUT
+*       @TEXT("\textbf{\textit{I}}_{\textbf{\textit{OUT}}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline",
+*       size=1.5116, bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #IOUT::name(label);
+*   #C1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
+*   #Ileakage
+*       @TEXT("\textbf{\textit{I}}_{\textbf{\textit{leakage}}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline",
+*       size=1.5116, bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #Ileakage::name(label);
+*   %port1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{\textit{C}}}", key="netname", dx=1.5, dy=-0.5, halign="start", valign="baseline",
+*       size=1.5116, bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   %vdd1 @TEXT("${p}", key="netname", textvisible=false)
+* }
+.ends dut

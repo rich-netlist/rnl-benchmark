@@ -1,8 +1,8 @@
 # RNL benchmark
 
-Two suites: the frozen **round-trip benchmark** below (100 Analog Canvas circuits, graded inside Analog Canvas, and a second set of 160, **[Season 1](season1/README.md)**, chosen by people for Schematic Arena, 20 in each of eight circuit families), and the tool-neutral **[conformance suite](conformance/README.md)**, which grades any tool that reads and writes RNL with the RNL runtime alone.
+Two suites: the frozen **round-trip benchmark** below (200 Analog Canvas circuits, graded inside Analog Canvas, and a separate set of 160, **[Season 1](season1/README.md)**, chosen by people for Schematic Arena, 20 in each of eight circuit families), and the tool-neutral **[conformance suite](conformance/README.md)**, which grades any tool that reads and writes RNL with the RNL runtime alone.
 
-100 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen, and a harness (in analog-canvas) that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
+200 schematics from the [Analog Canvas](https://analog-canvas.tokenzhang.com) Gallery, frozen (the first 100 since 2026-10-23, the second 100 since 2026-11-15), and a harness (in analog-canvas) that sends each one through **SPICE+RNL** and **Spectre+RNL** and back into Analog Canvas, then grades what came back against the original.
 
 It answers one question per change to RNL or to Canvas's RNL adapter: do more circuits survive the round trip than before, and did any get worse?
 
@@ -10,7 +10,7 @@ It answers one question per change to RNL or to Canvas's RNL adapter: do more ci
 
 | Path | What |
 |---|---|
-| `circuits/<id>.icproj.json` | The 100 Analog Canvas project files, byte for byte as stored. Never edited. |
+| `circuits/<id>.icproj.json` | The 200 Analog Canvas project files, byte for byte as stored. Never edited. |
 | `manifest.json` | Per circuit: name, author, part count, source snapshot, Gallery URL, SHA-256 of the file, feature tags. |
 | `summarize.py` | Turns a run's reports into `summary.json` and `SUMMARY.md`. |
 | `results/<date>-<label>/` | One run: `reports/<id>.json`, `summary.json`, `SUMMARY.md`, and `rnl/<id>.{spice,spectre}.rnl`, the files Canvas wrote. |
@@ -37,7 +37,9 @@ Some differences draw the same and are counted as none: a hidden label the impor
 
 Before comparing, an external definition of a reviewed device (a SKY130 transistor or BJT) that the original declares with no formal parameters is compared as declaring the reviewed interface's, with their defaults. Older Gallery projects lack them, Canvas's placement and import both declare them today, and every call gives the values. Each report lists the definitions brought up this way (`normalizedDefinitions`), and `SUMMARY.md` counts them; `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` compares against the original as stored.
 
-## How the 100 were chosen
+## How the 200 were chosen
+
+### The first 100
 
 From the 1497 public Gallery circuits whose netlist Canvas can write (snapshot of 2026-10-19; redrawn reference datasets excluded; at most 200 parts):
 
@@ -55,7 +57,27 @@ Coverage (circuits with the feature):
 | Models | sky130 bindings 74, generic models 16, external subcircuits 76, parameter expressions 5 |
 | Size | small (≤10 parts) 25, medium 50, large (>40) 25; 55 authors |
 
-Gaps: no circuit uses native buses (shipped after the snapshot), and few use no-connect marks or generic models. A later set can add them; this one stays frozen.
+Gaps: no circuit uses native buses (shipped after the snapshot), and few use no-connect marks or generic models.
+
+### The second 100
+
+Added on 2026-11-15 from the live Gallery (`select_more.py`, then `freeze_more.py`), the first 100 left as they were. From the 7726 public circuits whose netlist Canvas can write, the community's and those redrawn from the reference datasets (AnalogGenie, AnalogRetriever, Image2Net, AMS-Net, CircuitThink) alike, at most 200 parts, at least 3, and none with a placeholder or coursework name, an "(AI)" copy of a circuit that is there without it, or the name of a circuit already in:
+
+1. picked greedily as `select.py` picks, toward quotas for the 200 together (twice its own), counted from the first 100 on, with more weight on what the first 100 lack: no-connect marks, generic models, hierarchy, large circuits;
+2. at most 12 per author and 25 per reference dataset across the 200; a circuit of the Season 1 board gets a small bonus (19 are on it).
+
+73 are community circuits, 27 redrawn from the reference datasets (AnalogGenie 15, Image2Net 8, AnalogRetriever 2, AMS-Net 1, CircuitThink 1). Coverage of the second 100:
+
+| Area | Features |
+|---|---|
+| Structure | hierarchy 12, Cell symbols 12, custom symbols 7 |
+| Devices | MOS 73, BJT 16, diode 8, resistor 60, capacitor 60, inductor 14, transformer/T-coil 3, variable C 4, variable R 2, switch 12, current source 24, voltage source 12, controlled source 3, op-amp/comparator blocks 12, logic gates 10, flip-flops 3, DAC/ADC/adder/chopper 1 |
+| Supplies | VDD port 58, ground 81, filled port 16, power label 23, power rail 18 |
+| Drawing | net labels 39, hidden labels 19, mirrored parts 79, rotated parts 76, free text 28, arrows 12, rectangles 3, dashed 4, construction lines 3, circles 1, instance annotations 3, route markers 1, no-connect marks 8 |
+| Models | sky130 bindings 71, generic models 12, external subcircuits 72, parameter expressions 6 |
+| Size | small (≤10 parts) 40, medium 48, large (>40) 12; 71 authors |
+
+No public circuit uses native buses yet, so that gap stays.
 
 ## Run
 
@@ -67,7 +89,7 @@ RNL_BENCH_CORPUS=<this repo>/circuits RNL_BENCH_OUT=<out dir> \
 python3 <this repo>/summarize.py <out dir>/reports <this repo>/manifest.json <out dir> "<label>"
 ```
 
-`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_STRICT=all` turns off the equivalences above, and `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` the normalization. All 100 take about two minutes. The harness lives in analog-canvas (`apps/editor/src/features/netlist-export/rnl-benchmark.test.ts`, since cascode-ai/analog-canvas#2258), next to the importer it grades, and is skipped there unless `RNL_BENCH_CORPUS` is set.
+`RNL_BENCH_IDS=id1,id2` runs only those circuits; `RNL_BENCH_STRICT=all` turns off the equivalences above, and `RNL_BENCH_KEEP_ORIGINAL_FORMALS=1` the normalization. All 200 take about three minutes. The harness lives in analog-canvas (`apps/editor/src/features/netlist-export/rnl-benchmark.test.ts`, since cascode-ai/analog-canvas#2258), next to the importer it grades, and is skipped there unless `RNL_BENCH_CORPUS` is set.
 
 Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas commit and the `@rich-netlist/runtime` version in the label or in its `SUMMARY.md`.
 
@@ -82,7 +104,8 @@ Save a run worth keeping as `results/<date>-<label>/` with the analog-canvas com
 | `results/2026-10-31-rendered/` | `1abf83781` | `0.5.2` | 99 / 83 / 60 | 95 / 83 / 60 |
 | `results/2026-11-11-runtime-0.5.5/` | `57a1cd5af` | `0.5.5` | 100 / 97 / 83 | 100 / 92 / 83 |
 | `results/2026-11-15-rnl-0.4/` | `9cef3e7b1` (merged as `f966cdf94`) | `0.6.0-dev.6bdd5ce6`, RNL 0.4 | 100 / 100 / 86 | 100 / 100 / 86 |
+| `results/2026-11-15-200/` (200 circuits) | `0d7abbb87` | `0.6.0-dev.6bdd5ce6`, RNL 0.4 | 198 / 197 / 157 | 196 / 192 / 154 |
 
-Each count is the circuits at that level or above. `2026-10-26-reviewed-formals` is the same commit and runtime as `2026-10-26-after-review`, graded with the external-definition normalization (above): its `.rnl` files are that run's, byte for byte, so it keeps only its reports and summary. Without the normalization it grades as `2026-10-26-after-review`. `2026-10-26-equivalences` is graded with the equivalences above, without the normalization; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
+Each count is the circuits at that level or above. Runs up to `2026-11-15-rnl-0.4` grade the first 100; from `2026-11-15-200` on, all 200. In `2026-11-15-200` the first 100 grade as before (100 / 100 / 86 both ways) and the second 100 grade 98 / 97 / 71 (SPICE+RNL) and 96 / 92 / 68 (Spectre+RNL); `6ahgdzh25k`, `ar-1485`, `b9afqhsjzv` and `i2n-1477` reach L0 in one format or both. `2026-10-26-reviewed-formals` is the same commit and runtime as `2026-10-26-after-review`, graded with the external-definition normalization (above): its `.rnl` files are that run's, byte for byte, so it keeps only its reports and summary. Without the normalization it grades as `2026-10-26-after-review`. `2026-10-26-equivalences` is graded with the equivalences above, without the normalization; with `RNL_BENCH_STRICT=all` the same commit grades 92 / 68 / 13 and 91 / 64 / 13. Since 2026-10-26 L1 also requires that the editor can save the imported project; the baseline was graded without that check, and one of its Spectre L1 circuits (`xrbakw3dn5`) would not pass it.
 
 Each run's `SUMMARY.md` lists the problems by circuits affected and the issues tracking them (in analog-canvas).
