@@ -18,8 +18,7 @@ exec(compile(ast.Module(body=keep, type_ignores=[]), 'select.py', 'exec'), scope
 features = scope['features']
 
 # Licences of the reference datasets the Gallery redraws, as the conformance suite records them.
-LICENSE = {'ag': 'MIT (AnalogGenie)', 'amsnet': 'GPL-3.0 (AMS-Net)', 'ct': 'Apache-2.0 (CircuitThink)', 'ar': 'MIT (AnalogRetriever)',
-           'i2n': 'not stated (Image2Net)'}
+LICENSE = {'ag': 'MIT (AnalogGenie)', 'amsnet': 'GPL-3.0 (AMS-Net)', 'ct': 'Apache-2.0 (CircuitThink)', 'ar': 'MIT (AnalogRetriever)'}
 
 def fetch(entry):
     for attempt in range(3):

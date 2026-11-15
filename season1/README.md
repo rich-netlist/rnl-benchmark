@@ -12,7 +12,7 @@ A second frozen set for the round-trip benchmark: the 160 circuits of Schematic 
 ## What is in it
 
 - **Families**, 20 each: power management; references and bias; op amps and OTAs; signal-chain amplifiers and filters; data conversion and sampling; RF; clocking and timing; interfaces and drivers.
-- **Authors**: 32. 128 community circuits and 32 redrawn from reference datasets: AnalogGenie 19 (MIT), Image2Net 7 (licence not stated), CircuitThink 4 (Apache-2.0), AnalogRetriever 1 (MIT), AMS-Net 1 (GPL-3.0). Each keeps its source's licence (`license` in the manifest).
+- **Authors**: 32. 128 community circuits and 32 redrawn from reference datasets: AnalogGenie 19 (MIT), Image2Net 7, CircuitThink 4 (Apache-2.0), AnalogRetriever 1 (MIT), AMS-Net 1 (GPL-3.0). Each keeps its source's licence (`license` in the manifest).
 - **Size**: small (≤10 parts) 19, medium 127, large (>40) 14.
 - **Structure**: hierarchy 10 (4+ Cells: 4), Cell symbols 10, one bus.
 - **Schema**: 128 files in Project schema 83, the rest 70–80, as the Gallery stores them.
