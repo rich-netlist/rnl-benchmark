@@ -1,0 +1,232 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @USE-PACKAGE(name="rnl-std-functional", version="0.4")
+* }
+.subckt opamp VIP VIN VDD VSS VOUT params: gain=1e6 vhigh=5 vlow=-5
+Blin nlin 0 V={gain*(V(VIP)-V(VIN))}
+Bcore VOUT 0 V={0.5*(vhigh+(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12)))-sqrt((vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))*(vhigh-(0.5*(vlow+V(nlin)+sqrt((V(nlin)-vlow)*(V(nlin)-vlow)+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))))+(1e-4*(vhigh-vlow))*(1e-4*(vhigh-vlow))+1e-12))}
+.ends opamp
+
+.subckt dut VSS IN0 IN1 IN2 INN U_Fk S1 e o
+.model ideal_switch SW(RON=1 ROFF=1e12 VT=0.5 VH=0)
+C0 net6 net4 1p
+C1 net2 net4 1p
+C2 net5 net4 1p
+CN net0 net4 1p
+Co net4 net1 1p
+Co2 net7 net3 1p
+S1 net1 VSS S1 VSS ideal_switch
+Se0 net6 VSS e VSS ideal_switch
+Se1 net2 VSS e VSS ideal_switch
+Se2 net5 VSS e VSS ideal_switch
+Se4 net4 -Fk e VSS ideal_switch
+Se5 net7 VSS e VSS ideal_switch
+Se6 net3 U_Fk e VSS ideal_switch
+SeN net0 VSS e VSS ideal_switch
+So0 IN0 net6 o VSS ideal_switch
+So1 IN1 net2 o VSS ideal_switch
+So2 IN2 net5 o VSS ideal_switch
+So4 net1 -Fk o VSS ideal_switch
+So5 -Fk net7 o VSS ideal_switch
+SoN INN net0 o VSS ideal_switch
+X1 VSS net4 0 VSS -Fk opamp gain=1e6
+X2 VSS net3 0 VSS U_Fk opamp gain=1e6
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   $IO_PORT @ATTACH &IN0(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, 0) => @ORIENT("R0") => %port1;
+*   #So0 @SET-SYMBOL $SWITCH => @PLACE(4, 0) => @ORIENT("R0");
+*   #Se0 @SET-SYMBOL $SWITCH => @PLACE(8, -2) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(8, -4) => @ORIENT("R0") => %gnd1;
+*   #C0 @SET-SYMBOL $CAPACITOR => @PLACE(12, 0) => @ORIENT("R90");
+*   $IO_PORT @ATTACH &IN1(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, -8) => @ORIENT("R0") => %port2;
+*   #So1 @SET-SYMBOL $SWITCH => @PLACE(4, -8) => @ORIENT("R0");
+*   #Se1 @SET-SYMBOL $SWITCH => @PLACE(8, -10) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(8, -12) => @ORIENT("R0") => %gnd2;
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(12, -8) => @ORIENT("R90");
+*   $IO_PORT @ATTACH &IN2(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, -16) => @ORIENT("R0") => %port3;
+*   #So2 @SET-SYMBOL $SWITCH => @PLACE(4, -16) => @ORIENT("R0");
+*   #Se2 @SET-SYMBOL $SWITCH => @PLACE(8, -18) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(8, -20) => @ORIENT("R0") => %gnd3;
+*   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(12, -16) => @ORIENT("R90");
+*   $IO_PORT @ATTACH &INN(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(0, -24) => @ORIENT("R0") => %port4;
+*   #SoN @SET-SYMBOL $SWITCH => @PLACE(4, -24) => @ORIENT("R0");
+*   #SeN @SET-SYMBOL $SWITCH => @PLACE(8, -26) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(8, -28) => @ORIENT("R0") => %gnd4;
+*   #CN @SET-SYMBOL $CAPACITOR => @PLACE(12, -24) => @ORIENT("R90");
+*   #X1 @SET-SYMBOL(terminals=[[1, "inp"], [2, "inn"], [5, "out"]]) $OPAMP => @PLACE(26, -9) => @ORIENT("MX");
+*   $CANVAS_PARAMETER @ATTACH(name="vhigh", text="VDD") #X1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="vlow", text="VSS") #X1(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(21, -10) => @ORIENT("R0") => %gnd5;
+*   #Co @SET-SYMBOL $CAPACITOR => @PLACE(24, -3) => @ORIENT("R90");
+*   #So4 @SET-SYMBOL $SWITCH => @PLACE(31, -6) => @ORIENT("R270");
+*   #S1 @SET-SYMBOL $SWITCH => @PLACE(35, -3) => @ORIENT("R0");
+*   #Se4 @SET-SYMBOL $SWITCH => @PLACE(25, -14) => @ORIENT("R0");
+*   #So5 @SET-SYMBOL $SWITCH => @PLACE(35, -9) => @ORIENT("R0");
+*   #Se5 @SET-SYMBOL $SWITCH => @PLACE(39, -11) => @ORIENT("R270");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(39, -13) => @ORIENT("R0") => %gnd6;
+*   #Co2 @SET-SYMBOL $CAPACITOR => @PLACE(43, -9) => @ORIENT("R90");
+*   #X2 @SET-SYMBOL(terminals=[[1, "inp"], [2, "inn"], [5, "out"]]) $OPAMP => @PLACE(51, -10) => @ORIENT("MX");
+*   $CANVAS_PARAMETER @ATTACH(name="vhigh", text="VDD") #X2(part);
+*   $CANVAS_PARAMETER @ATTACH(name="vlow", text="VSS") #X2(part);
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(46, -11) => @ORIENT("R0") => %gnd7;
+*   #Se6 @SET-SYMBOL $SWITCH => @PLACE(51, -5) => @ORIENT("R0");
+*   $IO_PORT @ATTACH &U_Fk(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(59, -10) => @ORIENT("MY") => %port5;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(39, -4) => @ORIENT("R0") => %gnd8;
+*   %j1 = (17, -8);
+*   %j2 = (17, -16);
+*   %j3 = (19, -8);
+*   %j4 = (31, -3);
+*   %j5 = (31, -9);
+*   %j6 = (46, -9);
+*   %j7 = (56, -10);
+*   &IN0 @WIRE(mode="straight") {%port1::pin #So0:1};
+*   &net6 @WIRE(mode="straight") {#So0:2 #Se0:1};
+*   &net6 @WIRE(mode="straight") {#Se0:1 #C0:1};
+*   &IN1 @WIRE(mode="straight") {%port2::pin #So1:1};
+*   &net2 @WIRE(mode="straight") {#So1:2 #Se1:1};
+*   &net2 @WIRE(mode="straight") {#Se1:1 #C1:1};
+*   &IN2 @WIRE(mode="straight") {%port3::pin #So2:1};
+*   &net5 @WIRE(mode="straight") {#So2:2 #Se2:1};
+*   &net5 @WIRE(mode="straight") {#Se2:1 #C2:1};
+*   &INN @WIRE(mode="straight") {%port4::pin #SoN:1};
+*   &net0 @WIRE(mode="straight") {#SoN:2 #SeN:1};
+*   &net0 @WIRE(mode="straight") {#SeN:1 #CN:1};
+*   &net4 @WIRE(mode="straight") {#C0:2 (17, 0) %j1};
+*   &net4 @WIRE(mode="straight") {%j1 %j2};
+*   &net4 @WIRE(mode="straight") {%j2 (17, -24) #CN:2};
+*   &net4 @WIRE(mode="straight") {#C1:2 %j1};
+*   &net4 @WIRE(mode="straight") {#C2:2 %j2};
+*   &net4 @WIRE(mode="straight") {%j1 %j3};
+*   &net4 @WIRE(mode="straight") {%j3 #X1:2};
+*   &net4 @WIRE(mode="straight") {%j3 (19, -3) #Co:1};
+*   &net4 @WIRE(mode="straight") {%j3 (19, -14) #Se4:1};
+*   &VSS @WIRE(mode="straight") {#X1:1 %gnd5::pin};
+*   &net1 @WIRE(mode="straight") {#Co:2 %j4};
+*   &net1 @WIRE(mode="straight") {%j4 #So4:1};
+*   &net1 @WIRE(mode="straight") {%j4 #S1:1};
+*   &"-Fk" @WIRE(mode="straight") {#X1:5 %j5};
+*   &"-Fk" @WIRE(mode="straight") {%j5 #So5:1};
+*   &"-Fk" @WIRE(mode="straight") {#So4:2 %j5};
+*   &"-Fk" @WIRE(mode="straight") {#Se4:2 (31, -14) %j5} => %wire1;
+*   &net7 @WIRE(mode="straight") {#So5:2 #Se5:1};
+*   &net7 @WIRE(mode="straight") {#Se5:1 #Co2:1};
+*   &net3 @WIRE(mode="straight") {#Co2:2 %j6};
+*   &net3 @WIRE(mode="straight") {%j6 #X2:2};
+*   &VSS @WIRE(mode="straight") {#X2:1 %gnd7::pin};
+*   &net3 @WIRE(mode="straight") {%j6 (46, -5) #Se6:1};
+*   &U_Fk @WIRE(mode="straight") {#X2:5 %j7};
+*   &U_Fk @WIRE(mode="straight") {%j7 %port5::pin};
+*   &U_Fk @WIRE(mode="straight") {#Se6:2 (56, -5) %j7};
+*   &VSS @WIRE(mode="straight") {#S1:2 (39, -3) %gnd8::pin};
+*   $JUNCTION @ATTACH %j7(p) => @PLACE(56, -10) => %dot1;
+*   &VSS @WIRE(mode="straight") {%gnd1::pin #Se0:2};
+*   &VSS @WIRE(mode="straight") {%gnd2::pin #Se1:2};
+*   &VSS @WIRE(mode="straight") {%gnd3::pin #Se2:2};
+*   &VSS @WIRE(mode="straight") {%gnd6::pin #Se5:2};
+*   &VSS @WIRE(mode="straight") {%gnd4::pin #SeN:2};
+*   $JUNCTION @ATTACH (8, -24)(p) => @PLACE(8, -24) => %dot2;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(31, -3) => %dot3;
+*   $JUNCTION @ATTACH (8, -8)(p) => @PLACE(8, -8) => %dot4;
+*   $JUNCTION @ATTACH %j6(p) => @PLACE(46, -9) => %dot5;
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(31, -9) => %dot6;
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(17, -8) => %dot7;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(17, -16) => %dot8;
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(19, -8) => %dot9;
+*   $JUNCTION @ATTACH (8, -16)(p) => @PLACE(8, -16) => %dot10;
+*   $JUNCTION @ATTACH (8, 0)(p) => @PLACE(8, 0) => %dot11;
+*   $JUNCTION @ATTACH (39, -9)(p) => @PLACE(39, -9) => %dot12;
+*   %port1
+*       @TEXT("\textbf{\textit{sgn(bk0)}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #So0
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #Se0
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=1.7, dy=-0.5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #C0
+*       @TEXT("\textbf{\textit{μ}}_{\textbf{bk0Co}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   %port2
+*       @TEXT("\textbf{\textit{x1·sgn(bk1)}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #So1
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #Se1
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=1.7, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #C1
+*       @TEXT("\textbf{\textit{μ}}_{\textbf{bk1Co}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   %port3
+*       @TEXT("\textbf{\textit{x2·sgn(bk2)}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #So2
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #Se2
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=1.7, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #C2
+*       @TEXT("\textbf{\textit{μ}}_{\textbf{bk2Co}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   %port4
+*       @TEXT("\textbf{\textit{xN·sgn(bkN)}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #SoN
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #SeN
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=1.7, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #CN
+*       @TEXT("\textbf{\textit{μ}}_{\textbf{bkNCo}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #X1
+*       @TEXT("\textbf{\textit{X}}_{\textbf{1}}", key="name", dx=-0.5, dy=3.9, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X1::name(label);
+*   #Co
+*       @TEXT("\textbf{\textit{C}}_{\textbf{o}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #Co::name(label);
+*   #So4
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=-0.8, dy=-0.6, halign="end", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #S1
+*       @TEXT("\textbf{\textit{S}}_{\textbf{1}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #S1::name(label);
+*   #Se4
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #So5
+*       @TEXT("\textbf{\textit{o}}", key="name", dx=0, dy=-1.8, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #Se5
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=0.5, dy=2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #Co2
+*       @TEXT("\textbf{\textit{C'o}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X2
+*       @TEXT("\textbf{\textit{X}}_{\textbf{2}}", key="name", dx=-0.5, dy=-4.5, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #X2::name(label);
+*   #Se6
+*       @TEXT("\textbf{\textit{e}}", key="name", dx=0, dy=1.2, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   %port5
+*       @TEXT("\textbf{\textit{U(Fk)}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   %wire1 @TEXT("\textbf{\textit{-Fk}}", size=1.5116, bold=false) => @PLACE(31.8, -12.5) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label)
+* }
+.ends dut
