@@ -1,0 +1,91 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+// }
+
+subckt voltage_amplifier (VIN VOUT VDD VSS)
+parameters gain=1
+ECORE (VOUT 0 VIN 0) vcvs gain=gain
+ends voltage_amplifier
+
+subckt Main (Vin Vout)
+CC1 (net1 Vout) capacitor c=1p
+CC2 (net1 net0) capacitor c=1p
+X1 (Vin net1 0 0) voltage_amplifier
+X2 (net1 net0 0 0) voltage_amplifier
+X3 (net0 Vout 0 0) voltage_amplifier
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(22, -29) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(49, -29) => @ORIENT("R180") => %port2;
+//   #X1 @SET-SYMBOL(terminals=[[1, "in"], [2, "out"]]) $CANVAS_VOLTAGE_AMPLIFIER_LETTERED => @PLACE(26, -29) => @ORIENT("R0");
+//   #X2 @SET-SYMBOL(terminals=[[1, "in"], [2, "out"]]) $CANVAS_VOLTAGE_AMPLIFIER_LETTERED => @PLACE(35, -29) => @ORIENT("R0");
+//   #X3 @SET-SYMBOL(terminals=[[1, "in"], [2, "out"]]) $CANVAS_VOLTAGE_AMPLIFIER_LETTERED => @PLACE(44, -29) => @ORIENT("R0");
+//   #CC2 @SET-SYMBOL $CAPACITOR => @PLACE(35, -25) => @ORIENT("R90");
+//   #CC1 @SET-SYMBOL $CAPACITOR => @PLACE(39, -21) => @ORIENT("R90");
+//   %j1 = (31, -25);
+//   %j2 = (40, -29);
+//   %j3 = (48, -29);
+//   %j4 = (39, -29);
+//   %j5 = (29, -29);
+//   %j6 = (38, -29);
+//   %j7 = (47, -29);
+//   %j8 = (41, -21);
+//   %j9 = (37, -21);
+//   %j10 = (33, -25);
+//   %j11 = (37, -25);
+//   &Vout @WIRE(mode="straight") {%j8 (48, -21) %j3};
+//   &Vout @WIRE(mode="straight") {%j3 %port2::pin};
+//   &Vout @WIRE(mode="straight") {%j7 %j3};
+//   &net0 @WIRE(mode="straight") {%j11 (39, -25) %j4};
+//   &net0 @WIRE(mode="straight") {%j6 %j4};
+//   &net0 @WIRE(mode="straight") {%j4 %j2};
+//   &net1 @WIRE(mode="straight") {%j5 #X2:1};
+//   &net1 @WIRE(mode="straight") {#X2:1 %j1};
+//   &net1 @WIRE(mode="straight") {%j1 %j10};
+//   &net1 @WIRE(mode="straight") {%j1 (31, -21) %j9};
+//   &Vin @WIRE(mode="straight") {%port1::pin #X1:1};
+//   &Vout @WIRE(mode="straight") {%j8 #CC1:2};
+//   &Vout @WIRE(mode="straight") {%j7 #X3:2};
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(48, -29) => %dot1;
+//   &net0 @WIRE(mode="straight") {%j11 #CC2:2};
+//   &net0 @WIRE(mode="straight") {%j6 #X2:2};
+//   $JUNCTION @ATTACH %j4(p) => @PLACE(39, -29) => %dot2;
+//   &net0 @WIRE(mode="straight") {%j2 #X3:1};
+//   &net1 @WIRE(mode="straight") {%j5 #X1:2};
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(31, -25) => %dot3;
+//   $JUNCTION @ATTACH (31, -29)(p) => @PLACE(31, -29) => %dot4;
+//   &net1 @WIRE(mode="straight") {%j10 #CC2:1};
+//   &net1 @WIRE(mode="straight") {%j9 #CC1:1};
+//   %port1
+//       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+//   %port2
+//       @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="netname", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+//   #X1
+//       @TEXT("\textbf{\textit{A}}_{\textbf{1}}", key="name", dx=-0.5, dy=-4.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   #X2
+//       @TEXT("\textbf{\textit{A}}_{\textbf{2}}", key="name", dx=-0.5, dy=-4.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   #X3
+//       @TEXT("\textbf{\textit{A}}_{\textbf{3}}", key="name", dx=-0.5, dy=-4.6, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   #CC2
+//       @TEXT("\textbf{\textit{C}}_{\textbf{C}}_{\textbf{2}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline",
+//       size=1.5116, bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CC2::name(label);
+//   #CC1
+//       @TEXT("\textbf{\textit{C}}_{\textbf{C}}_{\textbf{1}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline",
+//       size=1.5116, bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CC1::name(label)
+// }
+ends Main

@@ -1,0 +1,97 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @DEVICE(model="sky130_fd_pr__npn_05v5_W1p00L1p00", terminals=["c", "b", "e", "s"], type="npn")
+* }
+.subckt dut VSS
+.model DIODE D(IS=1e-14 N=1)
+C1 net3 VSS 470uF
+D1 net2 net0 DIODE
+XQ1 net2 NC0001 net3 VSS sky130_fd_pr__npn_05v5_W1p00L1p00 m=1
+R1 net0 VSS 100Ω
+R2 net1 net3 1kΩ
+V1 net1 VSS DC 7.2V
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #V1 @SET-SYMBOL $VOLTAGE_SOURCE => @PLACE(0, -9) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #V1(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #V1(part);
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(6, -2) => @ORIENT("R0");
+*   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(6, -10) => @ORIENT("R0");
+*   #XQ1 @SET-SYMBOL(terminals=[[1, "c"], [2, "b"], [3, "e"]]) $NPN => @PLACE(13, -8) => @ORIENT("R180");
+*   $CANVAS_NAME @ATTACH(name="Q1") #XQ1(part);
+*   #D1 @SET-SYMBOL $LED => @PLACE(13, -14) => @ORIENT("R0");
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(13, -20) => @ORIENT("R0");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(0, -11) => @ORIENT("R0") => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(6, -12) => @ORIENT("R0") => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(13, -22) => @ORIENT("R0") => %gnd3;
+*   $NO_CONNECT @ATTACH #XQ1:2(t) => @PLACE(16, -8);
+*   %j1 = (6, -6);
+*   &net1 @WIRE(mode="straight") {#V1:1 (0, 0) #R2:1};
+*   &net3 @WIRE(mode="straight") {#R2:2 %j1};
+*   &net3 @WIRE(mode="straight") {%j1 #XQ1:3};
+*   &net3 @WIRE(mode="straight") {#C1:1 %j1};
+*   &net2 @WIRE(mode="straight") {#XQ1:1 #D1:1};
+*   &net0 @WIRE(mode="straight") {#D1:2 #R1:1};
+*   &VSS @WIRE(mode="straight") {%gnd1::pin #V1:2};
+*   &VSS @WIRE(mode="straight") {%gnd2::pin #C1:2};
+*   &VSS @WIRE(mode="straight") {%gnd3::pin #R1:2};
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(6, -6) => %dot1;
+*   #V1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{1}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #V1::name(label);
+*   #V1
+*       @TEXT("\textbf{7.2V}", key="value", dx=1.5, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="value") #V1::value(label);
+*   #R2
+*       @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
+*   #R2
+*       @TEXT("\textbf{1kΩ}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="value") #R2::value(label);
+*   #C1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
+*   #C1
+*       @TEXT("\textbf{470uF}", key="value", dx=1.2, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="value") #C1::value(label);
+*   #XQ1
+*       @TEXT("\textbf{\textit{Q}}_{\textbf{1}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XQ1::name(label);
+*   #D1
+*       @TEXT("\textbf{\textit{D}}_{\textbf{1}}", key="name", dx=-1.1, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #D1::name(label);
+*   #R1
+*       @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
+*   #R1
+*       @TEXT("\textbf{100Ω}", key="value", dx=0.9, dy=-2.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="value") #R1::value(label)
+* }
+.ends dut

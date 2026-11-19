@@ -1,0 +1,87 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+//   @USE-PACKAGE(name="rnl-std-logic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-signal-flow", version="0.4")
+// }
+
+// Ideal buffer: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt buffer (A Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(v(hA))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends buffer
+
+subckt adder (A B Y VDD VSS)
+ESUMA (Y nsum A 0) vcvs gain=1
+ESUMB (nsum 0 B 0) vcvs gain=1
+ends adder
+
+subckt Main (VDD VSS Vin Vin2)
+X1 (Vin Vin2 net0 VDD VSS) adder
+X2 (net0 net1 VDD VSS) buffer
+X3 (net1 net2 VDD VSS) buffer
+X4 (net2 Vin2 VDD VSS) buffer
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(16, -26) => @ORIENT("R0") => %port1;
+//   #X1 @SET-SYMBOL(terminals=[[1, "in1"], [2, "in2"], [3, "out"]]) $ADDER_SYMBOL => @PLACE(20, -26) => @ORIENT("R0");
+//   $CANVAS_UNNAMED @ATTACH #X1(part);
+//   #X2 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $BUFFER => @PLACE(26, -26) => @ORIENT("R0");
+//   $CANVAS_UNNAMED @ATTACH #X2(part);
+//   #X3 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $BUFFER => @PLACE(31, -26) => @ORIENT("R0");
+//   $CANVAS_UNNAMED @ATTACH #X3(part);
+//   #X4 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $BUFFER => @PLACE(36, -26) => @ORIENT("R0");
+//   $CANVAS_UNNAMED @ATTACH #X4(part);
+//   $IO_PORT @ATTACH &Vin2(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(42, -26) => @ORIENT("R180") => %port2;
+//   %j1 = (40, -26);
+//   &Vin2 @WIRE(mode="straight") {#X4:2 %j1};
+//   &Vin2 @WIRE(mode="straight") {%j1 %port2::pin};
+//   &Vin2 @WIRE(mode="straight") {%j1 (40, -31) (20, -31) #X1:2};
+//   &net0 @WIRE(mode="straight") {#X1:3 #X2:1};
+//   &net1 @WIRE(mode="straight") {#X3:1 #X2:2};
+//   &net2 @WIRE(mode="straight") {#X3:2 #X4:1};
+//   &Vin @WIRE(mode="straight") {#X1:1 %port1::pin};
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(40, -26) => %dot1;
+//   %port1
+//       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=-1.5, dy=0, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+//   #X2
+//       @TEXT("\textbf{\textit{X2}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X2::name(label);
+//   #X3
+//       @TEXT("\textbf{\textit{X3}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X3::name(label);
+//   #X4
+//       @TEXT("\textbf{\textit{X4}}", key="name", dx=0, dy=-5, halign="middle", valign="baseline", size=1.5116, bold=false,
+//       textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X4::name(label);
+//   @LINE {(18.152332, -28.5) (18.847668, -28.5)} => @LAYER("top") => %polarity1_plus1;
+//   @LINE {(18.5, -28.152332) (18.5, -28.847668)} => @LAYER("top") => %polarity1_plus2;
+//   @LINE {(16.652332, -26) (17.347668, -26)} => @LAYER("top") => %polarity2_plus1;
+//   @LINE {(17, -25.652332) (17, -26.347668)} => @LAYER("top") => %polarity2_plus2;
+//   @LINE(arrow="end", arrowsize=1.656977) {(20, -31) (20, -27.5)} => @LAYER("top") => %arrow1;
+//   @LINE(arrow="end", arrowsize=1.656977) {(15.5, -26) (18.5, -26)} => @LAYER("top") => %arrow2;
+//   (30.5, -26) @RECTANGLE(width=14.5, height=6, linestyle="dotted") => @LAYER("top");
+//   (32, -20)
+//       @TEXT("\textbackslash{}frac\{-A\_0\^3\}\{\textbackslash{}left(1+\textbackslash{}frac\{s\}\{\textbackslash{}omega\_0\}\textbackslash{}right)\^3\}", halign="middle", size=1.5116, bold=true)
+//       => %text1;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+//   (45, -26.4) @TEXT("\textbf{\textit{V}}_{\textbf{out}}", halign="middle", size=1.5116, bold=true) => %text2;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+//   @LINE {(16.652332, -25) (17.347668, -25)} => @LAYER("top") => %polarity3_plus1;
+//   @LINE {(17, -24.652332) (17, -25.347668)} => @LAYER("top") => %polarity3_plus2;
+//   %port2 @TEXT("${p}", key="netname", textvisible=false)
+// }
+ends Main

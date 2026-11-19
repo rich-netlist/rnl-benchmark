@@ -1,0 +1,88 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+//   @USE-PACKAGE(name="rnl-std-logic", version="0.4")
+// }
+
+// Ideal inverter: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt inverter (A Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(1-v(hA))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends inverter
+
+subckt dut (VDD VSS)
+CL (net1 VSS) capacitor c=1p
+CT (net0 VSS) capacitor c=1p
+Iin (VSS net0) isource dc=1m
+Rf (net1 net0) resistor r=1k
+X1 (net0 net1 VDD VSS) inverter td=10p vt=10m
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   #Rf @SET-SYMBOL $RESISTOR => @PLACE(36, -18) => @ORIENT("R270");
+//   #CT @SET-SYMBOL $CAPACITOR => @PLACE(30, -25) => @ORIENT("R0");
+//   #CL @SET-SYMBOL $CAPACITOR => @PLACE(42, -25) => @ORIENT("R0");
+//   #Iin @SET-SYMBOL $CURRENT_SOURCE => @PLACE(27, -25) => @ORIENT("R180");
+//   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1m") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="high", text="1m") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #Iin(part);
+//   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #Iin(part);
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(27, -26) => @ORIENT("R0") => %gnd1;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(30, -26) => @ORIENT("R0") => %gnd2;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(42, -26) => @ORIENT("R0") => %gnd3;
+//   #X1 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(37, -22) => @ORIENT("R0");
+//   %j1 = (30, -22);
+//   %j2 = (33, -22);
+//   %j3 = (40, -22);
+//   &VSS @WIRE(mode="straight") {#CT:2 %gnd2::pin};
+//   &VSS @WIRE(mode="straight") {%gnd1::pin #Iin:1};
+//   &VSS @WIRE(mode="straight") {#CL:2 %gnd3::pin};
+//   &net0 @WIRE(mode="straight") {#Iin:2 (27, -22) %j1};
+//   &net0 @WIRE(mode="straight") {%j1 #CT:1};
+//   &net0 @WIRE(mode="straight") {%j1 %j2};
+//   &net0 @WIRE(mode="straight") {%j2 (33, -18) #Rf:2};
+//   &net0 @WIRE(mode="straight") {%j2 #X1:1};
+//   &net1 @WIRE(mode="straight") {#Rf:1 (40, -18) %j3};
+//   &net1 @WIRE(mode="straight") {#X1:2 %j3};
+//   &net1 @WIRE(mode="straight") {%j3 (42, -22) #CL:1};
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(30, -22) => %dot1;
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(33, -22) => %dot2;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(40, -22) => %dot3;
+//   #Rf
+//       @TEXT("\textbf{\textit{R}}_{\textbf{f}}", key="name", dx=0, dy=1.5, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Rf::name(label);
+//   #CT
+//       @TEXT("\textbf{\textit{C}}_{\textbf{T}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CT::name(label);
+//   #CL
+//       @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #CL::name(label);
+//   #Iin
+//       @TEXT("\textbf{\textit{I}}_{\textbf{in}}", key="name", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Iin::name(label);
+//   #X1
+//       @TEXT("\textbf{\textit{ A}}_{\textbf{0}}_{\textbf{ }}\textbf{\textit{, ω}}_{\textbf{a}}", key="name", dx=0, dy=-3.4,
+//       halign="middle", valign="baseline", size=1.5116, bold=false, textvisible=true)
+// }
+ends dut
