@@ -13,7 +13,7 @@ A tool supports RNL when what it reads, it can write again. The suite gives RNL 
 `cases/<case>/` holds one design: its entry netlists (`.sp` SPICE+RNL, `.scs` Spectre+RNL), any files they include, and `case.json` with its source, licence and the features it was chosen for. [`manifest.json`](manifest.json) lists the Gallery cases.
 
 - **50 circuits from the [Analog Canvas Gallery](https://analog-canvas.tokenzhang.com)** (snapshot 2026-11-11), each written in RNL 0.4 as SPICE+RNL and as Spectre+RNL (49, one circuit's Spectre is not written), none from the frozen 100 of the round-trip benchmark. Chosen by feature: parts outside RNL's standard series (`analog-canvas-extensions`), external subcircuits, hierarchy (3+ Cells), large circuits (120+ parts), no-connect marks, formulas in drawing text, document styles, and circuits redrawn from four reference datasets (AnalogGenie MIT, AMS-Net GPL-3.0, CircuitThink Apache-2.0, AnalogRetriever MIT), at most 3–6 per author; the rest community circuits. Each case keeps its source's licence (`case.json`).
-- Designs written outside Analog Canvas come from [rnl-gallery](https://github.com/rich-netlist/rnl-gallery) once it publishes them in RNL 0.4. Its two 0.3 designs (`ext-pll`, `ext-risca`) left the suite when it moved to 0.4; `rnl upgrade` cannot choose for their authors how the standard definitions 0.4 split or removed should be read.
+- **14 designs written outside Analog Canvas** (`ext-*`), from [rnl-gallery](https://github.com/rich-netlist/rnl-gallery) at `90751ed`, as it publishes them in RNL 0.4: `ext-pll` (CC0-1.0) and `ext-risca` (CC-BY-4.0), large hierarchies its authors upgraded from 0.3, and twelve small circuits whose drawings the RNL 0.4 solver made (CC0-1.0). Each keeps its licence file.
 
 ## Run
 
@@ -23,7 +23,7 @@ cd conformance && npm install
 node grade.mjs cases <written> <out> "<tool and version>"
 ```
 
-The cases are RNL 0.4. No release of `@rich-netlist/runtime` on npm reads 0.4 yet, so `package.json` uses the package built from rich-netlist/rnl `main` at `b4c3f857` (`vendor/`), the one Analog Canvas uses. Public packages a file names are fetched from the [package catalog](https://rich-netlist.github.io/rnl-packages/catalog.json) and verified by SHA-256. A self-check (each original graded against itself) must give every entry R3: [`results/2026-11-12-self-check`](results/2026-11-12-self-check/SUMMARY.md).
+The cases are RNL 0.4, graded with `@rich-netlist/runtime` 0.6.0 from npm, the first release that reads 0.4 and the one Analog Canvas uses (`package-lock.json` holds its integrity). Public packages a file names are fetched from the [package catalog](https://rich-netlist.github.io/rnl-packages/catalog.json) and verified by SHA-256. A self-check (each original graded against itself) must give every entry R3: [`results/2026-11-19-self-check`](results/2026-11-19-self-check/SUMMARY.md), 113 of 113 in 64 cases.
 
 Analog Canvas runs it with its driver `apps/editor/src/features/netlist-export/rnl-conformance.test.ts` (`RNL_CONF_CORPUS=… RNL_CONF_OUT=…`), which also writes the Gallery cases from a Gallery download.
 
@@ -35,5 +35,6 @@ Analog Canvas runs it with its driver `apps/editor/src/features/netlist-export/r
 | [`results/2026-11-12-analog-canvas-357eb4815`](results/2026-11-12-analog-canvas-357eb4815/SUMMARY.md) | Analog Canvas `357eb4815` | 0.3, 0.5.5 | 101 / 101 / 99 (of 101) |
 | [`results/2026-11-15-analog-canvas-f966cdf94`](results/2026-11-15-analog-canvas-f966cdf94/SUMMARY.md) | Analog Canvas `f966cdf94` | 0.4, 0.6.0-dev.6bdd5ce6 | 99 / 99 / 99 (of 99) |
 | [`results/2026-11-15-analog-canvas-751e0e3ad`](results/2026-11-15-analog-canvas-751e0e3ad/SUMMARY.md) | Analog Canvas `751e0e3ad` | 0.4, 0.6.0-dev.b4c3f857 | 99 / 99 / 99 (of 99) |
+| [`results/2026-11-20-analog-canvas-f290362e3`](results/2026-11-20-analog-canvas-f290362e3/SUMMARY.md) | Analog Canvas `f290362e3` | 0.4, 0.6.0 | 113 / 110 / 100 (of 113): the 99 Gallery entries 99 / 99 / 99, the 14 `ext-*` 14 / 11 / 1 |
 
 Each `SUMMARY.md` lists the entries below R3 and their first difference.

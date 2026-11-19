@@ -1,0 +1,596 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @DEVICE(model="sky130_fd_pr__pfet_01v8", terminals=["d", "g", "s", "b"], type="pmos");
+*   @DEVICE(model="sky130_fd_pr__nfet_01v8", terminals=["d", "g", "s", "b"], type="nmos")
+* }
+.subckt BIAS VDD VSS VX VB3
+XM10 net1 net1 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM11 VB3 net1 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM12 net1 net0 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM22 VB3 VB3 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM23 VB1 VB3 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM24 VB1 VB1 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM25 net0 net0 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM26 VX net0 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM27 net0 VX VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM28 VX VX VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+R3 VDD net0 1k
+* @RNL(author="analog-canvas") {
+*   %BIAS_SYMBOL = @DEFINE-SYMBOL(box=[-5, -7, 5, 7]) {
+*     (0, 7) @PIN(terminal="VDD", label="\textbf{\textit{V}}_{\textbf{DD}}", direction="up");
+*     (-5, 2) @PIN(terminal="VX", label="\textbf{\textit{V}}_{\textbf{X}}", direction="left");
+*     (-5, -2) @PIN(terminal="VB3", label="\textbf{\textit{V}}_{\textbf{B3}}", direction="left");
+*     (0, 0) @RECTANGLE(width=8, height=12);
+*     @LINE {(0, 7) (0, 6)};
+*     @LINE {(-5, 2) (-4, 2)};
+*     @LINE {(-5, -2) (-4, -2)}
+*   };
+*   # @SET-SYMBOL %BIAS_SYMBOL;
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #XM28 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(0, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M28") #XM28(part);
+*   #XM26 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(0, -9) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M26") #XM26(part);
+*   #XM27 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(8, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M27") #XM27(part);
+*   #XM25 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(8, -9) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M25") #XM25(part);
+*   #R3 @SET-SYMBOL $RESISTOR => @PLACE(12, 0) => @ORIENT("R0");
+*   #XM10 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(20, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M10") #XM10(part);
+*   #XM12 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(20, -9) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M12") #XM12(part);
+*   #XM11 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(28, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M11") #XM11(part);
+*   #XM22 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(28, -9) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M22") #XM22(part);
+*   #XM24 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(38, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M24") #XM24(part);
+*   #XM23 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(38, -9) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M23") #XM23(part);
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(0, 3) => @ORIENT("R0") => %vdd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(20, -13) => @ORIENT("R0") => %gnd1;
+*   $IO_PORT @ATTACH &VX(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(-3, -6) => @ORIENT("R0") => %port1;
+*   $IO_PORT @ATTACH &VB3(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(30, -4) => @ORIENT("MY") => %port2;
+*   %j1 = (8, 3);
+*   %j2 = (12, 3);
+*   %j3 = (20, 3);
+*   %j4 = (28, 3);
+*   %j5 = (8, -13);
+*   %j6 = (28, -13);
+*   %j7 = (4, 0);
+*   %j8 = (0, -3);
+*   %j9 = (4, -9);
+*   %j10 = (8, -6);
+*   %j11 = (8, -4);
+*   %j12 = (12, -3);
+*   %j13 = (24, 0);
+*   %j14 = (20, -4);
+*   %j15 = (33, -9);
+*   %j16 = (28, -6);
+*   %j17 = (38, -3);
+*   %j18 = (0, -6);
+*   %j19 = (28, -4);
+*   %j20 = (38, -6);
+*   %j21 = (41, -6);
+*   &VDD @WIRE(mode="straight") {%vdd1::pin #XM28:3};
+*   &VDD @WIRE(mode="straight") {%vdd1::pin %j1};
+*   &VDD @WIRE(mode="straight") {%j1 %j2};
+*   &VDD @WIRE(mode="straight") {%j2 %j3};
+*   &VDD @WIRE(mode="straight") {%j3 %j4};
+*   &VDD @WIRE(mode="straight") {%j4 (38, 3) #XM24:3};
+*   &VDD @WIRE(mode="straight") {#XM27:3 %j1};
+*   &VDD @WIRE(mode="straight") {#R3:1 %j2};
+*   &VDD @WIRE(mode="straight") {#XM10:3 %j3};
+*   &VDD @WIRE(mode="straight") {#XM11:3 %j4};
+*   &VSS @WIRE(mode="straight") {#XM26:3 (0, -13) %j5};
+*   &VSS @WIRE(mode="straight") {%j5 %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#XM23:3 (38, -13) %j6};
+*   &VSS @WIRE(mode="straight") {%j6 %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#XM12:3 %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#XM25:3 %j5};
+*   &VSS @WIRE(mode="straight") {#XM22:3 %j6};
+*   &VX @WIRE(mode="straight") {#XM28:1 %j8};
+*   &VX @WIRE(mode="straight") {%j8 %j18};
+*   &VX @WIRE(mode="straight") {%j18 #XM26:1};
+*   &net0 @WIRE(mode="straight") {#XM27:1 %j11};
+*   &net0 @WIRE(mode="straight") {%j11 %j10};
+*   &net0 @WIRE(mode="straight") {%j10 #XM25:1};
+*   &net1 @WIRE(mode="straight") {#XM10:1 %j14};
+*   &net1 @WIRE(mode="straight") {%j14 #XM12:1};
+*   &VB3 @WIRE(mode="straight") {#XM11:1 %j19};
+*   &VB3 @WIRE(mode="straight") {%j19 %j16};
+*   &VB3 @WIRE(mode="straight") {%j16 #XM22:1};
+*   &VB1 @WIRE(mode="straight") {#XM24:1 %j17};
+*   &VB1 @WIRE(mode="straight") {%j17 %j20};
+*   &VB1 @WIRE(mode="straight") {%j20 #XM23:1};
+*   &VX @WIRE(mode="straight") {#XM28:2 %j7};
+*   &VX @WIRE(mode="straight") {%j7 #XM27:2};
+*   &VX @WIRE(mode="straight") {%j7 (4, -3) %j8};
+*   &net0 @WIRE(mode="straight") {#XM26:2 %j9};
+*   &net0 @WIRE(mode="straight") {%j9 #XM25:2};
+*   &net0 @WIRE(mode="straight") {%j9 (4, -6) %j10};
+*   &net0 @WIRE(mode="straight") {#R3:2 %j12};
+*   &net0 @WIRE(mode="straight") {%j12 (12, -4) %j11};
+*   &net0 @WIRE(mode="straight") {#XM12:2 (16, -9) (16, -3) %j12};
+*   &net1 @WIRE(mode="straight") {#XM10:2 %j13};
+*   &net1 @WIRE(mode="straight") {%j13 #XM11:2};
+*   &net1 @WIRE(mode="straight") {%j13 (24, -4) %j14};
+*   &VB3 @WIRE(mode="straight") {#XM22:2 %j15};
+*   &VB3 @WIRE(mode="straight") {%j15 #XM23:2};
+*   &VB3 @WIRE(mode="straight") {%j15 (33, -6) %j16};
+*   &VB1 @WIRE(mode="straight") {#XM24:2 (42, 0) (42, -3) %j17};
+*   &VX @WIRE(mode="straight") {%port1::pin %j18};
+*   &VB3 @WIRE(mode="straight") {%port2::pin %j19};
+*   &VB1 @WIRE(mode="straight") {%j20 %j21} => %wire1;
+*   $JUNCTION @ATTACH (0, 3)(p) => @PLACE(0, 3) => %dot1;
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(8, 3) => %dot2;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(12, 3) => %dot3;
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(20, 3) => %dot4;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(28, 3) => %dot5;
+*   $JUNCTION @ATTACH %j19(p) => @PLACE(28, -4) => %dot6;
+*   $JUNCTION @ATTACH %j16(p) => @PLACE(28, -6) => %dot7;
+*   $JUNCTION @ATTACH %j15(p) => @PLACE(33, -9) => %dot8;
+*   $JUNCTION @ATTACH %j8(p) => @PLACE(0, -3) => %dot9;
+*   $JUNCTION @ATTACH %j18(p) => @PLACE(0, -6) => %dot10;
+*   $JUNCTION @ATTACH %j7(p) => @PLACE(4, 0) => %dot11;
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(8, -13) => %dot12;
+*   $JUNCTION @ATTACH (20, -13)(p) => @PLACE(20, -13) => %dot13;
+*   $JUNCTION @ATTACH %j6(p) => @PLACE(28, -13) => %dot14;
+*   $JUNCTION @ATTACH %j17(p) => @PLACE(38, -3) => %dot15;
+*   $JUNCTION @ATTACH %j20(p) => @PLACE(38, -6) => %dot16;
+*   $JUNCTION @ATTACH %j9(p) => @PLACE(4, -9) => %dot17;
+*   $JUNCTION @ATTACH %j11(p) => @PLACE(8, -4) => %dot18;
+*   $JUNCTION @ATTACH %j10(p) => @PLACE(8, -6) => %dot19;
+*   $JUNCTION @ATTACH %j12(p) => @PLACE(12, -3) => %dot20;
+*   $JUNCTION @ATTACH %j14(p) => @PLACE(20, -4) => %dot21;
+*   $JUNCTION @ATTACH %j13(p) => @PLACE(24, 0) => %dot22;
+*   #XM28
+*       @TEXT("\textbf{\textit{M}}_{\textbf{28}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM28::name(label);
+*   #XM26
+*       @TEXT("\textbf{\textit{M}}_{\textbf{26}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM26::name(label);
+*   #XM27
+*       @TEXT("\textbf{\textit{M}}_{\textbf{27}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM27::name(label);
+*   #XM25
+*       @TEXT("\textbf{\textit{M}}_{\textbf{25}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM25::name(label);
+*   #R3
+*       @TEXT("\textbf{\textit{R}}_{\textbf{3}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R3::name(label);
+*   #XM10
+*       @TEXT("\textbf{\textit{M}}_{\textbf{10}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM10::name(label);
+*   #XM12
+*       @TEXT("\textbf{\textit{M}}_{\textbf{12}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM12::name(label);
+*   #XM11
+*       @TEXT("\textbf{\textit{M}}_{\textbf{11}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM11::name(label);
+*   #XM22
+*       @TEXT("\textbf{\textit{M}}_{\textbf{22}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM22::name(label);
+*   #XM24
+*       @TEXT("\textbf{\textit{M}}_{\textbf{24}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM24::name(label);
+*   #XM23
+*       @TEXT("\textbf{\textit{M}}_{\textbf{23}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM23::name(label);
+*   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power1;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+*   %port1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{X}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   %port2
+*       @TEXT("\textbf{\textit{V}}_{\textbf{B3}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+*   %wire1 @TEXT("\textbf{\textit{V}}_{\textbf{B1}}", halign="middle", size=1.5116, bold=false) => @PLACE(41, -5) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+*   %vdd1 @TEXT("${p}", key="netname", textvisible=false)
+* }
+.ends BIAS
+
+.subckt dut VDD VSS VREF VB4 IBUF VIN VOUT
+CL VOUT net0 1p
+XM1 net2 net2 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM13 net3 VB4 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM14 VY EAO net3 VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM15 VY VY VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM16 GATE VY VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM17 VDD net3 GATE VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM18 net1 EAO IBUF VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM19 net1 net1 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM2 net4 net4 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM20 GATE net1 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM21 VSS IBUF GATE VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM3 net2 VREF VY VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM4 net4 FB VY VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM5 VY VB3 VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM6 EAO net2 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM7 VX net4 VDD VDD sky130_fd_pr__pfet_01v8 l=0.15 w=1 nf=1 m=1
+XM8 EAO VX VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XM9 VX VX VSS VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+XMNP VIN GATE VOUT VSS sky130_fd_pr__nfet_01v8 l=0.15 w=1 nf=1 m=1
+R1 FB VSS 1k
+R2 VOUT FB 1k
+R4 net0 VSS 1k
+RL VOUT VSS 1k
+X1 VDD VSS VX VB3 BIAS
+* @RNL(author="analog-canvas") {
+*   %dut_SYMBOL = @DEFINE-SYMBOL(box=[-6, -6, 6, 6]) {
+*     (0, 6) @PIN(terminal="VDD", label="\textbf{\textit{V}}_{\textbf{DD}}", direction="up");
+*     (-6, -2) @PIN(terminal="VREF", label="\textbf{\textit{V}}_{\textbf{REF}}", direction="left");
+*     (-6, 0) @PIN(terminal="VB4", label="\textbf{\textit{V}}_{\textbf{B4}}", direction="left");
+*     (6, -3) @PIN(terminal="IBUF", label="\textbf{\textit{I}}_{\textbf{BUF}}", direction="right");
+*     (6, 1) @PIN(terminal="VIN", label="\textbf{\textit{V}}_{\textbf{IN}}", direction="right");
+*     (6, -1) @PIN(terminal="VOUT", label="\textbf{\textit{V}}_{\textbf{OUT}}", direction="right");
+*     (0, 0) @RECTANGLE(width=10, height=10);
+*     @LINE {(0, 6) (0, 5)};
+*     @LINE {(-6, -2) (-5, -2)};
+*     @LINE {(-6, 0) (-5, 0)};
+*     @LINE {(6, -3) (5, -3)};
+*     @LINE {(6, 1) (5, 1)};
+*     @LINE {(6, -1) (5, -1)}
+*   };
+*   # @SET-SYMBOL %dut_SYMBOL;
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #XM7 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(-1, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M7") #XM7(part);
+*   #XM2 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(7, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M2") #XM2(part);
+*   #XM1 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(15, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M1") #XM1(part);
+*   #XM6 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(27, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M6") #XM6(part);
+*   #XM4 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(7, -8) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M4") #XM4(part);
+*   #XM3 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(15, -8) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M3") #XM3(part);
+*   #XM5 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(11, -14) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M5") #XM5(part);
+*   #XM9 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(-1, -8) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M9") #XM9(part);
+*   #XM8 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(27, -8) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M8") #XM8(part);
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(-1, 3) => @ORIENT("R0") => %vdd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(11, -18) => @ORIENT("R0") => %gnd1;
+*   $IO_PORT @ATTACH &VREF(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(20, -8) => @ORIENT("MY") => %port1;
+*   #XM13 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(48, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M13") #XM13(part);
+*   #XM14 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(48, -8) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M14") #XM14(part);
+*   #XM15 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(48, -14) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M15") #XM15(part);
+*   #XM16 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(56, -14) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M16") #XM16(part);
+*   #XM17 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(56, -4) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M17") #XM17(part);
+*   #XM19 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(64, 0) => @ORIENT("MY");
+*   $CANVAS_NAME @ATTACH(name="M19") #XM19(part);
+*   #XM20 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(72, 0) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M20") #XM20(part);
+*   #XM18 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(64, -8) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M18") #XM18(part);
+*   #XM21 @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $PMOS => @PLACE(72, -14) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="M21") #XM21(part);
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(48, 3) => @ORIENT("R0") => %vdd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(48, -18) => @ORIENT("R0") => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(72, -18) => @ORIENT("R0") => %gnd3;
+*   $IO_PORT @ATTACH &VB4(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(43, 0) => @ORIENT("R0") => %port2;
+*   $IO_PORT @ATTACH &IBUF(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(64, -17) => @ORIENT("R90") => %port3;
+*   #XMNP @SET-SYMBOL(terminals=[[1, "d"], [2, "g"], [3, "s"]]) $NMOS => @PLACE(80, -5) => @ORIENT("R0");
+*   $CANVAS_NAME @ATTACH(name="MNP") #XMNP(part);
+*   #R2 @SET-SYMBOL $RESISTOR => @PLACE(80, -11) => @ORIENT("R0");
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(80, -17) => @ORIENT("R0");
+*   #CL @SET-SYMBOL $CAPACITOR => @PLACE(85, -11) => @ORIENT("R0");
+*   #R4 @SET-SYMBOL $RESISTOR => @PLACE(85, -17) => @ORIENT("R0");
+*   #RL @SET-SYMBOL $RESISTOR => @PLACE(89, -13) => @ORIENT("R0");
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(85, -21) => @ORIENT("R0") => %gnd4;
+*   $IO_PORT @ATTACH &VIN(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(80, 0) => @ORIENT("R270") => %port4;
+*   $IO_PORT @ATTACH &VOUT(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(91, -8) => @ORIENT("MY") => %port5;
+*   #X1 @PLACE(38, -16) => @ORIENT("R0");
+*   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(38, -7) => @ORIENT("R0") => %vdd3;
+*   %j1 = (7, 3);
+*   %j2 = (15, 3);
+*   %j3 = (-1, -4);
+*   %j4 = (3, 0);
+*   %j5 = (7, -4);
+*   %j6 = (21, 0);
+*   %j7 = (15, -4);
+*   %j8 = (11, -11);
+*   %j9 = (2, -8);
+*   %j10 = (6, -14);
+*   %j11 = (27, -3);
+*   %j12 = (31, -18);
+*   %j13 = (56, 3);
+*   %j14 = (64, 3);
+*   %j15 = (52, -14);
+*   %j16 = (48, -11);
+*   %j17 = (48, -4);
+*   %j18 = (68, 0);
+*   %j19 = (64, -4);
+*   %j20 = (64, -14);
+*   %j21 = (59, -8);
+*   %j22 = (72, -5);
+*   %j23 = (80, -8);
+*   %j24 = (85, -8);
+*   %j25 = (89, -8);
+*   &VDD @WIRE(mode="straight") {%vdd1::pin #XM7:3};
+*   &VDD @WIRE(mode="straight") {%vdd1::pin %j1};
+*   &VDD @WIRE(mode="straight") {%j1 %j2};
+*   &VDD @WIRE(mode="straight") {%j2 (27, 3) #XM6:3};
+*   &VDD @WIRE(mode="straight") {#XM2:3 %j1};
+*   &VDD @WIRE(mode="straight") {#XM1:3 %j2};
+*   &VSS @WIRE(mode="straight") {#XM9:3 (-1, -18) %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#XM8:3 (27, -18) %gnd1::pin};
+*   &VSS @WIRE(mode="straight") {#XM5:3 %gnd1::pin};
+*   &VX @WIRE(mode="straight") {#XM7:1 %j3};
+*   &VX @WIRE(mode="straight") {%j3 #XM9:1};
+*   &VX @WIRE(mode="straight") {#XM9:2 (-5, -8) (-5, -4) %j3} => %wire1;
+*   &net4 @WIRE(mode="straight") {#XM2:1 %j5};
+*   &net4 @WIRE(mode="straight") {%j5 #XM4:1};
+*   &net2 @WIRE(mode="straight") {#XM1:1 %j7};
+*   &net2 @WIRE(mode="straight") {%j7 #XM3:1};
+*   &EAO @WIRE(mode="straight") {#XM6:1 %j11};
+*   &EAO @WIRE(mode="straight") {%j11 #XM8:1};
+*   &net4 @WIRE(mode="straight") {#XM7:2 %j4};
+*   &net4 @WIRE(mode="straight") {%j4 #XM2:2};
+*   &net4 @WIRE(mode="straight") {%j4 (3, -4) %j5};
+*   &net2 @WIRE(mode="straight") {#XM1:2 %j6};
+*   &net2 @WIRE(mode="straight") {%j6 #XM6:2};
+*   &net2 @WIRE(mode="straight") {%j6 (21, -4) %j7};
+*   &VY @WIRE(mode="straight") {#XM4:3 (7, -11) %j8};
+*   &VY @WIRE(mode="straight") {%j8 (15, -11) #XM3:3} => %wire2;
+*   &VY @WIRE(mode="straight") {#XM5:1 %j8};
+*   &VREF @WIRE(mode="straight") {#XM3:2 %port1::pin};
+*   &FB @WIRE(mode="straight") {#XM4:2 %j9} => %wire3;
+*   &VB3 @WIRE(mode="straight") {#XM5:2 %j10} => %wire4;
+*   &EAO @WIRE(mode="straight") {%j11 (44, -3) (44, -8) #XM14:2} => %wire5;
+*   &VX @WIRE(mode="straight") {#XM8:2 (31, -8) (31, -14) #X1:3} => %wire6;
+*   &VB3 @WIRE(mode="straight") {#X1:4 %j12} => %wire7;
+*   &VDD @WIRE(mode="straight") {%vdd3::pin #X1:1};
+*   &VDD @WIRE(mode="straight") {%vdd2::pin #XM13:3};
+*   &VDD @WIRE(mode="straight") {%vdd2::pin %j13};
+*   &VDD @WIRE(mode="straight") {%j13 %j14};
+*   &VDD @WIRE(mode="straight") {%j14 (72, 3) #XM20:3};
+*   &VDD @WIRE(mode="straight") {#XM17:1 %j13};
+*   &VDD @WIRE(mode="straight") {#XM19:3 %j14};
+*   &net3 @WIRE(mode="straight") {#XM13:1 %j17};
+*   &net3 @WIRE(mode="straight") {%j17 #XM14:3};
+*   &VY @WIRE(mode="straight") {#XM14:1 %j16};
+*   &VY @WIRE(mode="straight") {%j16 #XM15:1};
+*   &net1 @WIRE(mode="straight") {#XM19:1 %j19};
+*   &net1 @WIRE(mode="straight") {%j19 #XM18:1};
+*   &GATE @WIRE(mode="straight") {#XM20:1 %j22};
+*   &GATE @WIRE(mode="straight") {%j22 #XM21:3};
+*   &GATE @WIRE(mode="straight") {#XM17:3 #XM16:1};
+*   &VY @WIRE(mode="straight") {#XM15:2 %j15};
+*   &VY @WIRE(mode="straight") {%j15 #XM16:2};
+*   &VY @WIRE(mode="straight") {%j15 (52, -11) %j16};
+*   &net3 @WIRE(mode="straight") {#XM17:2 %j17};
+*   &net1 @WIRE(mode="straight") {#XM19:2 %j18};
+*   &net1 @WIRE(mode="straight") {%j18 #XM20:2};
+*   &net1 @WIRE(mode="straight") {%j18 (68, -4) %j19};
+*   &VB4 @WIRE(mode="straight") {%port2::pin #XM13:2};
+*   &IBUF @WIRE(mode="straight") {%port3::pin %j20};
+*   &IBUF @WIRE(mode="straight") {%j20 #XM18:3};
+*   &IBUF @WIRE(mode="straight") {#XM21:2 %j20};
+*   &GATE @WIRE(mode="straight") {#XM16:1 #XM21:3};
+*   &VSS @WIRE(mode="straight") {#XM15:3 %gnd2::pin};
+*   &VSS @WIRE(mode="straight") {#XM16:3 (56, -18) %gnd2::pin};
+*   &VSS @WIRE(mode="straight") {%gnd3::pin #XM21:1};
+*   &EAO @WIRE(mode="straight") {#XM18:2 %j21} => %wire8;
+*   &GATE @WIRE(mode="straight") {%j22 #XMNP:2} => %wire9;
+*   &VIN @WIRE(mode="straight") {%port4::pin #XMNP:1};
+*   &VOUT @WIRE(mode="straight") {#XMNP:3 %j23};
+*   &VOUT @WIRE(mode="straight") {%j23 #R2:1};
+*   &VOUT @WIRE(mode="straight") {%port5::pin %j25};
+*   &VOUT @WIRE(mode="straight") {%j25 %j24};
+*   &VOUT @WIRE(mode="straight") {%j24 %j23};
+*   &VOUT @WIRE(mode="straight") {#CL:1 %j24};
+*   &VOUT @WIRE(mode="straight") {#RL:1 %j25};
+*   &net0 @WIRE(mode="straight") {#CL:2 #R4:1};
+*   &FB @WIRE(mode="straight") {#R2:2 #R1:1} => %wire10;
+*   &VSS @WIRE(mode="straight") {#R4:2 %gnd4::pin};
+*   &VSS @WIRE(mode="straight") {#R1:2 (80, -21) %gnd4::pin};
+*   &VSS @WIRE(mode="straight") {#RL:2 (89, -21) %gnd4::pin};
+*   $JUNCTION @ATTACH (48, 3)(p) => @PLACE(48, 3) => %dot1;
+*   $JUNCTION @ATTACH %j13(p) => @PLACE(56, 3) => %dot2;
+*   $JUNCTION @ATTACH %j14(p) => @PLACE(64, 3) => %dot3;
+*   $JUNCTION @ATTACH %j23(p) => @PLACE(80, -8) => %dot4;
+*   $JUNCTION @ATTACH %j24(p) => @PLACE(85, -8) => %dot5;
+*   $JUNCTION @ATTACH %j25(p) => @PLACE(89, -8) => %dot6;
+*   $JUNCTION @ATTACH %j20(p) => @PLACE(64, -14) => %dot7;
+*   $JUNCTION @ATTACH (-1, 3)(p) => @PLACE(-1, 3) => %dot8;
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(7, 3) => %dot9;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(15, 3) => %dot10;
+*   $JUNCTION @ATTACH (48, -18)(p) => @PLACE(48, -18) => %dot11;
+*   $JUNCTION @ATTACH (11, -18)(p) => @PLACE(11, -18) => %dot12;
+*   $JUNCTION @ATTACH (85, -21)(p) => @PLACE(85, -21) => %dot13;
+*   $JUNCTION @ATTACH %j19(p) => @PLACE(64, -4) => %dot14;
+*   $JUNCTION @ATTACH %j18(p) => @PLACE(68, 0) => %dot15;
+*   $JUNCTION @ATTACH %j7(p) => @PLACE(15, -4) => %dot16;
+*   $JUNCTION @ATTACH %j6(p) => @PLACE(21, 0) => %dot17;
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(-1, -4) => %dot18;
+*   $JUNCTION @ATTACH %j11(p) => @PLACE(27, -3) => %dot19;
+*   $JUNCTION @ATTACH %j17(p) => @PLACE(48, -4) => %dot20;
+*   $JUNCTION @ATTACH %j16(p) => @PLACE(48, -11) => %dot21;
+*   $JUNCTION @ATTACH %j15(p) => @PLACE(52, -14) => %dot22;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(3, 0) => %dot23;
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(7, -4) => %dot24;
+*   $JUNCTION @ATTACH %j8(p) => @PLACE(11, -11) => %dot25;
+*   $JUNCTION @ATTACH (56, -12)(p) => @PLACE(56, -12) => %dot26;
+*   $JUNCTION @ATTACH %j22(p) => @PLACE(72, -5) => %dot27;
+*   $JUNCTION @ATTACH (72, -12)(p) => @PLACE(72, -12) => %dot28;
+*   #XM7
+*       @TEXT("\textbf{\textit{M}}_{\textbf{7}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM7::name(label);
+*   #XM2
+*       @TEXT("\textbf{\textit{M}}_{\textbf{2}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM2::name(label);
+*   #XM1
+*       @TEXT("\textbf{\textit{M}}_{\textbf{1}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM1::name(label);
+*   #XM6
+*       @TEXT("\textbf{\textit{M}}_{\textbf{6}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM6::name(label);
+*   #XM4
+*       @TEXT("\textbf{\textit{M}}_{\textbf{4}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM4::name(label);
+*   #XM3
+*       @TEXT("\textbf{\textit{M}}_{\textbf{3}}", key="name", dx=1.5, dy=-3.5, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM3::name(label);
+*   #XM5
+*       @TEXT("\textbf{\textit{M}}_{\textbf{5}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM5::name(label);
+*   #XM9
+*       @TEXT("\textbf{\textit{M}}_{\textbf{9}}", key="name", dx=-1.5, dy=-3.5, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM9::name(label);
+*   #XM8
+*       @TEXT("\textbf{\textit{M}}_{\textbf{8}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM8::name(label);
+*   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power1;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+*   %port1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{REF}}", key="netname", dx=0.5, dy=1.2, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   #XM13
+*       @TEXT("\textbf{\textit{M}}_{\textbf{13}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM13::name(label);
+*   #XM14
+*       @TEXT("\textbf{\textit{M}}_{\textbf{14}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM14::name(label);
+*   #XM15
+*       @TEXT("\textbf{\textit{M}}_{\textbf{15}}", key="name", dx=-0.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM15::name(label);
+*   #XM16
+*       @TEXT("\textbf{\textit{M}}_{\textbf{16}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM16::name(label);
+*   #XM17
+*       @TEXT("\textbf{\textit{M}}_{\textbf{17}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM17::name(label);
+*   #XM19
+*       @TEXT("\textbf{\textit{M}}_{\textbf{19}}", key="name", dx=-0.4, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM19::name(label);
+*   #XM20
+*       @TEXT("\textbf{\textit{M}}_{\textbf{20}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM20::name(label);
+*   #XM18
+*       @TEXT("\textbf{\textit{M}}_{\textbf{18}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM18::name(label);
+*   #XM21
+*       @TEXT("\textbf{\textit{M}}_{\textbf{21}}", key="name", dx=0.4, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XM21::name(label);
+*   %vdd2 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power2;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power2(label);
+*   %port2
+*       @TEXT("\textbf{\textit{V}}_{\textbf{B4}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+*   %port3
+*       @TEXT("\textbf{\textit{I}}_{\textbf{BUF}}", key="netname", dx=0, dy=-2.8, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port3::netname(label);
+*   #XMNP
+*       @TEXT("\textbf{\textit{M}}_{\textbf{NP}}", key="name", dx=0.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #XMNP::name(label);
+*   #R2
+*       @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
+*   #R1
+*       @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
+*   #CL
+*       @TEXT("\textbf{\textit{C}}_{\textbf{L}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #CL::name(label);
+*   #R4
+*       @TEXT("\textbf{\textit{ESR}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #RL
+*       @TEXT("\textbf{\textit{R}}_{\textbf{L}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RL::name(label);
+*   %port4
+*       @TEXT("\textbf{\textit{V}}_{\textbf{IN}}", key="netname", dx=0, dy=1.9, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port4::netname(label);
+*   %port5
+*       @TEXT("\textbf{\textit{V}}_{\textbf{OUT}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port5::netname(label);
+*   #X1
+*       @TEXT("\textbf{BIAS}", key="value", dx=-0.5, dy=-7.5, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   %vdd3 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power3;
+*   $CANVAS_LABEL @ATTACH(bind="port") %power3(label);
+*   %wire3 @TEXT("\textbf{\textit{FB}}", halign="middle", size=1.5116, bold=false) => @PLACE(2, -7.6) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+*   %wire10 @TEXT("\textbf{\textit{FB}}", size=1.5116, bold=false) => @PLACE(80.8, -14) => %label2;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label2(label);
+*   %wire6 @TEXT("\textbf{\textit{V}}_{\textbf{X}}", size=1.5116, bold=false) => @PLACE(31.8, -8.2) => %label3;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label3(label);
+*   %wire4 @TEXT("\textbf{\textit{V}}_{\textbf{B3}}", halign="middle", size=1.5116, bold=false) => @PLACE(6, -13) => %label4;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label4(label);
+*   %wire7 @TEXT("\textbf{\textit{V}}_{\textbf{B3}}", halign="middle", size=1.5116, bold=false) => @PLACE(31, -17) => %label5;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label5(label);
+*   %wire1 @TEXT("\textbf{\textit{V}}_{\textbf{X}}", halign="middle", size=1.5116, bold=false) => @PLACE(-5, -7) => %label6;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label6(label);
+*   %wire2 @TEXT("\textbf{\textit{V}}_{\textbf{Y}}", halign="middle", size=1.5116, bold=false) => @PLACE(13, -10) => %label7;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label7(label);
+*   &VY @TEXT("\textbf{\textit{V}}_{\textbf{Y}}", halign="end", size=1.5116, bold=false) => @PLACE(47.4, -12.4) => %label8;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label8(label);
+*   %wire8 @TEXT("\textbf{\textit{EAO}}", halign="middle", size=1.5116, bold=false) => @PLACE(59, -7.6) => %label9;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label9(label);
+*   %wire9 @TEXT("\textbf{\textit{GATE}}", size=1.5116, bold=false) => @PLACE(72.8, -4.4) => %label10;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label10(label);
+*   %wire5 @TEXT("\textbf{\textit{EAO}}", halign="middle", size=1.5116, bold=false) => @PLACE(36, -2.6) => %label11;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label11(label);
+*   %vdd1 @TEXT("${p}", key="netname", textvisible=false);
+*   %vdd2 @TEXT("${p}", key="netname", textvisible=false);
+*   %vdd3 @TEXT("${p}", key="netname", textvisible=false)
+* }
+.ends dut

@@ -1,0 +1,148 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+*   @USE-PACKAGE(name="rnl-std-logic", version="0.4")
+* }
+* Ideal inverter: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt inverter A Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(1-V(hA))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends inverter
+
+* Ideal nand-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+.subckt nand_gate A B Y VDD VSS params: vt=10m td=10p
+BhA hA 0 V={0.5*(1+tanh((V(A,VSS)-0.5*V(VDD,VSS))/vt))}
+BhB hB 0 V={0.5*(1+tanh((V(B,VSS)-0.5*V(VDD,VSS))/vt))}
+Bf nfn VSS V={V(VDD,VSS)*(1-V(hA)*V(hB))}
+Rd nfn ndl 1k
+Cd ndl VSS {td/1000}
+BY Y VSS V={V(ndl,VSS)}
+.ends nand_gate
+
+.subckt dut VDD VSS fclk phi1 phi1_bar phi2_bar phi2
+X1 fclk fclk_bar VDD VSS inverter td=10p vt=10m
+X10 net2 phi2 VDD VSS inverter td=10p vt=10m
+X11 phi2 phi2_bar VDD VSS inverter td=10p vt=10m
+X2 fclk phi2_bar net1 VDD VSS nand_gate td=10p vt=10m
+X3 phi1_bar fclk_bar net0 VDD VSS nand_gate td=10p vt=10m
+X4 net1 net4 VDD VSS inverter td=10p vt=10m
+X5 net4 net5 VDD VSS inverter td=10p vt=10m
+X6 net5 phi1 VDD VSS inverter td=10p vt=10m
+X7 phi1 phi1_bar VDD VSS inverter td=10p vt=10m
+X8 net0 net3 VDD VSS inverter td=10p vt=10m
+X9 net3 net2 VDD VSS inverter td=10p vt=10m
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #X1 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(6, -20) => @ORIENT("R270");
+*   #X2 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $NAND_2INPUT => @PLACE(20, -10) => @ORIENT("R0");
+*   #X3 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $NAND_2INPUT => @PLACE(20, -30) => @ORIENT("R0");
+*   #X4 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(28, -10) => @ORIENT("R0");
+*   #X5 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(36, -10) => @ORIENT("R0");
+*   #X6 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(44, -10) => @ORIENT("R0");
+*   #X7 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(52, -10) => @ORIENT("R0");
+*   #X8 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(28, -30) => @ORIENT("R0");
+*   #X9 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(36, -30) => @ORIENT("R0");
+*   #X10 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(44, -30) => @ORIENT("R0");
+*   #X11 @SET-SYMBOL(terminals=[[1, "a"], [2, "y"]]) $INVERTER => @PLACE(52, -30) => @ORIENT("R0");
+*   $IO_PORT @ATTACH &fclk(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(6, -5) => @ORIENT("R270") => %port1;
+*   $IO_PORT @ATTACH &phi1(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(62, -3) => @ORIENT("MY") => %port2;
+*   $IO_PORT @ATTACH &phi1_bar(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(62, -10) => @ORIENT("MY") => %port3;
+*   $IO_PORT @ATTACH &phi2_bar(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(62, -30) => @ORIENT("MY") => %port4;
+*   $IO_PORT @ATTACH &phi2(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(62, -37) => @ORIENT("MY") => %port5;
+*   %j1 = (6, -9);
+*   %j2 = (47, -10);
+*   %j3 = (47, -30);
+*   %j4 = (57, -10);
+*   %j5 = (57, -30);
+*   &fclk @WIRE(mode="straight") {%port1::pin %j1};
+*   &fclk @WIRE(mode="straight") {%j1 #X1:1};
+*   &fclk @WIRE(mode="straight") {#X2:1 %j1};
+*   &fclk_bar @WIRE(mode="straight") {#X1:2 (6, -31) #X3:2} => %wire1;
+*   &net1 @WIRE(mode="straight") {#X2:3 #X4:1};
+*   &net4 @WIRE(mode="straight") {#X4:2 #X5:1};
+*   &net5 @WIRE(mode="straight") {#X5:2 #X6:1};
+*   &phi1 @WIRE(mode="straight") {#X6:2 %j2};
+*   &phi1 @WIRE(mode="straight") {%j2 #X7:1};
+*   &net0 @WIRE(mode="straight") {#X3:3 #X8:1};
+*   &net3 @WIRE(mode="straight") {#X8:2 #X9:1};
+*   &net2 @WIRE(mode="straight") {#X9:2 #X10:1};
+*   &phi2 @WIRE(mode="straight") {#X10:2 %j3};
+*   &phi2 @WIRE(mode="straight") {%j3 #X11:1};
+*   &phi1_bar @WIRE(mode="straight") {#X7:2 %j4};
+*   &phi1_bar @WIRE(mode="straight") {%j4 %port3::pin};
+*   &phi2_bar @WIRE(mode="straight") {#X11:2 %j5};
+*   &phi2_bar @WIRE(mode="straight") {%j5 %port4::pin};
+*   &phi1 @WIRE(mode="straight") {%port2::pin (47, -3) %j2};
+*   &phi2 @WIRE(mode="straight") {%port5::pin (47, -37) %j3};
+*   &phi1_bar @WIRE(mode="straight") {#X3:1 (13, -29) (13, -17) (57, -17) %j4};
+*   &phi2_bar @WIRE(mode="straight") {#X2:2 (15, -11) (15, -23) (57, -23) %j5};
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(47, -30) => %dot1;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(47, -10) => %dot2;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(57, -10) => %dot3;
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(57, -30) => %dot4;
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(6, -9) => %dot5;
+*   #X1
+*       @TEXT("\textbf{\textit{inv}}", key="name", dx=-1.8, dy=0, halign="end", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X2
+*       @TEXT("\textbf{\textit{N}}_{\textbf{2}}", key="name", dx=0, dy=-3, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #X3
+*       @TEXT("\textbf{\textit{N}}_{\textbf{1}}", key="name", dx=0, dy=-3, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   #X4
+*       @TEXT("\textbf{\textit{1a}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X5
+*       @TEXT("\textbf{\textit{2a}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X6
+*       @TEXT("\textbf{\textit{3a}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X7
+*       @TEXT("\textbf{\textit{4a}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X8
+*       @TEXT("\textbf{\textit{1}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X9
+*       @TEXT("\textbf{\textit{2}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X10
+*       @TEXT("\textbf{\textit{3}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   #X11
+*       @TEXT("\textbf{\textit{4}}", key="name", dx=-0.5, dy=-2.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   %port1
+*       @TEXT("\textbf{\textit{fclk}}", key="netname", dx=0, dy=1.9, halign="middle", valign="baseline", size=1.5116, bold=false,
+*       textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   %port2
+*       @TEXT("\textbf{\textit{φ}}_{\textbf{1}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+*   %port3
+*       @TEXT("\overline{\textbf{\textit{φ}}}_{\overline{\textbf{1}}}", key="netname", dx=2, dy=-0.5, halign="start",
+*       valign="baseline", size=1.5116, bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port3::netname(label);
+*   %port4
+*       @TEXT("\overline{\textbf{\textit{φ}}}_{\overline{\textbf{2}}}", key="netname", dx=2, dy=-0.5, halign="start",
+*       valign="baseline", size=1.5116, bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port4::netname(label);
+*   %port5
+*       @TEXT("\textbf{\textit{φ}}_{\textbf{2}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port5::netname(label);
+*   %wire1 @TEXT("\overline{\textbf{\textit{fclk}}}", halign="middle", size=1.5116, bold=false) => @PLACE(9.5, -30.5) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label)
+* }
+.ends dut

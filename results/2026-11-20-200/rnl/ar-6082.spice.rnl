@@ -1,0 +1,147 @@
+
+* @RNL(type="header") {
+*   @VERSION("0.4");
+*   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+*   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+*   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+* }
+.subckt dut VSS Vo
+CC1 net2 Vg 1p
+CC2 net3 Vo 1p
+CS net1 VSS 1p
+G1 net3 Vg Vg net1 {gm}
+R1 Vg net1 {1/gm}
+RD net3 VSS 1k
+RG1 Vg VSS 1k
+RG2 Vg VSS 1k
+RL Vo VSS 1k
+RS net1 VSS 1k
+Rsig net0 net2 1k
+Vsig net0 VSS DC 1
+* @RNL(author="analog-canvas") {
+*   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+*   #Vsig @SET-SYMBOL $VOLTAGE_SOURCE => @PLACE(-5, -4) => @ORIENT("R0");
+*   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="high", text="1") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #Vsig(part);
+*   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #Vsig(part);
+*   #Rsig @SET-SYMBOL $RESISTOR => @PLACE(-1, 0) => @ORIENT("R90");
+*   #CC1 @SET-SYMBOL $CAPACITOR => @PLACE(4, 0) => @ORIENT("R90");
+*   #RG1 @SET-SYMBOL $RESISTOR => @PLACE(9, -4) => @ORIENT("R0");
+*   #RG2 @SET-SYMBOL $RESISTOR => @PLACE(14, -4) => @ORIENT("R0");
+*   #R1 @SET-SYMBOL $RESISTOR => @PLACE(20, -3) => @ORIENT("R0");
+*   #RS @SET-SYMBOL $RESISTOR => @PLACE(18, -9) => @ORIENT("R0");
+*   #CS @SET-SYMBOL $CAPACITOR => @PLACE(22, -9) => @ORIENT("R0");
+*   #RD @SET-SYMBOL $RESISTOR => @PLACE(26, 3) => @ORIENT("R0");
+*   #CC2 @SET-SYMBOL $CAPACITOR => @PLACE(30, 7) => @ORIENT("R90");
+*   #RL @SET-SYMBOL $RESISTOR => @PLACE(35, 3) => @ORIENT("R0");
+*   $IO_PORT @ATTACH &Vo(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(39, 7) => @ORIENT("MY") => %port1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(-5, -6) => @ORIENT("R0") => %gnd1;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(9, -6) => @ORIENT("R0") => %gnd2;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(14, -6) => @ORIENT("R0") => %gnd3;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(18, -11) => @ORIENT("R0") => %gnd4;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(22, -11) => @ORIENT("R0") => %gnd5;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(26, 1) => @ORIENT("R0") => %gnd6;
+*   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(35, 1) => @ORIENT("R0") => %gnd7;
+*   #G1 @SET-SYMBOL $CANVAS_VCCS_CIRCLE => @PLACE(20, 3) => @ORIENT("R0");
+*   %j1 = (9, 0);
+*   %j2 = (14, 0);
+*   %j3 = (20, 0);
+*   %j4 = (20, -6);
+*   %j5 = (26, 7);
+*   %j6 = (35, 7);
+*   &net0 @WIRE(mode="straight") {#Vsig:1 (-5, 0) #Rsig:1};
+*   &net2 @WIRE(mode="straight") {#Rsig:2 #CC1:1};
+*   &Vg @WIRE(mode="straight") {#CC1:2 %j1};
+*   &Vg @WIRE(mode="straight") {%j1 %j2};
+*   &Vg @WIRE(mode="straight") {%j2 %j3};
+*   &Vg @WIRE(mode="straight") {%j3 #R1:1};
+*   &Vg @WIRE(mode="straight") {#RG1:1 %j1};
+*   &Vg @WIRE(mode="straight") {#RG2:1 %j2};
+*   &Vg @WIRE(mode="straight") {#G1:2 %j3};
+*   &net1 @WIRE(mode="straight") {#RS:1 (18, -6) %j4};
+*   &net1 @WIRE(mode="straight") {%j4 (22, -6) #CS:1};
+*   &net1 @WIRE(mode="straight") {#R1:2 %j4};
+*   &net3 @WIRE(mode="straight") {#G1:1 (20, 7) %j5};
+*   &net3 @WIRE(mode="straight") {%j5 #CC2:1};
+*   &net3 @WIRE(mode="straight") {#RD:1 %j5};
+*   &Vo @WIRE(mode="straight") {#CC2:2 %j6};
+*   &Vo @WIRE(mode="straight") {%j6 %port1::pin};
+*   &Vo @WIRE(mode="straight") {#RL:1 %j6};
+*   $JUNCTION @ATTACH %j6(p) => @PLACE(35, 7) => %dot1;
+*   &VSS @WIRE(mode="straight") {%gnd1::pin #Vsig:2};
+*   &VSS @WIRE(mode="straight") {%gnd2::pin #RG1:2};
+*   &VSS @WIRE(mode="straight") {%gnd3::pin #RG2:2};
+*   &VSS @WIRE(mode="straight") {%gnd4::pin #RS:2};
+*   &VSS @WIRE(mode="straight") {%gnd5::pin #CS:2};
+*   &VSS @WIRE(mode="straight") {%gnd6::pin #RD:2};
+*   &VSS @WIRE(mode="straight") {%gnd7::pin #RL:2};
+*   $JUNCTION @ATTACH %j1(p) => @PLACE(9, 0) => %dot2;
+*   $JUNCTION @ATTACH %j2(p) => @PLACE(14, 0) => %dot3;
+*   $JUNCTION @ATTACH %j3(p) => @PLACE(20, 0) => %dot4;
+*   $JUNCTION @ATTACH %j4(p) => @PLACE(20, -6) => %dot5;
+*   $JUNCTION @ATTACH %j5(p) => @PLACE(26, 7) => %dot6;
+*   #Vsig
+*       @TEXT("\textbf{\textit{V}}_{\textbf{sig}}", key="name", dx=1.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #Vsig::name(label);
+*   #Rsig
+*       @TEXT("\textbf{\textit{R}}_{\textbf{sig}}", key="name", dx=0, dy=1.4, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #Rsig::name(label);
+*   #CC1
+*       @TEXT("\textbf{\textit{C}}_{\textbf{C1}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #CC1::name(label);
+*   #RG1
+*       @TEXT("\textbf{\textit{R}}_{\textbf{G1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RG1::name(label);
+*   #RG2
+*       @TEXT("\textbf{\textit{R}}_{\textbf{G2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RG2::name(label);
+*   #RS
+*       @TEXT("\textbf{\textit{R}}_{\textbf{S}}", key="name", dx=-0.9, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RS::name(label);
+*   #CS
+*       @TEXT("\textbf{\textit{C}}_{\textbf{S}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #CS::name(label);
+*   #RD
+*       @TEXT("\textbf{\textit{R}}_{\textbf{D}}", key="name", dx=0.9, dy=1.8, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RD::name(label);
+*   #CC2
+*       @TEXT("\textbf{\textit{C}}_{\textbf{C2}}", key="name", dx=0, dy=1.7, halign="middle", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #CC2::name(label);
+*   #RL
+*       @TEXT("\textbf{\textit{R}}_{\textbf{L}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="name") #RL::name(label);
+*   %port1
+*       @TEXT("\textbf{\textit{V}}_{\textbf{o}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+*       bold=false, textvisible=true);
+*   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+*   &Vg @TEXT("\textbf{\textit{V}}_{\textbf{g}}", halign="middle", size=1.5116, bold=false) => @PLACE(14, 1) => %label1;
+*   $CANVAS_LABEL @ATTACH(bind="net") %label1(label);
+*   #G1
+*       @TEXT("\textbf{I}_{\textbf{d}}\textbf{ = I}_{\textbf{s}}", key="name", dx=-1.3, dy=-0.4, halign="end", valign="baseline",
+*       size=1.5116, bold=false, textvisible=true);
+*   (21.2, -3.4) @TEXT("\frac{1}{g_{m}}", size=1.5116, bold=true) => %text1;
+*   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text)
+* }
+.ends dut

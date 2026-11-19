@@ -1,0 +1,132 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7")
+// }
+
+subckt dut (VSS Vin Vo)
+C1 (Vin VSS) capacitor c=1p
+C2 (Vin VSS) capacitor c=1p
+Cc (Vo Vin) capacitor c=1p
+Ceq (Vin VSS) capacitor c=1p
+I1 (Vin VSS) isource dc=1m
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   #Cc @SET-SYMBOL $CAPACITOR => @PLACE(41, -22) => @ORIENT("R270");
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(34, -22) => @ORIENT("R0") => %port1;
+//   $IO_PORT @ATTACH &Vo(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(50, -22) => @ORIENT("R180") => %port2;
+//   #Ceq @SET-SYMBOL $CAPACITOR => @PLACE(73, -22) => @ORIENT("R0");
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(73, -18) => @ORIENT("R270") => %port3;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(73, -28) => @ORIENT("R0") => %gnd1;
+//   #I1 @SET-SYMBOL $CURRENT_SOURCE => @PLACE(32, -53) => @ORIENT("R0");
+//   $CANVAS_PARAMETER @ATTACH(name="amplitude", text="1m") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="damping", text="0") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="delay", text="0") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="fall", text="1ps") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="frequency", text="1k") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="high", text="1m") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="low", text="0") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="offset", text="0") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="period", text="10ns") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="phase", text="0") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="rise", text="1ps") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="waveform", text="dc") #I1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="width", text="5ns") #I1(part);
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(42, -53) => @ORIENT("R0");
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(42, -45) => @ORIENT("R270") => %port4;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(42, -61) => @ORIENT("R0") => %gnd2;
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(75, -53) => @ORIENT("R0");
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(75, -47) => @ORIENT("R270") => %port5;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(75, -61) => @ORIENT("R0") => %gnd3;
+//   %j1 = (73, -28);
+//   %j2 = (42, -59);
+//   %j3 = (42, -48);
+//   &Vin @WIRE(mode="straight") {#Cc:2 %port1::pin};
+//   &Vo @WIRE(mode="straight") {#Cc:1 %port2::pin};
+//   &Vin @WIRE(mode="straight") {%port3::pin #Ceq:1};
+//   &VSS @WIRE(mode="straight") {#Ceq:2 %j1};
+//   &Vin @WIRE(mode="straight") {#I1:1 (32, -48) %j3};
+//   &Vin @WIRE(mode="straight") {%j3 #C1:1};
+//   &VSS @WIRE(mode="straight") {#I1:2 (32, -59) %j2};
+//   &VSS @WIRE(mode="straight") {%j2 #C1:2};
+//   &VSS @WIRE(mode="straight") {%gnd2::pin %j2};
+//   &Vin @WIRE(mode="straight") {%port4::pin %j3};
+//   &Vin @WIRE(mode="straight") {%port5::pin #C2:1};
+//   &VSS @WIRE(mode="straight") {#C2:2 %gnd3::pin};
+//   &VSS @WIRE(mode="straight") {%j1 %gnd1::pin};
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(42, -48) => %dot1;
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(42, -59) => %dot2;
+//   #Cc
+//       @TEXT("\textbf{\textit{C}}_{\textbf{c}}", key="name", dx=0, dy=2.5, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Cc::name(label);
+//   %port1
+//       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=-2, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+//   %port2
+//       @TEXT("\textbf{\textit{V}}_{\textbf{o}}", key="netname", dx=2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+//   #Ceq
+//       @TEXT("\textbf{\textit{C}}_{\textbf{eq}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Ceq::name(label);
+//   %port3
+//       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=0, dy=1.9, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port3::netname(label);
+//   #I1
+//       @TEXT("\textbf{\textit{K*I}}_{\textbf{C}}", key="name", dx=-5.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   #C1
+//       @TEXT("\textbf{\textit{C}}_{\textbf{c}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   %port4
+//       @TEXT("\textbf{\textit{V}}_{\textbf{i}}_{\textbf{n}}", key="netname", dx=0, dy=1.9, halign="middle", valign="baseline",
+//       size=1.5116, bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port4::netname(label);
+//   #C2
+//       @TEXT("\textbf{\textit{C}}_{\textbf{eq}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   %port5
+//       @TEXT("\textbf{\textit{V}}_{\textbf{i}}_{\textbf{n}}", key="netname", dx=0, dy=1.9, halign="middle", valign="baseline",
+//       size=1.5116, bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port5::netname(label);
+//   (41.5, -29.5)
+//       @TEXT("\textbf{V}_{\textbf{o}}\textbf{=-A}_{\textbf{1}}\textbf{V}_{\textbf{n1}}", halign="middle", size=1.5116, bold=true)
+//       => %text1;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(38, -24) (45, -24)} => @LAYER("top") => %arrow1;
+//   (41, -26) @TEXT("\textbf{I}_{\textbf{c}}", halign="middle", size=1.5116, bold=true) => %text2;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+//   (72.6, -33.5)
+//       @TEXT("\textbf{\textit{C}}_{\textbf{eq}}\textbf{\textit{=}}\textbf{（1+A}_{\textbf{1}}\textbf{）C}_{\textbf{c}}",
+//       halign="middle", size=1.5116, bold=true) => %text3;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text3(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(40, -51) (40, -57)} => @LAYER("top") => %arrow2;
+//   (38, -54) @TEXT("\textbf{I}_{\textbf{c}}", halign="middle", size=1.5116, bold=true) => %text4;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text4(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(70.5, -50) (70.5, -58)} => @LAYER("top") => %arrow3;
+//   (67, -54) @TEXT("\textbf{I}_{\textbf{eq}}", halign="middle", size=1.5116, bold=false) => %text5;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text5(text);
+//   (75, -70.5)
+//       @TEXT("\textbf{\textit{C}}_{\textbf{eq}}\textbf{\textit{=}}\textbf{（1+K）C}_{\textbf{c}}", halign="middle", size=1.5116,
+//       bold=false) => %text6;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text6(text);
+//   (75, -67)
+//       @TEXT("\textbf{\textit{I}}_{\textbf{eq}}\textbf{\textit{=}}\textbf{（1+K）I}_{\textbf{c}}", halign="middle", size=1.5116,
+//       bold=false) => %text7;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text7(text);
+//   (40, -38) @TEXT("\textbf{(a)Voltage-mode capacitor multiplier}", halign="middle", size=1.5116, bold=false) => %text8;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text8(text);
+//   (41, -76) @TEXT("\textbf{(b)Current-mode capacitor multiplier}", halign="middle", size=1.5116, bold=false) => %text9;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text9(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(58, -22) (64, -22) (65, -22)} => @LAYER("top") => %arrow4;
+//   @LINE(arrow="end", arrowsize=1.656977) {(57, -54) (63, -54) (64, -54)} => @LAYER("top") => %arrow5
+// }
+ends dut

@@ -1,0 +1,179 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+//   @USE-PACKAGE(name="rnl-std-functional", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-logic", version="0.4")
+// }
+
+subckt icm_ideal_comparator_vdd (VIP VIN VOUT VDD)
+parameters vlow=0 vtransition=1m
+Bcmp (VOUT 0) bsource v=vlow+(v(VDD)-vlow)*0.5*(1+tanh((v(VIP)-v(VIN))/vtransition))
+ends icm_ideal_comparator_vdd
+
+// Ideal nand-gate: switches at V(VDD,VSS)/2; vt sets the step width, td the delay
+subckt nand_gate (A B Y VDD VSS)
+parameters vt=10m td=10p
+BhA (hA 0) bsource v=0.5*(1+tanh((v(A,VSS)-0.5*v(VDD,VSS))/vt))
+BhB (hB 0) bsource v=0.5*(1+tanh((v(B,VSS)-0.5*v(VDD,VSS))/vt))
+Bf (nfn VSS) bsource v=v(VDD,VSS)*(1-v(hA)*v(hB))
+Rd (nfn ndl) resistor r=1k
+Cd (ndl VSS) capacitor c=td/1000
+BY (Y VSS) bsource v=v(ndl,VSS)
+ends nand_gate
+
+subckt dut (VDD VSS S1 S2 S3 S4)
+subckt ideal_switch (p n cp cn)
+parameters ron=1 roff=1e12 vt=0.5
+core (p n) bsource i=v(p,n)/(v(cp,cn)>vt ? ron : roff)
+ends ideal_switch
+C1 (net6 VSS) capacitor c=1p
+C2 (net7 VSS) capacitor c=1p
+R1 (net1 net6) resistor r=1k
+R2 (net2 net7) resistor r=1k
+S1 (VDD net1 S1 VSS) ideal_switch
+S2 (net6 VSS S2 VSS) ideal_switch
+S3 (VDD net2 S3 VSS) ideal_switch
+S4 (net7 VSS S4 VSS) ideal_switch
+X1 (net6 net8 net3 VDD) icm_ideal_comparator_vdd vlow=0 vtransition=1m
+X2 (net7 net8 net4 VDD) icm_ideal_comparator_vdd vlow=0 vtransition=1m
+X3 (net3 net0 net5 VDD VSS) nand_gate td=10p vt=10m
+X4 (net5 net4 net0 VDD VSS) nand_gate td=10p vt=10m
+// @RNL(author="analog-canvas") {
+//   %dut_SYMBOL = @DEFINE-SYMBOL(box=[-5, -3, 5, 3]) {
+//     (0, 3) @PIN(terminal="VDD", label="\textbf{\textit{V}}_{\textbf{DD}}", direction="up");
+//     (0, 0) @RECTANGLE(width=8, height=4);
+//     @LINE {(0, 3) (0, 2)}
+//   };
+//   # @SET-SYMBOL %dut_SYMBOL;
+//   $CANVAS_TYPESETTING @ATTACH(subscript_italic=false) #(level);
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(21, -18) => @ORIENT("R0") => %vdd1;
+//   #S1 @SET-SYMBOL(terminals=[[1, "p"], [2, "n"]]) $SWITCH => @PLACE(21, -20) => @ORIENT("R270");
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(21, -24) => @ORIENT("R0");
+//   #C1 @SET-SYMBOL $CAPACITOR => @PLACE(21, -30) => @ORIENT("R0");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(21, -34) => @ORIENT("R0") => %gnd1;
+//   #X1 @SET-SYMBOL(terminals=[[1, "inp"], [2, "inn"], [3, "out"]]) $COMPARATOR => @PLACE(40, -27) => @ORIENT("R0");
+//   $CANVAS_VARIANT @ATTACH(symbol="comparator") #X1(part);
+//   $CANVAS_PARAMETER @ATTACH(name="vhigh", text="VDD") #X1(part);
+//   #S2 @SET-SYMBOL(terminals=[[1, "p"], [2, "n"]]) $SWITCH => @PLACE(29, -30) => @ORIENT("R270");
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(21, -40) => @ORIENT("R0") => %vdd2;
+//   #S3 @SET-SYMBOL(terminals=[[1, "p"], [2, "n"]]) $SWITCH => @PLACE(21, -42) => @ORIENT("R270");
+//   #R2 @SET-SYMBOL $RESISTOR => @PLACE(21, -46) => @ORIENT("R0");
+//   #C2 @SET-SYMBOL $CAPACITOR => @PLACE(21, -52) => @ORIENT("R0");
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(21, -56) => @ORIENT("R0") => %gnd2;
+//   #X2 @SET-SYMBOL(terminals=[[1, "inp"], [2, "inn"], [3, "out"]]) $COMPARATOR => @PLACE(40, -47) => @ORIENT("MX");
+//   $CANVAS_PARAMETER @ATTACH(name="vhigh", text="VDD") #X2(part);
+//   #S4 @SET-SYMBOL(terminals=[[1, "p"], [2, "n"]]) $SWITCH => @PLACE(29, -52) => @ORIENT("R270");
+//   #X3 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $NAND_2INPUT => @PLACE(48, -28) => @ORIENT("R0");
+//   #X4 @SET-SYMBOL(terminals=[[1, "a"], [2, "b"], [3, "y"]]) $NAND_2INPUT => @PLACE(48, -46) => @ORIENT("R0");
+//   %j1 = (29, -26);
+//   %j2 = (21, -33);
+//   %j3 = (21, -55);
+//   %j4 = (29, -48);
+//   &VSS @WIRE(mode="straight") {#C1:2 %j2};
+//   &VSS @WIRE(mode="straight") {%j2 %gnd1::pin};
+//   &net6 @WIRE(mode="straight") {#R1:2 #C1:1};
+//   &net6 @WIRE(mode="straight") {#R1:2 %j1};
+//   &net6 @WIRE(mode="straight") {%j1 #S2:1};
+//   &net6 @WIRE(mode="straight") {%j1 #X1:1};
+//   &VSS @WIRE(mode="straight") {#S2:2 (29, -33) %j2};
+//   &VSS @WIRE(mode="straight") {#C2:2 %j3};
+//   &VSS @WIRE(mode="straight") {%j3 %gnd2::pin};
+//   &VSS @WIRE(mode="straight") {#S4:2 (29, -55) %j3};
+//   &net7 @WIRE(mode="straight") {#R2:2 #C2:1};
+//   &net7 @WIRE(mode="straight") {#R2:2 %j4};
+//   &net7 @WIRE(mode="straight") {%j4 #S4:1};
+//   &net7 @WIRE(mode="straight") {%j4 #X2:1};
+//   &net8 @WIRE(mode="straight") {#X1:2 (35, -28) (35, -46) #X2:2};
+//   &net3 @WIRE(mode="straight") {#X1:3 #X3:1};
+//   &net4 @WIRE(mode="straight") {#X2:3 #X4:2};
+//   &net0 @WIRE(mode="straight") {#X3:2 (45, -34) (51, -40) #X4:3};
+//   &net5 @WIRE(mode="straight") {#X4:1 (45, -40) (51, -34) #X3:3};
+//   &VDD @WIRE(mode="straight") {#S1:1 %vdd1::pin};
+//   &VDD @WIRE(mode="straight") {#S3:1 %vdd2::pin};
+//   $JUNCTION @ATTACH %j2(p) => @PLACE(21, -33) => %dot1;
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(21, -55) => %dot2;
+//   &net1 @WIRE(mode="straight") {#R1:1 #S1:2};
+//   &net2 @WIRE(mode="straight") {#R2:1 #S3:2};
+//   $JUNCTION @ATTACH (21, -26)(p) => @PLACE(21, -26) => %dot3;
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(29, -26) => %dot4;
+//   $JUNCTION @ATTACH (21, -48)(p) => @PLACE(21, -48) => %dot5;
+//   $JUNCTION @ATTACH %j4(p) => @PLACE(29, -48) => %dot6;
+//   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   #S1
+//       @TEXT("\textbf{\textit{S}}_{\textbf{1}}", key="name", dx=-0.7, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #S1::name(label);
+//   #R1
+//       @TEXT("\textbf{\textit{R}}_{\textbf{1}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #R1::name(label);
+//   #C1
+//       @TEXT("\textbf{\textit{C}}_{\textbf{1}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C1::name(label);
+//   #X1
+//       @TEXT("\textbf{\textit{X}}_{\textbf{1}}", key="name", dx=-0.5, dy=3.9, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X1::name(label);
+//   #S2
+//       @TEXT("\textbf{\textit{S}}_{\textbf{2}}", key="name", dx=-0.7, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #S2::name(label);
+//   %vdd2 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power2;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power2(label);
+//   #S3
+//       @TEXT("\textbf{\textit{S}}_{\textbf{3}}", key="name", dx=-0.7, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #S3::name(label);
+//   #R2
+//       @TEXT("\textbf{\textit{R}}_{\textbf{2}}", key="name", dx=0.9, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #R2::name(label);
+//   #C2
+//       @TEXT("\textbf{\textit{C}}_{\textbf{2}}", key="name", dx=1.2, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #C2::name(label);
+//   #X2
+//       @TEXT("\textbf{\textit{X}}_{\textbf{2}}", key="name", dx=-0.5, dy=-4.5, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X2::name(label);
+//   #S4
+//       @TEXT("\textbf{\textit{S}}_{\textbf{4}}", key="name", dx=-0.7, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #S4::name(label);
+//   #X3
+//       @TEXT("\textbf{\textit{X}}_{\textbf{3}}", key="name", dx=0, dy=-3, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X3::name(label);
+//   #X4
+//       @TEXT("\textbf{\textit{X}}_{\textbf{4}}", key="name", dx=0, dy=-3, halign="middle", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #X4::name(label);
+//   @LINE(arrow="end", arrowsize=1.656977) {(50.5, -28) (59, -28)} => @LAYER("top") => %arrow1;
+//   @LINE(arrow="end", arrowsize=1.656977) {(50.5, -46) (59, -46)} => @LAYER("top") => %arrow2;
+//   (24.5, -20.5) @TEXT("\overline{\textbf{CLK}}", halign="middle", size=1.5116, bold=false) => %text1;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text1(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(26.5, -21.1) (21.5, -21.1)} => @LAYER("top") => %arrow3;
+//   (32.5, -52.5) @TEXT("\overline{\textbf{CLK}}", halign="middle", size=1.5116, bold=false) => %text2;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text2(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(34.5, -53.1) (29.5, -53.1)} => @LAYER("top") => %arrow4;
+//   (24.5, -42.5) @TEXT("\textbf{CLK}", halign="middle", size=1.5116, bold=false) => %text3;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text3(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(26.5, -43.1) (21.5, -43.1)} => @LAYER("top") => %arrow5;
+//   (32.5, -30.5) @TEXT("\textbf{CLK}", halign="middle", size=1.5116, bold=false) => %text4;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text4(text);
+//   @LINE(arrow="end", arrowsize=1.656977) {(34.5, -31.1) (29.5, -31.1)} => @LAYER("top") => %arrow6;
+//   (56, -27.5) @TEXT("\textbf{CLK}", halign="middle", size=1.5116, bold=false) => %text5;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text5(text);
+//   (56, -45.5) @TEXT("\overline{\textbf{CLK}}", halign="middle", size=1.5116, bold=false) => %text6;
+//   $CANVAS_TYPOGRAPHY @ATTACH(token="label") %text6(text);
+//   %vdd1 @TEXT("${p}", key="netname", textvisible=false);
+//   %vdd2 @TEXT("${p}", key="netname", textvisible=false)
+// }
+ends dut

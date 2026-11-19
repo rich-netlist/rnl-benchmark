@@ -1,0 +1,63 @@
+simulator lang=spectre
+// @RNL(type="header") {
+//   @VERSION("0.4");
+//   @USE-PACKAGE(name="rnl-std-style", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-basic", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-semiconductors", version="0.4");
+//   @USE-PACKAGE(name="rnl-std-no-labels", version="0.4");
+//   @USE-PACKAGE(name="analog-canvas-extensions", version="0.7");
+//   @DEVICE(model="sky130_fd_pr__npn_05v5_W1p00L1p00", terminals=["c", "b", "e", "s"], type="npn")
+// }
+
+subckt Main (VDD VSS Vout Vin)
+Q1 (net0 Vin Vout VSS) sky130_fd_pr__npn_05v5_W1p00L1p00
+Q2 (Vout net0 VSS VSS) sky130_fd_pr__npn_05v5_W1p00L1p00
+R1 (VDD net0) resistor r=1k
+// @RNL(author="analog-canvas") {
+//   $CANVAS_TYPESETTING @ATTACH #(level);
+//   #R1 @SET-SYMBOL $RESISTOR => @PLACE(38, -15) => @ORIENT("R0");
+//   $IO_PORT @ATTACH &Vout(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(41, -25) => @ORIENT("MY") => %port1;
+//   $GROUND @ATTACH &VSS(p) => @SET-SYMBOL $GROUND_SYMBOL => @PLACE(38, -32) => @ORIENT("R0") => %gnd1;
+//   $IO_PORT @ATTACH &Vin(p) => @SET-SYMBOL $IO_PORT_SYMBOL => @PLACE(32, -21) => @ORIENT("R0") => %port2;
+//   #Q1 @SET-SYMBOL(terminals=[[1, "c"], [2, "b"], [3, "e"]]) $NPN => @PLACE(38, -21) => @ORIENT("R0");
+//   #Q2 @SET-SYMBOL(terminals=[[1, "c"], [2, "b"], [3, "e"]]) $NPN => @PLACE(38, -28) => @ORIENT("R0");
+//   $SUPPLY @ATTACH &VDD(p) => @SET-SYMBOL $SUPPLY_SYMBOL => @PLACE(38, -13) => @ORIENT("R0") => %vdd1;
+//   %j1 = (38, -18);
+//   %j2 = (38, -14);
+//   %j3 = (38, -25);
+//   &VDD @WIRE(mode="straight") {#R1:1 %j2};
+//   &net0 @WIRE(mode="straight") {#R1:2 %j1};
+//   &net0 @WIRE(mode="straight") {%j1 #Q1:1};
+//   &Vout @WIRE(mode="straight") {#Q1:3 %j3};
+//   &Vout @WIRE(mode="straight") {%j3 #Q2:1};
+//   &Vin @WIRE(mode="straight") {%port2::pin #Q1:2};
+//   &net0 @WIRE(mode="straight") {#Q2:2 (34, -28) (34, -18) %j1};
+//   &Vout @WIRE(mode="straight") {%port1::pin %j3};
+//   &VSS @WIRE(mode="straight") {%gnd1::pin #Q2:3};
+//   $JUNCTION @ATTACH %j3(p) => @PLACE(38, -25) => %dot1;
+//   $JUNCTION @ATTACH %j1(p) => @PLACE(38, -18) => %dot2;
+//   &VDD @WIRE(mode="straight") {#R1:1 %vdd1::pin};
+//   #R1
+//       @TEXT("\textbf{\textit{R}}_{\textbf{D}}", key="name", dx=1, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   %port1
+//       @TEXT("\textbf{\textit{V}}_{\textbf{out}}", key="netname", dx=3.5, dy=-0.5, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port1::netname(label);
+//   %port2
+//       @TEXT("\textbf{\textit{V}}_{\textbf{in}}", key="netname", dx=-1.5, dy=-0.5, halign="end", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="port") %port2::netname(label);
+//   #Q1
+//       @TEXT("\textbf{\textit{Q}}_{\textbf{1}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Q1::name(label);
+//   #Q2
+//       @TEXT("\textbf{\textit{Q}}_{\textbf{2}}", key="name", dx=1, dy=-1, halign="start", valign="baseline", size=1.5116,
+//       bold=false, textvisible=true);
+//   $CANVAS_LABEL @ATTACH(bind="name") #Q2::name(label);
+//   %vdd1 @TEXT("\textbf{\textit{V}}_{\textbf{DD}}", dx=2, dy=1, size=1.5116, bold=false) => %power1;
+//   $CANVAS_LABEL @ATTACH(bind="port") %power1(label);
+//   %vdd1 @TEXT("${p}", key="netname", textvisible=false)
+// }
+ends Main
